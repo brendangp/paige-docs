@@ -1,0 +1,110 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "almond",
+  "name": "Paige",
+  "description": "Build AI-powered WhatsApp bots with interactive flows, automated conversations, and a built-in database — no backend required.",
+  "colors": {
+    "primary": "#82d441",
+    "light": "#151d36",
+    "dark": "#cfeabb"
+  },
+  "favicon": "https://media.brand.dev/a3208a4c-a7ff-4d76-aae1-9cb74a5f55df.png",
+  "icons": {
+    "library": "lucide"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs"
+  },
+  "contextual": {
+    "options": ["copy", "view", "assistant"]
+  },
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Home",
+          "icon": "house",
+          "href": "/"
+        }
+      ]
+    },
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "whatsapp-setup"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/projects",
+              "concepts/bot-code",
+              "concepts/flows",
+              "concepts/database",
+              "concepts/conversations"
+            ]
+          },
+          {
+            "group": "Building Your Bot",
+            "pages": [
+              "guides/ai-agent",
+              "guides/message-types",
+              "guides/templates",
+              "guides/flows-builder",
+              "guides/secrets"
+            ]
+          },
+          {
+            "group": "Testing & Monitoring",
+            "pages": [
+              "guides/testing",
+              "guides/logs",
+              "guides/version-history"
+            ]
+          },
+          {
+            "group": "Team & Billing",
+            "pages": [
+              "guides/workspaces",
+              "guides/billing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Flow Templates",
+        "groups": [
+          {
+            "group": "Templates",
+            "pages": [
+              "templates/overview",
+              "templates/appointment-booking",
+              "templates/lead-capture",
+              "templates/contact-form",
+              "templates/customer-feedback",
+              "templates/support-ticket",
+              "templates/survey"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://paige.app"
+    }
+  },
+  "footer": {
+    "socials": {}
+  }
+}

@@ -1,0 +1,75 @@
+---
+title: "Manage contacts and conversations in your Paige bot"
+sidebarTitle: "Conversations"
+description: "Paige tracks every WhatsApp conversation by phone number. View message history, monitor conversation state, and send messages from the dashboard."
+---
+
+Every time someone messages your bot, Paige records the conversation and links it to their phone number. The **Conversations** section of your project dashboard gives you a live view of who is talking to your bot, what state each conversation is in, and the full message history. You can also intervene manually — changing a conversation's state or sending a message directly — without touching your bot code.
+
+## Contacts
+
+A contact represents a unique phone number that has messaged your bot. Paige creates a contact record automatically the first time a message is received from a given number.
+
+Each contact can have multiple conversations over time. From the contacts list you can:
+
+- Browse all contacts that have messaged your bot
+- View all conversations for a specific contact
+- See the full message history across a contact's conversations
+
+## Conversations
+
+A conversation is a session between your bot and a contact. Each conversation has:
+
+- A reference to the contact (phone number)
+- A **state** — the current position in your bot's state machine
+- A full log of inbound and outbound messages
+
+### Conversation state
+
+The state field reflects where the contact is in your bot's conversation flow. It is set and updated by your bot code as the contact progresses through the state machine. For example, a contact might move from `unstructured` → `collect_info` → `support` depending on what your bot does.
+
+<Info>
+  The state machine pattern is defined in your bot code. The template includes three default states: `unstructured`, `support`, and `collect_info`. You can add as many custom states as your bot needs.
+</Info>
+
+### Changing state from the dashboard
+
+If a contact gets stuck in an unexpected state, or you need to manually reset a conversation, you can update the state directly from the dashboard without modifying your bot code or waiting for the contact to message again.
+
+<Steps>
+  <Step title="Open the conversation">
+    Navigate to the **Conversations** tab in your project and click the conversation you want to update.
+  </Step>
+  <Step title="Change the state">
+    Use the state control to select a new state. Only states that exist in your bot code are meaningful — setting an unrecognised state will leave the contact in a state your bot does not handle.
+  </Step>
+  <Step title="Confirm the change">
+    The change takes effect immediately. The next message from the contact will be processed by the handler for the new state.
+  </Step>
+</Steps>
+
+### Filtering by state
+
+The conversations list can be filtered by state. Use the **States** filter to view only conversations in a particular state — for example, all contacts currently in `collect_info` or all contacts in a custom `awaiting_payment` state.
+
+You can also fetch the list of unique states currently active across all conversations. This is useful for getting a quick overview of where your contacts are in the conversation flow.
+
+## Sending messages from the dashboard
+
+You can send a message directly to any contact from the conversation view. This is useful for:
+
+- Following up with a contact manually
+- Testing a specific message flow without going through the bot logic
+- Sending a response when the bot is unable to handle a situation automatically
+
+<Warning>
+  Messages sent from the dashboard are delivered through your project's WhatsApp number. They count against your WhatsApp Business API messaging limits. If you are outside the 24-hour customer service window, you will need to use an approved message template.
+</Warning>
+
+## How conversations are recorded
+
+Paige logs messages automatically as your bot handles them. Every inbound message your bot receives and every outbound message it sends is stored in the database and associated with the correct conversation — you do not need to write any logging code yourself.
+
+<Note>
+  The conversations module must be installed in your project for the conversations dashboard to display data. If you see a notice that the module is not installed, ask the AI agent to add it to your bot code.
+</Note>

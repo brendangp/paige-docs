@@ -1,0 +1,57 @@
+---
+title: "Use version history to roll back your Paige bot code"
+sidebarTitle: "Version History"
+description: "Paige creates a commit every time the AI saves your bot code. Browse the full change history and restore any previous version of your bot with one click."
+---
+
+Paige automatically tracks every change the AI makes to your bot code. Each save creates a commit — a snapshot of your bot at that moment in time. You can browse this history, inspect what changed in any commit, and restore your bot to a previous version if something goes wrong. There's no manual saving required.
+
+## How commits work
+
+Every time you ask the AI agent to change your bot code and it saves those changes, a commit is recorded. Commits include a description of what changed and a complete snapshot of your code at that point, so you always have a full record of how your bot evolved.
+
+<Info>
+  Commits are created automatically by the AI when it saves code. You don't need to do anything to enable version history — it's on for every project.
+</Info>
+
+## View your commit history
+
+<Steps>
+  <Step title="Open your project">
+    From the Paige dashboard, select the project whose history you want to review.
+  </Step>
+  <Step title="Go to Version History">
+    In the project sidebar, click **Version History**. You'll see a list of all commits for this project, ordered from most recent to oldest.
+  </Step>
+  <Step title="Open a commit">
+    Click any commit to see its details — including a description of what the AI changed and a diff showing exactly which lines were added, removed, or modified.
+  </Step>
+</Steps>
+
+## Restore a previous version
+
+If a recent change broke your bot or you want to go back to an earlier working state, you can restore any commit.
+
+<Steps>
+  <Step title="Find the commit to restore">
+    Browse your commit history and open the commit you want to revert to. Review the diff to confirm it's the right version.
+  </Step>
+  <Step title="Click Restore">
+    Click the **Restore** button on that commit. Paige will immediately deploy that version of your bot code.
+  </Step>
+  <Step title="Confirm your bot is working">
+    Use [Paige Dev](/guides/testing) to send a test message and verify the restored version behaves as expected.
+  </Step>
+</Steps>
+
+<Warning>
+  Restoring a commit **deploys that version immediately**. Your bot starts using the restored code right away, for all live users. If you're not sure, test the version first by reviewing the diff carefully before restoring.
+</Warning>
+
+## After a restore
+
+Restoring a commit does not delete newer commits — your full history is preserved. If you restore an older version and then the AI makes new changes, those will be recorded as new commits on top of the restored state.
+
+<Tip>
+  If you want to experiment with a change without risk, describe the change to the AI agent and ask it to explain what it plans to do before saving. Once you're confident, tell it to go ahead.
+</Tip>

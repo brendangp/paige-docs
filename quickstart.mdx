@@ -1,0 +1,86 @@
+---
+title: "Get started: build your first WhatsApp bot with Paige"
+sidebarTitle: "Quick Start"
+description: "Sign up, create a project, connect your WhatsApp number, build your first bot with AI, and send a test message — all in under 15 minutes."
+---
+
+This guide walks you through everything you need to go from a new account to a working WhatsApp bot. By the end you'll have a bot running on a connected WhatsApp Business number and a way to test it live from your own phone.
+
+<Steps>
+  <Step title="Create your account">
+    Go to [paige.app](https://paige.app) and sign up. You can create an account with your email address or sign in with Google.
+
+    After signing up with email, Paige will send you a verification link. Open the email and click the link to confirm your address before continuing.
+
+    <Tip>
+      Google sign-in skips the email verification step and gets you into the dashboard faster.
+    </Tip>
+  </Step>
+
+  <Step title="Create your first project">
+    When you log in for the first time, Paige automatically creates a project called **My First Bot** and takes you straight to it. You don't need to do anything — the project is ready to use.
+
+    A project is your workspace for a single bot. It comes with its own bot code editor, database, conversation history, WhatsApp connection, and settings. If you want to build a second bot for a different use case, you can create additional projects from the dashboard at any time.
+
+    <Info>
+      If you already have projects from a previous session, Paige opens the most recently used one instead of creating a new one.
+    </Info>
+  </Step>
+
+  <Step title="Connect your WhatsApp number">
+    Before your bot can send or receive messages, you need to link a WhatsApp Business number to the project.
+
+    Open your project and go to **Settings → WhatsApp**. Click **Connect WhatsApp** to start the Meta embedded signup flow. You'll log in to your Facebook account, select or create a WhatsApp Business Account (WABA), and choose the phone number you want to use.
+
+    See [Connect your WhatsApp Business number](/whatsapp-setup) for a full walkthrough of this process, including what to do if you don't have a WhatsApp Business Account yet.
+
+    <Note>
+      You need a Facebook account to complete the Meta embedded signup. The phone number you connect must not already be registered as a personal WhatsApp account on an active device.
+    </Note>
+  </Step>
+
+  <Step title="Build your bot with the AI assistant">
+    With your WhatsApp number connected, open the **Bot** tab in your project. You'll see the AI chat interface on the left and your bot code on the right.
+
+    Type a description of what you want your bot to do. For example:
+
+    > "When someone messages me, greet them by name and ask if they want to know our opening hours or our location."
+
+    The AI reads your request and writes (or rewrites) the bot code for you. You can keep refining it by sending follow-up messages — ask it to add conditions, change the wording, or handle edge cases.
+
+    <Tip>
+      You don't need to know how to code to use the AI builder. Describe what you want in plain language and iterate from there. If you do know how to code, you can also edit the bot code directly.
+    </Tip>
+
+    When you're happy with the bot, click **Deploy** to make it live. Paige saves a version snapshot every time you deploy, so you can always roll back if something goes wrong.
+  </Step>
+
+  <Step title="Test your bot with Paige Dev">
+    Paige Dev is a special phone number you can add to your contacts to test your bot in a real WhatsApp conversation before users interact with it.
+
+    In your project, open the **Test** section and follow the instructions to link your phone. Once linked, open WhatsApp on your phone and start a conversation with the Paige Dev number. Your messages will be processed by your bot exactly as they would be in production.
+
+    <Info>
+      Paige Dev routes messages to the bot code in your project, so changes you make and deploy are reflected immediately in your test conversations.
+    </Info>
+
+    When your bot behaves the way you want, it's ready for real users. Share your connected WhatsApp Business number and start automating.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="WhatsApp flows" icon="git-branch" href="/concepts/flows">
+    Add interactive multi-screen forms to your bot using WhatsApp Flows.
+  </Card>
+  <Card title="Message templates" icon="message-square" href="/guides/templates">
+    Create Meta-approved templates for sending outbound notifications.
+  </Card>
+  <Card title="Built-in database" icon="database" href="/concepts/database">
+    Store and query bot data using your project's built-in database.
+  </Card>
+  <Card title="Invite your team" icon="users" href="/guides/workspaces">
+    Collaborate with teammates by creating a shared workspace.
+  </Card>
+</CardGroup>

@@ -1,0 +1,185 @@
+---
+title: "Build interactive multi-screen WhatsApp Flows with Paige"
+sidebarTitle: "Flows Builder"
+description: "WhatsApp Flows are multi-screen interactive forms embedded in the chat. Learn how to generate, publish, and send flows using Paige's AI agent."
+---
+
+WhatsApp Flows let you collect structured information from users inside the WhatsApp chat — without sending them to a website or asking them to reply to a series of messages. A flow opens as a sequence of screens with inputs, dropdowns, date pickers, and selection controls. When the user submits the final screen, the data is delivered back to your bot as a single webhook event.
+
+Flows are ideal for appointment booking, lead capture, surveys, sign-up forms, customer support intake, and any other structured data collection that would otherwise require multiple back-and-forth messages.
+
+## How flows work in Paige
+
+Each flow is defined as a JSON file stored in your project at `flows/{name}.json`. Paige's AI agent generates and manages this JSON for you — you describe what you want and the agent creates the correct structure, validates it against Meta's schema, and uploads it to your WhatsApp Business Account.
+
+## Flow lifecycle
+
+<Steps>
+  <Step title="Generate the flow">
+    Ask the AI agent to create a flow. Describe the screens, inputs, and logic you need. The agent writes the JSON, saves it to `flows/{name}.json`, and uploads it to Meta as a DRAFT.
+  </Step>
+  <Step title="Check for validation errors">
+    After generating, the agent checks the flow against Meta's API. If there are validation errors, the agent fixes them automatically.
+  </Step>
+  <Step title="Publish the flow">
+    Once the draft looks right, publish it. Published flows can be sent to users. Ask the agent "publish my [flow name] flow" or use the **Flows** section in your project dashboard.
+  </Step>
+  <Step title="Embed in your bot">
+    Use `sendFlow()` in your bot code to send the flow to a user. When they submit it, your webhook receives the data and your bot can process it.
+  </Step>
+</Steps>
+
+<Info>
+  When you update a published flow, Meta moves it back to DRAFT status automatically. You need to republish it after any update.
+</Info>
+
+## Creating a flow with the AI agent
+
+Describe the flow you want in plain language. Be specific about the screens, the type of inputs, and any logic between screens.
+
+Example prompts:
+
+> "Create a 3-screen appointment booking flow. The first screen asks the user to select a service from a dropdown. The second screen has a date picker and a time slot dropdown. The third screen shows a summary and a confirm button."
+
+> "Build a lead capture flow with two screens. The first screen collects the user's name and email. The second screen asks how they heard about us using radio buttons, then has a submit button."
+
+> "Create a customer support intake flow that collects a subject, a description (text input), and an urgency level (dropdown: Low, Medium, High)."
+
+The agent picks the right components for each screen based on your description.
+
+## Flow components
+
+WhatsApp Flows support a specific set of UI components. The agent knows which components are valid and in what contexts they can be used.
+
+<AccordionGroup>
+  <Accordion title="TextHeading">
+    A bold heading displayed at the top of a screen or section. Use it to label each screen clearly.
+
+    ```json
+    { "type": "TextHeading", "text": "Book your appointment" }
+    ```
+  </Accordion>
+  <Accordion title="TextBody">
+    Regular body text for instructions or descriptions. Supports basic formatting.
+
+    ```json
+    { "type": "TextBody", "text": "Fill in your details below and we'll confirm your slot." }
+    ```
+  </Accordion>
+  <Accordion title="TextInput">
+    A single-line or multi-line text field. Used for names, email addresses, notes, or any free-text input.
+
+    ```json
+    {
+      "type": "TextInput",
+      "name": "full_name",
+      "label": "Full name",
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="Dropdown">
+    A select menu with a list of options. Used for service selection, time slots, categories, and similar choices.
+
+    ```json
+    {
+      "type": "Dropdown",
+      "name": "service",
+      "label": "Select a service",
+      "data-source": [
+        { "id": "web", "title": "Web design" },
+        { "id": "seo", "title": "SEO" }
+      ],
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="DatePicker">
+    A native date selector. Returns the selected date as a string in ISO format.
+
+    ```json
+    {
+      "type": "DatePicker",
+      "name": "appointment_date",
+      "label": "Preferred date",
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="Footer">
+    The primary action button at the bottom of a screen. Used to navigate to the next screen or submit the form. Each screen must have a Footer.
+
+    ```json
+    {
+      "type": "Footer",
+      "label": "Next",
+      "on-click-action": {
+        "name": "navigate",
+        "next": { "type": "screen", "name": "SCREEN_TWO" }
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Updating an existing flow
+
+To modify an existing flow, ask the agent to update it — do not edit the flow JSON file directly.
+
+> "Update the booking flow: replace the time slot dropdown with a list of radio buttons."
+
+> "Fix the appointment flow — add a confirmation screen at the end that shows the selected date and service before submitting."
+
+The agent reads the current flow JSON, applies your changes, re-validates the structure, and re-uploads the updated draft to Meta.
+
+<Warning>
+  Never edit a flow's JSON file manually. The flows sub-agent enforces Meta's schema and validation rules. Direct file edits will likely produce invalid JSON that cannot be uploaded.
+</Warning>
+
+## Publishing and deprecating a flow
+
+<Tabs>
+  <Tab title="Publish">
+    Publish a draft flow to make it available to send to users.
+
+    From the AI agent:
+
+    > "Publish my appointment_booking flow."
+
+    From the dashboard: navigate to the **Flows** section, find the flow, and click **Publish**.
+
+    <Note>
+      You can only publish flows that have no validation errors. If publishing fails, ask the agent to check the flow for errors.
+    </Note>
+  </Tab>
+  <Tab title="Deprecate">
+    Deprecating a flow takes it offline. Users who receive a message containing a deprecated flow will see an error if they try to open it. Deprecation cannot be undone.
+
+    From the dashboard: navigate to the **Flows** section, find the published flow, and click **Deprecate**.
+
+    Use deprecation when you are replacing a flow with a newer version and want to prevent the old one from being opened.
+  </Tab>
+</Tabs>
+
+## Receiving flow submissions in your bot
+
+When a user completes and submits a flow, your webhook receives an `interactive` message with `message.interactive.nfm_reply`. The submitted form data is nested inside that object.
+
+```javascript
+if (incoming.type === "interactive" && incoming.interactive?.nfm_reply) {
+  const flowData = JSON.parse(incoming.interactive.nfm_reply.response_json);
+
+  // Access submitted fields by the name you defined in the flow
+  const fullName = flowData.full_name;
+  const service = flowData.service;
+  const appointmentDate = flowData.appointment_date;
+
+  // Save to your database and send a confirmation
+  await db.insertRow("bookings", { name: fullName, service, date: appointmentDate, phone: from });
+  await sendText(conversationId, from, `Thanks ${fullName}, your ${service} appointment on ${appointmentDate} is confirmed.`);
+}
+```
+
+## Pre-built flow templates
+
+Paige provides pre-built flow templates for common use cases to help you get started quickly. See [Flow Templates](/templates/overview) for the full list.

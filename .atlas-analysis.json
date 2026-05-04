@@ -1,0 +1,126 @@
+{
+  "projectType": "saas",
+  "projectName": "Paige",
+  "projectDescription": "Paige is a WhatsApp bot builder platform that lets you create AI-powered chatbots, interactive flows, and automated conversations without writing backend infrastructure.",
+  "theme": "almond",
+  "primaryColor": "#82d441",
+  "lightColor": "#151d36",
+  "darkColor": "#cfeabb",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "whatsapp-setup"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/projects",
+              "concepts/bot-code",
+              "concepts/flows",
+              "concepts/database",
+              "concepts/conversations"
+            ]
+          },
+          {
+            "group": "Building Your Bot",
+            "pages": [
+              "guides/ai-agent",
+              "guides/message-types",
+              "guides/templates",
+              "guides/flows-builder",
+              "guides/secrets"
+            ]
+          },
+          {
+            "group": "Testing & Monitoring",
+            "pages": [
+              "guides/testing",
+              "guides/logs",
+              "guides/version-history"
+            ]
+          },
+          {
+            "group": "Team & Billing",
+            "pages": [
+              "guides/workspaces",
+              "guides/billing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Flow Templates",
+        "groups": [
+          {
+            "group": "Templates",
+            "pages": [
+              "templates/overview",
+              "templates/appointment-booking",
+              "templates/lead-capture",
+              "templates/contact-form",
+              "templates/customer-feedback",
+              "templates/support-ticket",
+              "templates/survey"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "AI-powered bot builder with natural language instructions",
+    "Visual WhatsApp Flow builder with drag-and-drop screens",
+    "Built-in per-project database with schema management",
+    "Conversation and contact management dashboard",
+    "WhatsApp Business API integration via Meta embedded signup",
+    "Message template creation and management",
+    "Secrets manager for API keys and credentials",
+    "Execution logs and real-time debugging",
+    "Version history with commit restore",
+    "Live testing via Paige Dev phone link",
+    "Team workspaces with role-based access",
+    "Subscription billing with credits system"
+  ],
+  "publicApiSurface": [
+    "POST /api/auth/signup",
+    "POST /api/auth/login",
+    "GET /api/projects",
+    "POST /api/projects",
+    "GET /api/projects/:id",
+    "PATCH /api/projects/:id",
+    "GET /api/projects/:projectId/flows",
+    "POST /api/projects/:projectId/flows/:flowId/publish",
+    "POST /api/projects/:projectId/flows/:flowId/deprecate",
+    "POST /api/projects/:projectId/flows/:flowId/sync",
+    "GET /api/projects/:projectId/conversations",
+    "GET /api/projects/:projectId/conversations/:id/messages",
+    "PATCH /api/projects/:projectId/conversations/:id/state",
+    "POST /api/projects/:projectId/messages/send",
+    "POST /api/projects/:projectId/messages/mark-read",
+    "GET /api/projects/:projectId/contacts",
+    "GET /api/projects/:projectId/database",
+    "POST /api/projects/:projectId/database",
+    "GET /api/projects/:projectId/secrets",
+    "PUT /api/projects/:projectId/secrets/:key",
+    "GET /api/projects/:projectId/logs",
+    "GET /api/projects/:projectId/commits",
+    "POST /api/projects/:projectId/commits/:commitId/restore",
+    "GET /api/projects/:projectId/templates",
+    "POST /api/projects/:projectId/templates",
+    "GET /api/projects/:id/whatsapp",
+    "PUT /api/projects/:id/whatsapp/profile",
+    "POST /api/projects/:projectId/billing/subscribe",
+    "POST /api/projects/:projectId/billing/buy-credits",
+    "GET /api/workspaces",
+    "POST /api/workspaces/:id/invitations",
+    "POST /api/webhooks/events"
+  ]
+}

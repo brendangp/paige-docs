@@ -1,0 +1,96 @@
+---
+title: "WhatsApp Flows: build interactive forms in the chat"
+sidebarTitle: "Flows"
+description: "WhatsApp Flows are multi-screen interactive forms inside the chat. Build surveys, booking forms, and lead capture without redirecting users to a website."
+---
+
+WhatsApp Flows let you embed rich, multi-screen interactive experiences directly inside a WhatsApp conversation. Instead of redirecting a user to a website, your bot can present a form — with dropdowns, date pickers, text inputs, and more — that the user completes without leaving WhatsApp. When the user submits, the results are sent back to your bot as a structured message.
+
+## What you can build with Flows
+
+<CardGroup cols={2}>
+  <Card title="Appointment booking" icon="calendar">
+    Let customers pick a service, choose a date and time, and confirm a booking — all within WhatsApp.
+  </Card>
+  <Card title="Lead capture" icon="user-plus">
+    Collect names, contact details, and preferences from new contacts in a structured, guided form.
+  </Card>
+  <Card title="Surveys and feedback" icon="clipboard-list">
+    Gather structured responses through rating scales, dropdowns, and open text fields.
+  </Card>
+  <Card title="Order forms" icon="shopping-cart">
+    Take orders or service requests with validated inputs, reducing back-and-forth messages.
+  </Card>
+</CardGroup>
+
+## Flow lifecycle
+
+A Flow moves through three statuses from creation to retirement:
+
+```
+Draft → Published → Deprecated
+```
+
+| Status | Description |
+|---|---|
+| **Draft** | The Flow is being built or edited. It can be tested via the preview simulator but cannot be sent to real users. |
+| **Published** | The Flow is live and can be sent to users in bot messages. A published Flow cannot be edited; it must be deprecated first or a new version created. |
+| **Deprecated** | The Flow has been retired and can no longer be sent. Existing conversations already in a Flow are not interrupted. |
+
+<Note>
+  When you update a published Flow's JSON on Meta, it is automatically returned to Draft status. You need to republish it before sending it to users again.
+</Note>
+
+## How Flows are synced to Meta
+
+Paige manages the sync between your Flow definition and Meta's WhatsApp Business API automatically. When you create or update a Flow, Paige uploads the Flow JSON to Meta as a Draft. From there you can publish it directly from the Paige dashboard.
+
+Each Flow is identified by a Meta Flow ID that is stored in your project. Your bot code uses this ID when sending a Flow to a contact.
+
+<Steps>
+  <Step title="Generate a Flow">
+    Describe the Flow you want to the AI agent in the bot code chat. For example: "Create a 3-screen appointment booking flow with a service dropdown, date picker, and confirmation screen." The agent uses the `generate_flow` tool to produce the Flow JSON and automatically uploads it to Meta as a Draft.
+  </Step>
+  <Step title="Preview and validate">
+    Use the Flow preview simulator in the Paige dashboard to step through the Flow screens. The agent can also run `check_flow` to surface any Meta validation errors.
+  </Step>
+  <Step title="Publish the Flow">
+    Once you are satisfied, publish the Flow from the dashboard or ask the AI agent to publish it. After publishing, the Flow can be sent to users.
+  </Step>
+  <Step title="Embed in your bot code">
+    Reference the Flow by its ID in your bot code to send it to a contact at the right moment in the conversation. The submission payload arrives as a structured message that your webhook handler processes.
+  </Step>
+</Steps>
+
+## Flow JSON format
+
+Flows are defined in JSON format (version `6.0`). Each Flow contains one or more screens, and each screen contains a layout of components. Paige's AI agent generates and edits this JSON for you — you rarely need to edit it by hand.
+
+Common Flow components include:
+
+| Component | Description |
+|---|---|
+| `TextHeading` | A heading displayed at the top of a screen |
+| `TextBody` | Body copy or instructions on a screen |
+| `TextInput` | A free-text input field |
+| `Dropdown` | A single-select dropdown |
+| `DatePicker` | A date selection widget |
+| `Footer` | A button at the bottom of a screen that advances to the next screen or submits the form |
+
+<Tip>
+  Use the `generate_flow` tool for new Flows and the `update_flow` tool for changes to existing ones. The agent preserves the existing Meta Flow ID when updating, so your bot code references remain valid.
+</Tip>
+
+## Managing Flows from the dashboard
+
+From the **Flows** section of your project you can:
+
+- View all Flows and their current status
+- Open the preview simulator for any Flow
+- Sync a Flow to Meta manually
+- Publish or deprecate a Flow
+- Delete a Draft Flow
+
+<Warning>
+  Only Draft Flows can be deleted. To remove a Published Flow, deprecate it first.
+</Warning>

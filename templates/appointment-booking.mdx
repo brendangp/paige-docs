@@ -1,0 +1,161 @@
+---
+title: "Book appointments with a pre-built WhatsApp Flow template"
+sidebarTitle: "Appointment Booking"
+description: "A 2-screen WhatsApp Flow for booking appointments: the customer picks a service, chooses a date and time slot, and submits with optional notes."
+---
+
+The appointment booking template gives your customers a guided, in-chat experience for scheduling appointments with your business. In two screens, the user selects the service they need, chooses a preferred date and time slot, adds any optional notes, and submits — all without leaving WhatsApp. Your bot receives the completed booking details as a structured payload, ready for your backend or CRM.
+
+## Who should use this template
+
+This template suits any business that takes bookings or appointments: clinics, salons, consultancies, repair services, fitness studios, or any service-based operation where customers need to reserve a specific time slot.
+
+## Screen breakdown
+
+The flow has two screens.
+
+### Screen 1: Select service (`SELECT_SERVICE`)
+
+The opening screen prompts the user to choose a service from a dropdown. The screen title is **Book Appointment** and the heading reads "Select a Service."
+
+| Field | Type | Required | Options |
+|---|---|---|---|
+| Service | Dropdown | Yes | Consultation, Follow-up Visit, Assessment, General Inquiry |
+
+Tapping **Next** passes the selected service to screen 2.
+
+### Screen 2: Pick date & time (`SELECT_DATE`)
+
+The second screen asks the user when they would like to come in. It includes a date picker, a time-slot dropdown, and an optional notes field.
+
+| Field | Type | Required | Options |
+|---|---|---|---|
+| Preferred Date | DatePicker | Yes | — |
+| Preferred Time | Dropdown | Yes | 09:00 AM, 10:00 AM, 11:00 AM, 02:00 PM, 03:00 PM, 04:00 PM |
+| Additional Notes | TextInput | No | Free text |
+
+Tapping **Confirm Booking** completes the flow and submits the full payload.
+
+## Components used
+
+`TextHeading`, `TextBody`, `Dropdown`, `DatePicker`, `TextInput`, `Footer`
+
+## Submitted payload
+
+When the user completes the flow, your bot receives:
+
+| Key | Value |
+|---|---|
+| `service` | Selected service ID (e.g. `consultation`) |
+| `date` | Selected date |
+| `time_slot` | Selected time slot ID (e.g. `09_00`) |
+| `notes` | Optional free-text notes |
+
+## How to generate this flow
+
+Open the AI agent in your Paige project and send a prompt like:
+
+- `"Use the appointment booking template"`
+- `"Create an appointment booking flow"`
+- `"Generate a flow based on the appointment booking template"`
+
+The agent creates and syncs the flow to Meta. You can then ask it to update the service list, time slots, or any other detail.
+
+<Tip>
+  To replace the hard-coded service list with dynamic data from your database, ask the agent: "Update the appointment booking flow to load services dynamically from my services table."
+</Tip>
+
+## Flow JSON
+
+Below is the complete flow definition from this template.
+
+```json
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "SELECT_SERVICE",
+      "title": "Book Appointment",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "Select a Service" },
+          { "type": "TextBody", "text": "Choose the service you'd like to book." },
+          {
+            "type": "Dropdown",
+            "name": "service",
+            "label": "Service",
+            "required": true,
+            "data-source": [
+              { "id": "consultation", "title": "Consultation" },
+              { "id": "follow_up", "title": "Follow-up Visit" },
+              { "id": "assessment", "title": "Assessment" },
+              { "id": "general", "title": "General Inquiry" }
+            ]
+          },
+          {
+            "type": "Footer",
+            "label": "Next",
+            "on-click-action": {
+              "name": "navigate",
+              "next": { "type": "screen", "name": "SELECT_DATE" },
+              "payload": { "service": "${form.service}" }
+            }
+          }
+        ]
+      },
+      "data": {}
+    },
+    {
+      "id": "SELECT_DATE",
+      "title": "Pick Date & Time",
+      "data": {
+        "service": { "type": "string", "__example__": "consultation" }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "When would you like to come in?" },
+          { "type": "DatePicker", "name": "date", "label": "Preferred Date", "required": true },
+          {
+            "type": "Dropdown",
+            "name": "time_slot",
+            "label": "Preferred Time",
+            "required": true,
+            "data-source": [
+              { "id": "09_00", "title": "09:00 AM" },
+              { "id": "10_00", "title": "10:00 AM" },
+              { "id": "11_00", "title": "11:00 AM" },
+              { "id": "14_00", "title": "02:00 PM" },
+              { "id": "15_00", "title": "03:00 PM" },
+              { "id": "16_00", "title": "04:00 PM" }
+            ]
+          },
+          {
+            "type": "TextInput",
+            "name": "notes",
+            "label": "Additional Notes",
+            "required": false,
+            "input-type": "text"
+          },
+          {
+            "type": "Footer",
+            "label": "Confirm Booking",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "service": "${data.service}",
+                "date": "${form.date}",
+                "time_slot": "${form.time_slot}",
+                "notes": "${form.notes}"
+              }
+            }
+          }
+        ]
+      },
+      "terminal": true,
+      "success": true
+    }
+  ]
+}
+```

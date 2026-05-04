@@ -1,0 +1,120 @@
+---
+title: "Collect customer feedback with a WhatsApp Flow template"
+sidebarTitle: "Customer Feedback"
+description: "A single-screen WhatsApp Flow with a radio-button rating scale (Excellent to Very Poor), a comments field, and an opt-in for follow-up contact."
+---
+
+The customer feedback template makes it easy to collect structured ratings and qualitative comments from customers directly inside WhatsApp. The user sees a radio-button group to rate their overall experience on a five-point scale (Excellent to Very Poor), an optional comments field for free-text feedback, and a checkbox they can tick if they want to be contacted about their response. Your bot receives all three values when they tap **Submit Feedback**.
+
+## Who should use this template
+
+This template suits any business that wants to measure customer satisfaction after a purchase, service, or interaction: retailers, service providers, hospitality businesses, clinics, and support teams. It is also a useful starting point for Net Promoter Score (NPS) flows or post-appointment follow-ups.
+
+## Screen breakdown
+
+The flow has one screen.
+
+### Screen 1: Feedback form (`FEEDBACK_FORM`)
+
+The screen title is **Your Feedback** and the heading reads "How was your experience?"
+
+| Field | Type | Required | Options |
+|---|---|---|---|
+| Overall Rating | RadioButtonsGroup | Yes | Excellent (5), Good (4), Average (3), Poor (2), Very Poor (1) |
+| Additional Comments | TextArea | No | Free text |
+| I'd like to be contacted about my feedback | OptIn | No | Checkbox |
+
+Tapping **Submit Feedback** completes the flow.
+
+## Components used
+
+`TextHeading`, `TextBody`, `RadioButtonsGroup`, `TextArea`, `OptIn`, `Footer`
+
+## Submitted payload
+
+When the user completes the flow, your bot receives:
+
+| Key | Value |
+|---|---|
+| `rating` | Rating ID — `"5"` (Excellent) through `"1"` (Very Poor) |
+| `comments` | Free-text comments (optional) |
+| `follow_up` | `true` if the opt-in checkbox was ticked |
+
+## How to generate this flow
+
+Open the AI agent in your Paige project and send a prompt like:
+
+- `"Use the customer feedback template"`
+- `"Create a customer satisfaction survey flow"`
+- `"Generate a flow based on the customer feedback template"`
+
+The agent creates and syncs the flow to Meta. You can then ask it to rename the rating labels, add a follow-up screen, or change the opt-in label.
+
+<Tip>
+  To turn this into a post-purchase review flow, ask the agent: "Update the feedback form heading to 'How was your order?' and add a required dropdown asking which product the customer bought."
+</Tip>
+
+## Flow JSON
+
+Below is the complete flow definition from this template.
+
+```json
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "FEEDBACK_FORM",
+      "title": "Your Feedback",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "How was your experience?" },
+          {
+            "type": "TextBody",
+            "text": "We'd love to hear your thoughts. Your feedback helps us improve."
+          },
+          {
+            "type": "RadioButtonsGroup",
+            "name": "rating",
+            "label": "Overall Rating",
+            "required": true,
+            "data-source": [
+              { "id": "5", "title": "Excellent" },
+              { "id": "4", "title": "Good" },
+              { "id": "3", "title": "Average" },
+              { "id": "2", "title": "Poor" },
+              { "id": "1", "title": "Very Poor" }
+            ]
+          },
+          {
+            "type": "TextArea",
+            "name": "comments",
+            "label": "Additional Comments",
+            "required": false
+          },
+          {
+            "type": "OptIn",
+            "name": "follow_up",
+            "label": "I'd like to be contacted about my feedback"
+          },
+          {
+            "type": "Footer",
+            "label": "Submit Feedback",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "rating": "${form.rating}",
+                "comments": "${form.comments}",
+                "follow_up": "${form.follow_up}"
+              }
+            }
+          }
+        ]
+      },
+      "terminal": true,
+      "success": true,
+      "data": {}
+    }
+  ]
+}
+```

@@ -1,0 +1,126 @@
+---
+title: "Add a contact form to WhatsApp with a Flow template"
+sidebarTitle: "Contact Form"
+description: "A minimal single-screen WhatsApp Flow collecting a name, email, optional phone number, and a free-text message — ideal for general enquiries."
+---
+
+The contact form template is the simplest way to let customers reach you directly through WhatsApp. It presents a single screen asking for a full name, email address, an optional phone number, and a message. When the user taps **Submit**, your bot receives the details and can route them to your inbox, CRM, or support system. Because it has no branching logic, it is easy to understand, quick to fill in, and straightforward to customise.
+
+## Who should use this template
+
+This template suits any business that wants a general-purpose "get in touch" form inside WhatsApp: small businesses, websites with a contact page, support teams, or any scenario where you want a low-friction way for customers to send a message.
+
+## Screen breakdown
+
+The flow has one screen.
+
+### Screen 1: Contact form (`CONTACT_INFO`)
+
+The screen title is **Contact Us** and the heading reads "Get in Touch."
+
+| Field | Type | Required | Input type |
+|---|---|---|---|
+| Full Name | TextInput | Yes | Text |
+| Email Address | TextInput | Yes | Email |
+| Phone Number | TextInput | No | Phone |
+| Your Message | TextArea | Yes | Free text |
+
+Tapping **Submit** completes the flow.
+
+## Components used
+
+`TextHeading`, `TextBody`, `TextInput`, `TextArea`, `Footer`
+
+## Submitted payload
+
+When the user completes the flow, your bot receives:
+
+| Key | Value |
+|---|---|
+| `name` | Full name |
+| `email` | Email address |
+| `phone` | Phone number (optional) |
+| `message` | Free-text message |
+
+## How to generate this flow
+
+Open the AI agent in your Paige project and send a prompt like:
+
+- `"Use the contact form template"`
+- `"Create a contact us flow"`
+- `"Generate a flow based on the contact form template"`
+
+The agent creates and syncs the flow to Meta. You can then ask it to change field labels, make the phone field required, or add additional fields.
+
+<Tip>
+  To add a subject line field, ask the agent: "Add a required Subject dropdown to the contact form with options: General Enquiry, Sales, Support, and Billing."
+</Tip>
+
+## Flow JSON
+
+Below is the complete flow definition from this template.
+
+```json
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "CONTACT_INFO",
+      "title": "Contact Us",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "Get in Touch" },
+          {
+            "type": "TextBody",
+            "text": "Please fill in your details and we'll get back to you shortly."
+          },
+          {
+            "type": "TextInput",
+            "name": "name",
+            "label": "Full Name",
+            "required": true,
+            "input-type": "text"
+          },
+          {
+            "type": "TextInput",
+            "name": "email",
+            "label": "Email Address",
+            "required": true,
+            "input-type": "email"
+          },
+          {
+            "type": "TextInput",
+            "name": "phone",
+            "label": "Phone Number",
+            "required": false,
+            "input-type": "phone"
+          },
+          {
+            "type": "TextArea",
+            "name": "message",
+            "label": "Your Message",
+            "required": true
+          },
+          {
+            "type": "Footer",
+            "label": "Submit",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "name": "${form.name}",
+                "email": "${form.email}",
+                "phone": "${form.phone}",
+                "message": "${form.message}"
+              }
+            }
+          }
+        ]
+      },
+      "terminal": true,
+      "success": true,
+      "data": {}
+    }
+  ]
+}
+```

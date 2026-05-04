@@ -1,0 +1,168 @@
+---
+title: "Capture sales leads with a pre-built WhatsApp Flow template"
+sidebarTitle: "Lead Capture"
+description: "A single-screen WhatsApp Flow that collects contact details, area of interest, budget range, and a free-text field for lead generation."
+---
+
+The lead capture template is a single-screen form that collects the information your sales team needs to qualify and follow up with a new prospect — all inside WhatsApp. Users fill in their name, business name, email, and optionally a phone number. They then select what they are interested in and a budget range, and can add any extra context in a free-text field. When they tap **Submit**, your bot receives the full payload.
+
+## Who should use this template
+
+This template suits businesses that want to capture inbound sales enquiries directly from WhatsApp conversations: B2B companies, agencies, SaaS products, consultancies, or any business that qualifies leads before a sales conversation.
+
+## Screen breakdown
+
+The flow has one screen.
+
+### Screen 1: Lead form (`LEAD_FORM`)
+
+The screen title is **Tell Us About You** and the heading reads "Let's Get Started."
+
+| Field | Type | Required | Options / Input type |
+|---|---|---|---|
+| Your Name | TextInput | Yes | Text |
+| Business Name | TextInput | Yes | Text |
+| Email Address | TextInput | Yes | Email |
+| Phone Number | TextInput | No | Phone |
+| What are you interested in? | Dropdown | Yes | Product Demo, Pricing Information, Partnership, Technical Support, Other |
+| Budget Range | Dropdown | No | Under R5,000 · R5,000–R20,000 · R20,000–R50,000 · R50,000+ · Not sure yet |
+| Tell us more | TextArea | No | Free text |
+
+Tapping **Submit** completes the flow.
+
+## Components used
+
+`TextHeading`, `TextBody`, `TextInput`, `Dropdown`, `TextArea`, `Footer`
+
+## Submitted payload
+
+When the user completes the flow, your bot receives:
+
+| Key | Value |
+|---|---|
+| `contact_name` | User's name |
+| `business_name` | Business name |
+| `email` | Email address |
+| `phone` | Phone number (optional) |
+| `interest` | Selected interest ID (e.g. `product_demo`) |
+| `budget` | Selected budget range ID (e.g. `5k_20k`) |
+| `details` | Free-text details (optional) |
+
+## How to generate this flow
+
+Open the AI agent in your Paige project and send a prompt like:
+
+- `"Use the lead capture template"`
+- `"Create a lead generation form"`
+- `"Generate a flow based on the lead capture template"`
+
+The agent creates and syncs the flow to Meta. You can then ask it to update the interest options, budget ranges, or field labels to match your business.
+
+<Tip>
+  To localise the budget ranges, ask the agent: "Update the budget dropdown to use USD amounts: Under $1,000 / $1,000–$5,000 / $5,000–$20,000 / $20,000+."
+</Tip>
+
+## Flow JSON
+
+Below is the complete flow definition from this template.
+
+```json
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "LEAD_FORM",
+      "title": "Tell Us About You",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "Let's Get Started" },
+          {
+            "type": "TextBody",
+            "text": "Tell us about your business and we'll show you how we can help."
+          },
+          {
+            "type": "TextInput",
+            "name": "contact_name",
+            "label": "Your Name",
+            "required": true,
+            "input-type": "text"
+          },
+          {
+            "type": "TextInput",
+            "name": "business_name",
+            "label": "Business Name",
+            "required": true,
+            "input-type": "text"
+          },
+          {
+            "type": "TextInput",
+            "name": "email",
+            "label": "Email Address",
+            "required": true,
+            "input-type": "email"
+          },
+          {
+            "type": "TextInput",
+            "name": "phone",
+            "label": "Phone Number",
+            "required": false,
+            "input-type": "phone"
+          },
+          {
+            "type": "Dropdown",
+            "name": "interest",
+            "label": "What are you interested in?",
+            "required": true,
+            "data-source": [
+              { "id": "product_demo", "title": "Product Demo" },
+              { "id": "pricing", "title": "Pricing Information" },
+              { "id": "partnership", "title": "Partnership" },
+              { "id": "support", "title": "Technical Support" },
+              { "id": "other", "title": "Other" }
+            ]
+          },
+          {
+            "type": "Dropdown",
+            "name": "budget",
+            "label": "Budget Range",
+            "required": false,
+            "data-source": [
+              { "id": "under_5k", "title": "Under R5,000" },
+              { "id": "5k_20k", "title": "R5,000 - R20,000" },
+              { "id": "20k_50k", "title": "R20,000 - R50,000" },
+              { "id": "50k_plus", "title": "R50,000+" },
+              { "id": "not_sure", "title": "Not sure yet" }
+            ]
+          },
+          {
+            "type": "TextArea",
+            "name": "details",
+            "label": "Tell us more",
+            "required": false
+          },
+          {
+            "type": "Footer",
+            "label": "Submit",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "contact_name": "${form.contact_name}",
+                "business_name": "${form.business_name}",
+                "email": "${form.email}",
+                "phone": "${form.phone}",
+                "interest": "${form.interest}",
+                "budget": "${form.budget}",
+                "details": "${form.details}"
+              }
+            }
+          }
+        ]
+      },
+      "terminal": true,
+      "success": true,
+      "data": {}
+    }
+  ]
+}
+```

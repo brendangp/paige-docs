@@ -1,0 +1,106 @@
+---
+title: "Debug your WhatsApp bot using Paige execution logs"
+sidebarTitle: "Logs"
+description: "Execution logs capture all console output from your bot code. Use them to understand what your bot is doing, trace errors, and diagnose unexpected behavior."
+---
+
+Every time your bot handles a message, any `console.log`, `console.error`, `console.warn`, or `console.info` calls in your code are captured as execution logs. You can view these logs from the Paige dashboard to understand exactly what happened during a conversation — which is especially useful when your bot behaves differently than you expected.
+
+## View logs from the dashboard
+
+<Steps>
+  <Step title="Open your project">
+    From the Paige dashboard, select the project you want to inspect.
+  </Step>
+  <Step title="Go to Logs">
+    In the project sidebar, click **Logs**. The logs panel shows the most recent execution output for your bot.
+  </Step>
+  <Step title="Filter by log level">
+    Use the log level filter to narrow results. You can show all levels or focus on a specific one — for example, filter to **error** when tracking down a specific failure.
+  </Step>
+</Steps>
+
+## Log levels
+
+Paige captures four log levels, matching the standard browser console methods:
+
+<AccordionGroup>
+  <Accordion title="log — General output">
+    Use `console.log()` for general debugging information: variable values, which branch of logic ran, or any output that helps you trace execution flow.
+
+    ```javascript
+    console.log("Received message:", message.body);
+    console.log("User state:", userState);
+    ```
+  </Accordion>
+  <Accordion title="error — Errors and failures">
+    Use `console.error()` to record errors. These are shown prominently in the logs panel and are the first place to look when your bot stops responding correctly.
+
+    ```javascript
+    try {
+      const result = await fetchData(userId);
+    } catch (err) {
+      console.error("Failed to fetch user data:", err.message);
+    }
+    ```
+  </Accordion>
+  <Accordion title="warn — Warnings and unexpected conditions">
+    Use `console.warn()` for situations that aren't failures but signal something unexpected — for example, a missing optional field or a fallback path being triggered.
+
+    ```javascript
+    if (!user.phoneNumber) {
+      console.warn("User record missing phone number, using fallback");
+    }
+    ```
+  </Accordion>
+  <Accordion title="info — Informational milestones">
+    Use `console.info()` for high-level events like a flow completing, a payment being confirmed, or a user reaching a specific step.
+
+    ```javascript
+    console.info("Booking confirmed for user:", userId);
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Add useful logging to your bot code
+
+Good logging makes debugging much faster. A few practices that help:
+
+- **Log inputs at the start of a handler** — record the incoming message text and any user state you retrieve, so you can see exactly what your code was working with.
+- **Log before and after external calls** — if your bot calls an API or queries the database, log the request and response so you can spot failures quickly.
+- **Log which branch ran** — in conditional logic, add a short log to each branch so you can confirm the right path was taken.
+- **Include identifiers** — log user IDs or conversation IDs alongside messages so you can correlate log entries with specific users.
+
+```javascript
+console.log("Handling message from:", from);
+console.log("Current step:", conversationState.step);
+
+const order = await db.orders.findOne({ userId: from });
+if (!order) {
+  console.warn("No order found for user:", from);
+  return reply("We couldn't find your order. Please try again.");
+}
+
+console.log("Order found:", order.id, "status:", order.status);
+```
+
+## Common error patterns
+
+<CardGroup cols={2}>
+  <Card title="Unhandled promise rejections" icon="circle-x">
+    If your bot makes async calls without `try/catch`, an error in that call will silently fail. Wrap async operations and log the error to surface the cause.
+  </Card>
+  <Card title="Undefined variables" icon="variable">
+    A `TypeError: Cannot read properties of undefined` in the logs usually means a database record or API response wasn't what you expected. Log the value before you access it.
+  </Card>
+  <Card title="Unexpected message types" icon="message-square-warning">
+    Users can send images, voice notes, and reactions — not just text. If your bot only handles text, log the incoming message type so you can see when non-text messages arrive.
+  </Card>
+  <Card title="Infinite loops or repeated triggers" icon="refresh-cw">
+    If the same log entry appears many times in rapid succession, your bot may be re-triggering itself. Check your reply logic for conditions that might cause a loop.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Use [Paige Dev](/guides/testing) while reviewing logs — link your phone, send a test message, and watch the log entries appear. This gives you a direct line between your action and the output.
+</Tip>

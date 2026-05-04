@@ -1,0 +1,100 @@
+---
+title: "How to connect your WhatsApp Business number to Paige"
+sidebarTitle: "WhatsApp Setup"
+description: "Link a WhatsApp Business phone number to your Paige project through Meta embedded signup, then configure your business profile and display name."
+---
+
+Before your bot can send or receive messages, you need to connect a WhatsApp Business number to your project. Paige uses Meta's embedded signup flow to link your WhatsApp Business Account and phone number directly — you stay inside the Paige dashboard the entire time, and Paige handles the API token and webhook configuration automatically.
+
+## What you'll need
+
+- A **Facebook account**. Meta uses this to verify your identity and associate your business assets.
+- A **WhatsApp Business Account (WABA)**. This is a Meta business asset that holds your phone number and messaging settings. If you don't have one yet, you can create it during signup.
+- A **phone number** to register with WhatsApp Business API. This can be a mobile or landline number, but it must not already be an active WhatsApp personal account on a device.
+
+<Warning>
+  If the phone number you want to use is currently registered as a personal WhatsApp account, you need to delete that account in the WhatsApp app before you can register it with the Business API. This action cannot be undone — you'll lose the message history on that account.
+</Warning>
+
+## Connect your number
+
+<Steps>
+  <Step title="Open WhatsApp settings in your project">
+    Inside your project, go to **Settings** and select the **WhatsApp** tab. You'll see your current connection status and a button to start the signup process.
+  </Step>
+
+  <Step title="Start Meta embedded signup">
+    Click **Connect WhatsApp**. A Meta popup will open inside the Paige dashboard. Log in to your Facebook account if prompted.
+
+    <Info>
+      The popup is served by Meta, not Paige. Paige only receives the result of the signup — your WhatsApp Business Account ID, phone number ID, and an access token — once you complete the flow.
+    </Info>
+  </Step>
+
+  <Step title="Select or create a WhatsApp Business Account">
+    During signup, Meta will ask you to choose an existing WhatsApp Business Account or create a new one.
+
+    - If your business is already set up in Meta Business Manager, select the existing WABA.
+    - If this is your first time, choose **Create a new WhatsApp Business Account** and follow the prompts to enter your business name and details.
+
+    <Note>
+      A single WABA can hold multiple phone numbers, but each Paige project connects to one phone number at a time.
+    </Note>
+  </Step>
+
+  <Step title="Add your phone number">
+    Enter the phone number you want to register. Meta will send a verification code via SMS or voice call to confirm you own the number. Enter the code to complete verification.
+  </Step>
+
+  <Step title="Finish and return to Paige">
+    After verification, close the Meta popup. Paige automatically receives your connection details and configures the webhook. Your project's WhatsApp status will update to **Connected**.
+
+    You'll now see your **phone number ID** and **WhatsApp Business Account ID** in the settings panel. Paige stores the access token securely — you don't need to manage it manually.
+  </Step>
+</Steps>
+
+## Understanding the connection details
+
+Once connected, Paige shows three pieces of information about your WhatsApp integration:
+
+**WhatsApp Business Account (WABA)** — The top-level Meta business asset associated with your number. Your WABA ID is used when working with Meta's API directly, for example when submitting message templates for review.
+
+**Phone number ID** — A unique identifier for the specific phone number registered with the Business API. Paige uses this internally to route messages. You may need it if you're integrating with other Meta tools.
+
+**Access token** — A credential that allows Paige to send and receive messages on your behalf. Paige manages token storage and refresh automatically.
+
+## Update your business profile
+
+After connecting, you can update the WhatsApp profile that contacts see when they chat with your bot.
+
+Go to **Settings → WhatsApp → Business profile** to edit the following:
+
+- **Display name** — The name shown to users in WhatsApp. This must match your registered business name and is subject to Meta's approval process (see below).
+- **Description** — A short description of your business, shown on your WhatsApp profile page.
+- **Profile photo** — Your business logo or a recognizable image. Paige accepts image files up to 5 MB.
+
+To update the profile, make your changes and click **Save**. Changes to the description and photo take effect immediately. Display name changes require Meta approval.
+
+### Display name approval
+
+When you request a display name change, Meta reviews the new name against your business verification status and brand guidelines. This process can take from a few hours to several days.
+
+<Note>
+  During review, your existing display name remains active. Users won't see the new name until Meta approves it. You'll receive an update in the Paige dashboard once the review is complete.
+</Note>
+
+Common reasons Meta rejects display name requests:
+
+- The name doesn't match the verified business name on your WABA
+- The name uses a generic term without a brand identifier (for example, "Support" on its own)
+- The name implies an official relationship with Meta or WhatsApp
+
+If your request is rejected, you can update your business verification details in Meta Business Manager and submit a revised name.
+
+## Troubleshooting
+
+**The Meta popup closes without completing** — This usually means a browser extension (such as an ad blocker or popup blocker) interrupted the flow. Disable extensions for the Paige domain and try again.
+
+**My phone number verification code isn't arriving** — Make sure the number can receive SMS or voice calls and isn't already registered as a WhatsApp personal account. If you've requested multiple codes, wait at least 10 minutes before requesting another.
+
+**My project shows "Connection failed" after signup** — Go to **Settings → WhatsApp** and click **Reconnect**. If the problem persists, contact Paige support with your project ID.

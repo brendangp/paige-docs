@@ -1,0 +1,66 @@
+---
+title: "Test your WhatsApp bot in real time with Paige Dev"
+sidebarTitle: "Testing"
+description: "Link your real phone number to a project and chat with your bot in real time. Use Paige Dev to test messages, flows, and edge cases before going live."
+---
+
+Paige Dev lets you connect your personal WhatsApp number directly to a project so you can test your bot exactly as your users will experience it — no staging environment needed. When your phone is linked, any message you send to your bot's number is processed live by your bot code, giving you immediate feedback on how it behaves.
+
+## Link your phone number
+
+<Steps>
+  <Step title="Open your project">
+    From the Paige dashboard, select the project you want to test.
+  </Step>
+  <Step title="Go to Paige Dev">
+    In the project sidebar, click **Paige Dev**. You'll see your current link status.
+  </Step>
+  <Step title="Link your number">
+    Click **Link my number** and follow the prompt to associate your WhatsApp phone number with this project. Once linked, your number is active for this project only.
+  </Step>
+</Steps>
+
+<Note>
+  Each phone number can only be linked to one project at a time. If you want to test a different project, unlink from the current one first.
+</Note>
+
+## Send test messages
+
+Once your number is linked, open WhatsApp on your phone and send a message to your bot's number. The message flows through your bot code in real time — you'll see a response just as any user would.
+
+<CardGroup cols={2}>
+  <Card title="Test the happy path" icon="check">
+    Walk through the primary use case your bot is designed for to confirm the core flow works end to end.
+  </Card>
+  <Card title="Test edge cases" icon="triangle-alert">
+    Send unexpected inputs — empty messages, long strings, emojis, or out-of-order replies — to see how your bot handles them.
+  </Card>
+  <Card title="Check conversation state" icon="layers">
+    If your bot stores state between messages (for example, multi-step flows), test that the state carries over correctly across multiple turns.
+  </Card>
+  <Card title="Use logs alongside testing" icon="scroll">
+    Open the **Logs** panel while testing to see `console.log` output from your bot code in real time. See [Execution logs](/guides/logs) for details.
+  </Card>
+</CardGroup>
+
+## Programmatic testing with `test_bot`
+
+If you're working with the AI agent to build or modify your bot, you can ask it to run a simulated test using the built-in `test_bot` tool. This lets the AI send a message to your bot programmatically and observe the response — without you needing to pick up your phone.
+
+To trigger a programmatic test, describe the scenario you want to test in the AI agent chat. For example:
+
+> "Test what happens when a user sends 'hello' as their first message."
+
+The AI agent will invoke `test_bot`, show you the result, and can iterate on your code based on what it finds.
+
+<Tip>
+  Programmatic testing is especially useful for regression checks — ask the AI to re-run the same test after making code changes to confirm nothing broke.
+</Tip>
+
+## Unlink your phone
+
+When you're done testing, you can unlink your phone from the project. Go to **Paige Dev** in the project sidebar and click **Unlink**. Your bot will continue operating normally for real users — only your personal test link is removed.
+
+<Warning>
+  While your phone is linked, all messages you send to the bot number are processed as real bot interactions. Avoid sending messages you wouldn't want logged or acted on.
+</Warning>

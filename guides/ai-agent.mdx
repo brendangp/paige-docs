@@ -1,0 +1,131 @@
+---
+title: "Build your WhatsApp bot with the Paige AI chat agent"
+sidebarTitle: "AI Agent"
+description: "Chat with the Paige AI agent to write, edit, and test your bot code in plain language. Describe what you want and the agent handles the rest."
+---
+
+The AI agent is the primary way you build and modify your bot in Paige. You describe what you want your bot to do in plain language, and the agent writes or edits the underlying Node.js/Express code for you. It has direct access to your project files, database, and WhatsApp tools, so it can make end-to-end changes — from creating a new conversation state to uploading a Flow to Meta — without you touching a code editor.
+
+## How it works
+
+When you open the AI chat for a project, the agent has context about your current bot code and can read, write, and edit files in your project. You describe a change, the agent makes it, and can immediately test it by sending a message through the bot's preview mode. You stay in the loop through a task list the agent maintains while working through multi-step changes.
+
+<Steps>
+  <Step title="Open the AI chat">
+    Navigate to your project and open the AI chat panel. For a new project, the agent starts without any existing code.
+  </Step>
+  <Step title="Describe what you want">
+    Type your instruction in plain language. For example: "Add a main menu with three options: Book a demo, Get support, and Learn more."
+  </Step>
+  <Step title="Review and test">
+    The agent writes the code, then tests it using the built-in preview. You can see the bot's responses directly in the chat before the change goes live.
+  </Step>
+  <Step title="Iterate">
+    Continue the conversation to refine behavior, fix edge cases, or add new features. Each message builds on the previous context.
+  </Step>
+</Steps>
+
+## What the AI can do
+
+The agent has access to a set of tools it uses behind the scenes to complete your requests.
+
+<CardGroup cols={2}>
+  <Card title="File tools" icon="file-code">
+    Read, write, edit, and delete files in your project. The agent can also search across all files to find functions or patterns.
+  </Card>
+  <Card title="Database tools" icon="database">
+    Create tables, add columns, drop tables, query data, and insert rows — all before writing bot code that references those tables.
+  </Card>
+  <Card title="Bot testing tools" icon="play">
+    Send test messages through the bot in preview mode, simulate button and list taps, and fetch recent execution logs to debug errors.
+  </Card>
+  <Card title="Flow tools" icon="layout">
+    Generate and update WhatsApp Flows, upload them to Meta, publish drafts, and embed images into flow screens.
+  </Card>
+  <Card title="Template tools" icon="file-text">
+    List existing message templates and create new ones for outbound notifications, directly from within the conversation.
+  </Card>
+  <Card title="Cron job tools" icon="clock">
+    Register scheduled tasks that run a JavaScript file on a cron schedule — useful for daily reports or recurring notifications.
+  </Card>
+</CardGroup>
+
+## The default bot structure
+
+When you ask the AI to build a new bot, it starts from one of two templates depending on the type of bot you want.
+
+<Tabs>
+  <Tab title="AI bot">
+    The AI bot template includes a state machine webhook handler, a prompts configuration file, and an OpenAI integration. The default states are:
+
+    - **`unstructured`** — the default state; the master router classifies the user's intent and routes them to a sub-agent
+    - **`support`** — an AI-powered support conversation
+    - **`collect_info`** — gathers structured information from the user
+
+    Key files in this template:
+
+    ```
+    routes/whatsapp_webhook.js   # Webhook handler and state machine
+    utils/prompts.js             # AI prompts and company configuration
+    services/openai_functions.js # OpenAI integration and voice transcription
+    services/messages.js         # WhatsApp message sending functions
+    services/dbServices.js       # Database access helpers
+    ```
+  </Tab>
+  <Tab title="Simple bot">
+    The simple bot template is a pure state machine with no AI integration. All responses are hardcoded or template-driven. It's a good starting point for menu-driven bots with predictable flows.
+
+    The default states are:
+
+    - **`start`** — a SEND state that delivers the welcome menu
+    - **`awaiting_selection`** — an AWAIT state that handles the user's menu choice
+
+    Key files in this template:
+
+    ```
+    routes/whatsapp_webhook.js   # Webhook handler and state machine
+    services/messages.js         # WhatsApp message sending functions
+    services/dbServices.js       # Database access helpers
+    ```
+  </Tab>
+</Tabs>
+
+## State machine pattern
+
+Your bot manages each conversation as a state machine. Every conversation has a current state stored in the database, and each incoming message is handled by the code for that state.
+
+There are two kinds of states:
+
+- **SEND states** — send a message or UI element, then immediately transition to an AWAIT state
+- **AWAIT states** — receive the user's response and process it
+
+<Note>
+  A state should never both send a message and handle the user's reply. SEND and AWAIT are always separate states.
+</Note>
+
+To add a new conversation state, tell the agent what you want. For example:
+
+> "Add a booking flow. After the user selects 'Book a demo', ask for their name, then their preferred date, then confirm the booking and save it to a `bookings` table."
+
+The agent will:
+
+1. Create the `bookings` table in your database
+2. Add `AWAITING_NAME`, `AWAITING_DATE`, and `SEND_CONFIRMATION` states to the webhook handler
+3. Wire up the transitions between states
+4. Test the full flow in preview mode
+
+## Tips for effective prompting
+
+**Be specific about the behavior you want.** Instead of "add a contact form", say "ask the user for their name and email address in two separate messages, then save both to a `leads` table and confirm with a text message."
+
+**Reference file names when you know them.** If you want a change in a specific file, mention it: "In `routes/whatsapp_webhook.js`, add a handler for the `awaiting_email` state."
+
+**Ask the agent to test after every significant change.** The agent can send test messages and simulate button clicks automatically. Add "then test it" to the end of your instruction.
+
+**Ask for logs when something is broken.** "Check the recent error logs and fix whatever is failing" gives the agent everything it needs to diagnose and fix issues without further input from you.
+
+**One thing at a time for complex changes.** Breaking a large feature into smaller steps (menu first, then each handler) produces more reliable results than asking for everything at once.
+
+<Tip>
+  If the agent makes a change that breaks something, just tell it what went wrong. It will read the logs, inspect the code, and fix the issue — you don't need to describe the underlying cause.
+</Tip>

@@ -1,0 +1,76 @@
+---
+title: "Paige projects: everything your WhatsApp bot needs"
+sidebarTitle: "Projects"
+description: "A Paige project is a self-contained WhatsApp bot deployment — its own phone number, codebase, database, flows, and conversation history."
+---
+
+A project is the top-level container for everything in Paige. When you create a project, Paige provisions a dedicated environment for your bot: a WhatsApp Business phone number connected via Meta, a Node.js/Express codebase that handles incoming messages, an isolated Postgres database, and a separate space for your WhatsApp Flows. Nothing is shared between projects — each one is fully independent.
+
+## What a project contains
+
+<CardGroup cols={2}>
+  <Card title="WhatsApp number" icon="phone">
+    Each project is linked to a single WhatsApp Business phone number connected through Meta's embedded signup. Messages sent to that number are routed to your bot code.
+  </Card>
+  <Card title="Bot code" icon="code">
+    A Node.js/Express codebase that runs on Paige's infrastructure. You write and edit it through Paige's AI-powered chat interface or directly in the editor.
+  </Card>
+  <Card title="Database" icon="database">
+    A dedicated Postgres database provisioned exclusively for this project. Your bot code can read and write it, and you can manage it from the dashboard.
+  </Card>
+  <Card title="Flows" icon="layout">
+    WhatsApp Flows are multi-screen interactive forms that run inside the WhatsApp chat. They are created and managed per project and synced to Meta via your connected phone number.
+  </Card>
+  <Card title="Conversations" icon="message-circle">
+    Every WhatsApp conversation your bot has is stored here, indexed by contact phone number. You can view message history and conversation state from the dashboard.
+  </Card>
+  <Card title="Message templates" icon="file-text">
+    Utility, marketing, and authentication templates tied to this project's WhatsApp number. Templates require Meta approval before they can be sent.
+  </Card>
+</CardGroup>
+
+## Project isolation
+
+Projects are fully isolated from each other. The bot code, database tables, flows, and conversation records of one project are never accessible to another. This means you can run separate bots — for example, a customer support bot and a marketing bot — without any cross-contamination of data or logic.
+
+## Project lifecycle
+
+### Creating a project
+
+When you create a project, Paige provisions the infrastructure in the background. You can track provisioning status from your project list. Once provisioning completes, you can connect a WhatsApp number via Meta's embedded signup and start building.
+
+### Updating a project
+
+You can update a project's name and settings at any time from the project settings page. WhatsApp Business profile details — including your display name and profile photo — can also be updated from within the project.
+
+<Note>
+  Display name changes require Meta approval and may take time to reflect on the WhatsApp number.
+</Note>
+
+### Resetting a project
+
+Resetting a project clears your bot code back to its initial state while preserving your project settings and WhatsApp connection. Use this if you want to start your codebase from scratch without creating a new project.
+
+<Warning>
+  Resetting a project permanently deletes your current bot code. This cannot be undone. Your database, flows, and conversation history are not affected by a reset.
+</Warning>
+
+### Suspending and restoring a project
+
+You can suspend a project to temporarily take it offline. Suspending a project backs up its data and removes the active runtime. A suspended project can be restored at any time.
+
+<Tip>
+  Suspend a project if you need to pause a bot without deleting it — for example, during a seasonal pause or while a project is being rebuilt.
+</Tip>
+
+### Transferring a project
+
+Projects can be transferred to a workspace, allowing teams to collaborate on the same bot. Transferring moves ownership from your personal account to the selected workspace.
+
+### Deleting a project
+
+Deleting a project permanently removes all associated data — bot code, database, flows, and conversation history. This action cannot be reversed.
+
+<Warning>
+  Deleting a project also removes the associated WhatsApp phone number from Paige. Make sure you no longer need the number or its data before proceeding.
+</Warning>

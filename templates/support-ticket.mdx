@@ -1,0 +1,137 @@
+---
+title: "Handle support tickets with a WhatsApp Flow template"
+sidebarTitle: "Support Ticket"
+description: "A single-screen WhatsApp Flow that collects an issue category, subject, description, and priority level to create a structured support ticket."
+---
+
+The support ticket template gives customers a structured way to report an issue directly inside WhatsApp. Rather than receiving an unstructured text message, your support team receives a categorised ticket with a subject, a detailed description, and a priority level — all in a consistent format that is easy to route and prioritise. The flow presents a single screen and takes under a minute for a customer to complete.
+
+## Who should use this template
+
+This template suits any business with a customer support function: SaaS products, e-commerce stores, service providers, or any team that handles inbound issue reports. It is also a strong starting point for building a triage flow that routes tickets to different agents or channels based on category or priority.
+
+## Screen breakdown
+
+The flow has one screen.
+
+### Screen 1: Support ticket form (`TICKET_FORM`)
+
+The screen title is **Support Request** and the heading reads "How can we help?"
+
+| Field | Type | Required | Options |
+|---|---|---|---|
+| Issue Category | Dropdown | Yes | Billing & Payments, Technical Issue, Account & Access, Feature Request, Other |
+| Subject | TextInput | Yes | Text |
+| Describe your issue | TextArea | Yes | Free text |
+| Priority | Dropdown | Yes | Low — General question · Medium — Affecting workflow · High — Service disrupted · Urgent — Complete outage |
+
+Tapping **Submit Ticket** completes the flow.
+
+## Components used
+
+`TextHeading`, `TextBody`, `Dropdown`, `TextInput`, `TextArea`, `Footer`
+
+## Submitted payload
+
+When the user completes the flow, your bot receives:
+
+| Key | Value |
+|---|---|
+| `category` | Category ID (e.g. `billing`, `technical`, `account`, `feature`, `other`) |
+| `subject` | Issue subject |
+| `description` | Full description |
+| `priority` | Priority ID (`low`, `medium`, `high`, `urgent`) |
+
+## How to generate this flow
+
+Open the AI agent in your Paige project and send a prompt like:
+
+- `"Use the support ticket template"`
+- `"Create a help desk ticket flow"`
+- `"Generate a flow based on the support ticket template"`
+
+The agent creates and syncs the flow to Meta. You can then ask it to add, remove, or rename categories and priority levels to match your support structure.
+
+<Tip>
+  To add automatic escalation logic, ask the agent: "When a ticket is submitted with priority 'urgent', send an immediate notification message to the customer confirming the ticket and stating the expected response time."
+</Tip>
+
+## Flow JSON
+
+Below is the complete flow definition from this template.
+
+```json
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "TICKET_FORM",
+      "title": "Support Request",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "How can we help?" },
+          {
+            "type": "TextBody",
+            "text": "Describe your issue and we'll get back to you as soon as possible."
+          },
+          {
+            "type": "Dropdown",
+            "name": "category",
+            "label": "Issue Category",
+            "required": true,
+            "data-source": [
+              { "id": "billing", "title": "Billing & Payments" },
+              { "id": "technical", "title": "Technical Issue" },
+              { "id": "account", "title": "Account & Access" },
+              { "id": "feature", "title": "Feature Request" },
+              { "id": "other", "title": "Other" }
+            ]
+          },
+          {
+            "type": "TextInput",
+            "name": "subject",
+            "label": "Subject",
+            "required": true,
+            "input-type": "text"
+          },
+          {
+            "type": "TextArea",
+            "name": "description",
+            "label": "Describe your issue",
+            "required": true
+          },
+          {
+            "type": "Dropdown",
+            "name": "priority",
+            "label": "Priority",
+            "required": true,
+            "data-source": [
+              { "id": "low", "title": "Low — General question" },
+              { "id": "medium", "title": "Medium — Affecting workflow" },
+              { "id": "high", "title": "High — Service disrupted" },
+              { "id": "urgent", "title": "Urgent — Complete outage" }
+            ]
+          },
+          {
+            "type": "Footer",
+            "label": "Submit Ticket",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "category": "${form.category}",
+                "subject": "${form.subject}",
+                "description": "${form.description}",
+                "priority": "${form.priority}"
+              }
+            }
+          }
+        ]
+      },
+      "terminal": true,
+      "success": true,
+      "data": {}
+    }
+  ]
+}
+```

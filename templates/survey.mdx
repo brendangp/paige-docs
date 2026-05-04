@@ -1,0 +1,358 @@
+---
+title: "Run WhatsApp surveys with pre-built Flow templates"
+sidebarTitle: "Survey"
+description: "Two WhatsApp survey flow templates: a community petition with consent and position selection, and a multi-question opinion survey with conditional routing."
+---
+
+Paige includes two survey flow templates that show different approaches to collecting structured responses from a large number of participants inside WhatsApp. Both use a consent screen to open, collect the user's answers across one or more screens, and gather personal contact details on a final screen. The key difference is in how questions are structured and how routing logic is handled.
+
+<Tabs>
+  <Tab title="Road extension survey">
+
+## Road extension survey (`survey_road_extension`)
+
+This is a 3-screen community petition flow. The user first sees a consent statement, then selects whether they support or oppose a specific proposal, and finally fills in their personal details. It was built for a real-world civic survey about a planned road extension, and demonstrates how to collect a clear binary position alongside verified contact information.
+
+### Screen breakdown
+
+#### Screen 1: Consent (`CONSENT_SCREEN`)
+
+The screen title is **Before Starting**. The heading reads: "Show your support or opposition to the planned Wildebosch Road Extension." The body text explains that by participating the respondent declares they are an interested and affected party and mandates their ward councillor to submit the survey to the municipality and town planners.
+
+Tapping **Continue** navigates to the position screen.
+
+#### Screen 2: Select position (`SELECTION_SCREEN`)
+
+The screen title is **Select your position**.
+
+| Field | Type | Required | Options |
+|---|---|---|---|
+| Select your position | RadioButtonsGroup | Yes | SUPPORT — I support the construction · OPPOSE — I oppose the construction |
+
+Tapping **Continue** passes the selected position to the details screen.
+
+#### Screen 3: Personal details (`SURVEY_DETAILS_SCREEN`)
+
+The screen title is **Details**. This is the terminal screen.
+
+| Field | Type | Required | Input type / Notes |
+|---|---|---|---|
+| Initials | TextInput | Yes | Text |
+| Surname | TextInput | Yes | Text |
+| Street Address | TextInput | Yes | Text |
+| Email Address | TextInput | Yes | Email |
+| Cellphone Number | TextInput | Yes | Phone |
+| Date of Birth | TextInput | Yes | Pattern `YYYY-MM-DD`, helper text "E.g. 1993-08-04" |
+
+Tapping **Submit** completes the flow.
+
+### Components used
+
+`TextHeading`, `TextBody`, `RadioButtonsGroup`, `TextInput`, `Footer`
+
+### Submitted payload
+
+| Key | Value |
+|---|---|
+| `position` | `"support"` or `"oppose"` |
+| `initials` | Initials |
+| `surname` | Surname |
+| `street_address` | Street address |
+| `email` | Email address |
+| `cellphone_number` | Cellphone number |
+| `date_of_birth` | Date of birth in `YYYY-MM-DD` format |
+
+### How to generate this flow
+
+Open the AI agent and send a prompt like:
+
+- `"Use the road extension survey template"`
+- `"Create a community petition survey flow"`
+- `"Generate a survey flow with a consent screen, position selection, and personal details"`
+
+### Flow JSON (Screen 1 and 2)
+
+```json
+{
+  "version": "7.3",
+  "routing_model": {
+    "CONSENT_SCREEN": ["SELECTION_SCREEN"],
+    "SELECTION_SCREEN": ["SURVEY_DETAILS_SCREEN"],
+    "SURVEY_DETAILS_SCREEN": []
+  },
+  "screens": [
+    {
+      "id": "CONSENT_SCREEN",
+      "title": "Before Starting",
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Show your support or opposition to the planned Wildebosch Road Extension."
+          },
+          {
+            "type": "TextBody",
+            "text": "By partipating in this survey I declare that I am an interested and affected party, and that I mandate my ward councillor MYNARD SLABBERT to send this surevy to both the Stellenbosch Municipality and town planners."
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "on-click-action": {
+              "name": "navigate",
+              "next": { "type": "screen", "name": "SELECTION_SCREEN" },
+              "payload": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SELECTION_SCREEN",
+      "title": "Select your position",
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "text_input_form",
+            "children": [
+              {
+                "type": "RadioButtonsGroup",
+                "name": "position",
+                "label": "Select your position",
+                "required": true,
+                "data-source": [
+                  {
+                    "id": "support",
+                    "title": "SUPPORT",
+                    "description": "I support the construction of the Wildebosch road extension."
+                  },
+                  {
+                    "id": "oppose",
+                    "title": "OPPOSE",
+                    "description": "I oppose the construction of the Wildebosch road extension."
+                  }
+                ],
+                "on-select-action": { "name": "update_data", "payload": {} }
+              },
+              {
+                "type": "Footer",
+                "label": "Continue",
+                "on-click-action": {
+                  "name": "navigate",
+                  "next": { "type": "screen", "name": "SURVEY_DETAILS_SCREEN" },
+                  "payload": { "position": "" }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+  </Tab>
+  <Tab title="Electricity services survey">
+
+## Electricity services survey (`survey_electricity`)
+
+This is a 3-screen municipal opinion survey with conditional routing. The user consents, answers five agree/disagree questions about electricity services, and — depending on whether they opt into a lucky draw — either submits immediately or is routed to a third screen to provide their personal details. The routing is controlled by a `Switch` component that reads the value of question E.
+
+### Screen breakdown
+
+#### Screen 1: Consent (`CONSENT_SCREEN`)
+
+The screen title is **Before Starting**. The heading reads "YOUR VOICE MATTERS." The body text explains that the survey is about electricity services and that by participating, the respondent consents to giving their feedback to their ward councillor.
+
+Tapping **Continue** navigates to the questions screen.
+
+#### Screen 2: Questions (`SELECTION_SCREEN`)
+
+The screen title is **Answer Questions**. It contains five agree/disagree questions, each presented as a `RadioButtonsGroup` with options AGREE and DISAGREE (or YES/NO THANKS for question E).
+
+| Question | Statement |
+|---|---|
+| A | The Stellenbosch Municipality is better equipped to deal with electricity challenges and should be given more rights to respond to challenges. |
+| B | The Stellenbosch Municipality will be quicker to respond to electricity challenges. Outages will be shorter. |
+| C | The Stellenbosch Municipality will be able to communicate more effectively regarding electricity challenges if they manage the process. |
+| D | Our Ward Councillor gives regular feedback on WhatsApp regarding services and service challenges. |
+| E | I would like to be entered into a lucky draw for a R500 Woolworths voucher as a thank you for my time to participate in this survey. |
+
+A `Switch` component reads the value of question E:
+- If `"no"` — a **Submit** footer is shown and the flow completes immediately.
+- Otherwise (default / `"yes"`) — a **Continue** footer navigates to the details screen.
+
+#### Screen 3: Personal details (`SURVEY_DETAILS_SCREEN`)
+
+The screen title is **Details**. This is the terminal screen, shown only when the user wants to enter the lucky draw.
+
+| Field | Type | Required | Input type / Notes |
+|---|---|---|---|
+| Initials | TextInput | Yes | Text |
+| Surname | TextInput | Yes | Text |
+| Street Address | TextInput | Yes | Text |
+| Email Address | TextInput | No | Email |
+| Cellphone Number | TextInput | Yes | Phone |
+| Date of Birth | TextInput | Yes | Pattern `YYYY-MM-DD`, helper text "E.g. 1993-08-04" |
+
+Tapping **Submit** completes the flow, including answers to all five questions passed from screen 2.
+
+### Components used
+
+`TextHeading`, `TextBody`, `RadioButtonsGroup`, `Switch`, `TextInput`, `Footer`
+
+### Submitted payload
+
+**When the user opts out of the lucky draw (submits from screen 2):**
+
+| Key | Value |
+|---|---|
+| `question_A` through `question_E` | `"agree"` / `"disagree"` (or `"yes"` / `"no"` for E) |
+
+**When the user opts in and completes screen 3:**
+
+| Key | Value |
+|---|---|
+| `question_A` through `question_E` | Same as above, passed from screen 2 |
+| `initials` | Initials |
+| `surname` | Surname |
+| `street_address` | Street address |
+| `email` | Email address (optional) |
+| `cellphone_number` | Cellphone number |
+| `date_of_birth` | Date of birth in `YYYY-MM-DD` format |
+
+### How to generate this flow
+
+Open the AI agent and send a prompt like:
+
+- `"Use the electricity services survey template"`
+- `"Create a multi-question opinion survey with conditional routing"`
+- `"Generate a survey flow with agree/disagree questions and an optional details screen"`
+
+<Info>
+  The `Switch` component on screen 2 is what makes the routing conditional. When the user selects "NO THANKS" on question E, the flow completes immediately without showing screen 3. When they select "YES", they are routed to the details screen to enter the lucky draw.
+</Info>
+
+### Flow JSON (consent screen and question screen)
+
+```json
+{
+  "version": "7.3",
+  "routing_model": {
+    "CONSENT_SCREEN": ["SELECTION_SCREEN"],
+    "SELECTION_SCREEN": ["SURVEY_DETAILS_SCREEN"],
+    "SURVEY_DETAILS_SCREEN": []
+  },
+  "screens": [
+    {
+      "id": "CONSENT_SCREEN",
+      "title": "Before Starting",
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextHeading", "text": "YOUR VOICE MATTERS" },
+          {
+            "type": "TextBody",
+            "text": "We are always testing to see where and how things can be improved regarding ELECTRICITY. By particpaiting in this survey, I consent to giving my feedback to my ward councillor MYNARD SLABBERT."
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "on-click-action": {
+              "name": "navigate",
+              "next": { "type": "screen", "name": "SELECTION_SCREEN" },
+              "payload": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SELECTION_SCREEN",
+      "title": "Answer Questions",
+      "data": {},
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "text_input_form",
+            "children": [
+              {
+                "type": "TextBody",
+                "text": "The Stellenbosch Municipality is better equipped to deal with electricity challenges and should be given more rights to respond to challenges."
+              },
+              {
+                "type": "RadioButtonsGroup",
+                "name": "question_A",
+                "label": "Select your option",
+                "required": true,
+                "data-source": [
+                  { "id": "agree", "title": "AGREE" },
+                  { "id": "disagree", "title": "DISAGREE" }
+                ],
+                "on-select-action": { "name": "update_data", "payload": {} }
+              },
+              {
+                "type": "TextBody",
+                "text": "I would like to be entered into a lucky draw for a R500 Woolworths voucher as a thank you for my time to participate in this survey."
+              },
+              {
+                "type": "RadioButtonsGroup",
+                "name": "question_E",
+                "label": "Select your option",
+                "required": true,
+                "data-source": [
+                  { "id": "yes", "title": "YES" },
+                  { "id": "no", "title": "NO THANKS" }
+                ],
+                "on-select-action": { "name": "update_data", "payload": {} }
+              },
+              {
+                "type": "Switch",
+                "value": "${form.question_E}",
+                "cases": {
+                  "no": [
+                    {
+                      "type": "Footer",
+                      "label": "Submit",
+                      "on-click-action": {
+                        "name": "complete",
+                        "payload": {
+                          "question_A": "${form.question_A}",
+                          "question_E": "${form.question_E}"
+                        }
+                      }
+                    }
+                  ],
+                  "default": [
+                    {
+                      "type": "Footer",
+                      "label": "Continue",
+                      "on-click-action": {
+                        "name": "navigate",
+                        "next": { "type": "screen", "name": "SURVEY_DETAILS_SCREEN" },
+                        "payload": { "position": "" }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+  </Tab>
+</Tabs>

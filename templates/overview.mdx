@@ -1,0 +1,74 @@
+---
+title: "Pre-built WhatsApp Flow templates available in Paige"
+sidebarTitle: "Overview"
+description: "Browse all pre-built WhatsApp Flow templates in Paige. Generate any template instantly via the AI agent, then customise it for your use case."
+---
+
+Paige includes a library of pre-built WhatsApp Flow templates that give you a working starting point for common use cases. Each template is a complete flow definition — with screens, form fields, and navigation logic — that you can generate through the AI agent and then customise to match your brand and business needs. You do not need to write any JSON manually; the AI agent handles it for you.
+
+## What are WhatsApp Flows?
+
+WhatsApp Flows are multi-screen interactive UIs that run natively inside the WhatsApp chat. Users tap through them without leaving the app. Flows are defined as JSON, synced to Meta, and can collect structured data — dates, dropdown selections, free text, ratings, and more — which your bot receives as a completed payload when the user submits.
+
+## How to use a template
+
+To generate a flow from a template, open the AI agent in your Paige project and describe what you want. You can be explicit about the template name or describe the use case:
+
+<Steps>
+  <Step title="Open the AI agent">
+    Navigate to your project and open the AI agent chat panel.
+  </Step>
+  <Step title="Ask for a template">
+    Type a prompt such as:
+    - `"Use the appointment booking template to create a flow"`
+    - `"Generate a lead capture flow based on the lead capture template"`
+    - `"Create a customer feedback survey using the customer feedback template"`
+  </Step>
+  <Step title="Review the generated flow">
+    The agent creates the flow JSON and syncs it to Meta. Review the screens in the flow builder.
+  </Step>
+  <Step title="Customise as needed">
+    Update service names, dropdown options, field labels, or add additional screens through follow-up prompts to the agent.
+  </Step>
+</Steps>
+
+<Tip>
+  You can ask the agent to modify any part of a generated template. For example: "Change the service options in the appointment booking flow to Haircut, Colour, and Blowout."
+</Tip>
+
+## Available templates
+
+<CardGroup cols={2}>
+  <Card title="Appointment booking" icon="calendar" href="/templates/appointment-booking">
+    A 2-screen flow for booking appointments: choose a service, pick a date and time, and submit with optional notes.
+  </Card>
+  <Card title="Lead capture" icon="user-plus" href="/templates/lead-capture">
+    A single-screen form collecting contact details, area of interest, budget range, and a free-text field.
+  </Card>
+  <Card title="Contact form" icon="mail" href="/templates/contact-form">
+    A minimal single-screen form for name, email, phone, and a free-text message.
+  </Card>
+  <Card title="Customer feedback" icon="star" href="/templates/customer-feedback">
+    A single-screen feedback form with a radio-button rating scale, comments field, and follow-up opt-in.
+  </Card>
+  <Card title="Support ticket" icon="life-buoy" href="/templates/support-ticket">
+    A single-screen ticket form with category, subject, description, and priority dropdowns.
+  </Card>
+  <Card title="Survey" icon="clipboard-list" href="/templates/survey">
+    Two survey variants: a community petition flow (Road Extension) and a multi-question opinion survey (Electricity Services) with conditional routing.
+  </Card>
+</CardGroup>
+
+## Customising a generated template
+
+After the AI agent generates a flow from a template, you can ask it to make changes through follow-up prompts. Common customisations include:
+
+- **Changing dropdown options** — update service names, issue categories, time slots, or budget ranges to match your business
+- **Adding or removing fields** — ask the agent to add a field for company name, or remove the phone number field if it is not needed
+- **Renaming screens or headings** — change the screen title and heading text to reflect your brand voice
+- **Adjusting required fields** — make optional fields required, or vice versa
+- **Adding screens** — extend a single-screen flow into a multi-step experience
+
+<Note>
+  Changes you make through the agent are applied to the flow JSON and re-synced to Meta automatically. You do not need to manage the flow JSON directly.
+</Note>

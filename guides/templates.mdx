@@ -1,0 +1,184 @@
+---
+title: "Create and manage WhatsApp message templates in Paige"
+sidebarTitle: "Message Templates"
+description: "Message templates are Meta-approved messages for outbound notifications. Learn how to create, get approval, and send them from your Paige bot."
+---
+
+Message templates are pre-approved message formats that let your bot reach users proactively — outside of an active conversation window or as outbound notifications. Every template must be approved by Meta before it can be sent. Once approved, you call `sendTemplate()` in your bot code to deliver it to any number in your contact list.
+
+## Template categories
+
+When you create a template, you assign it to one of three categories. The category affects approval speed and how WhatsApp bills the message.
+
+<CardGroup cols={3}>
+  <Card title="UTILITY" icon="wrench">
+    Transactional messages tied to a user action or request — order confirmations, appointment reminders, shipping updates, payment receipts. Approved in minutes in most cases.
+  </Card>
+  <Card title="MARKETING" icon="megaphone">
+    Promotional messages, product announcements, offers, and campaigns. Approval typically takes longer than UTILITY. Subject to per-message marketing pricing.
+  </Card>
+  <Card title="AUTHENTICATION" icon="lock">
+    One-time passcodes and verification messages. Used for 2FA and account verification flows. Tightly scoped and approved quickly.
+  </Card>
+</CardGroup>
+
+<Tip>
+  If your message is tied to something the user initiated — a booking, an order, a sign-up — use UTILITY. UTILITY templates are approved in minutes and cost less to send.
+</Tip>
+
+## Template components
+
+A template is made up of components. The only required component is a BODY. You can optionally add a HEADER (text or media), a FOOTER, and BUTTONS.
+
+<AccordionGroup>
+  <Accordion title="BODY (required)">
+    The main text of the message. Supports variables using `{{1}}`, `{{2}}` notation. Variable values are provided at send time.
+
+    ```json
+    {
+      "type": "BODY",
+      "text": "Hi {{1}}, your appointment on {{2}} has been confirmed."
+    }
+    ```
+  </Accordion>
+  <Accordion title="HEADER (optional)">
+    Displayed above the body. Can be plain text or a media type (image, video, document).
+
+    ```json
+    {
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "Appointment Confirmed"
+    }
+    ```
+  </Accordion>
+  <Accordion title="FOOTER (optional)">
+    A short line of grey text displayed below the body. Does not support variables.
+
+    ```json
+    {
+      "type": "FOOTER",
+      "text": "Reply STOP to unsubscribe."
+    }
+    ```
+  </Accordion>
+  <Accordion title="BUTTONS (optional)">
+    Up to three buttons. Supported types are `QUICK_REPLY` (sends a reply back to your webhook), `URL` (opens a link), and `PHONE_NUMBER` (initiates a call).
+
+    ```json
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        {
+          "type": "URL",
+          "text": "Track order",
+          "url": "https://example.com/track/{{1}}"
+        }
+      ]
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Creating a template
+
+You can create a template from the Paige dashboard or by asking the AI agent to create one for you.
+
+<Tabs>
+  <Tab title="Via the AI agent">
+    Tell the AI agent what template you need. The agent calls `create_template` automatically and handles the Meta API submission.
+
+    Example prompt:
+
+    > "Create a UTILITY template called order_shipped in English. The body should say 'Hi {'{{1}}'}, your order {'{{2}}'} has shipped and will arrive by {'{{3}}'}.'"
+
+    The agent will create the template and confirm when it has been submitted to Meta for approval.
+
+    <Info>
+      Template names must be lowercase letters, numbers, and underscores only, and must start with a letter. For example: `order_confirmation`, `appt_reminder_v2`.
+    </Info>
+  </Tab>
+  <Tab title="Via the dashboard">
+    Navigate to your project, open the **Templates** section, and click **New template**. Fill in the template name, category, language, and components. Submit the template for Meta approval when ready.
+  </Tab>
+</Tabs>
+
+## Template approval
+
+After you submit a template, Meta reviews it. Approval times vary by category:
+
+- **UTILITY** — typically approved within minutes
+- **AUTHENTICATION** — typically approved within minutes
+- **MARKETING** — can take hours to a few days
+
+You can check the approval status of your templates from the **Templates** section in your project dashboard or by asking the AI agent to list your templates.
+
+<Warning>
+  Templates that are rejected can be edited and resubmitted, but the name cannot be changed. If your template was rejected, review Meta's messaging policies, adjust the content, and resubmit.
+</Warning>
+
+## Listing your templates
+
+To see the current status of all templates for your project, ask the AI agent:
+
+> "List my templates."
+
+Or view them directly in the **Templates** section of your project dashboard.
+
+## Sending a template in bot code
+
+Once a template is approved, use `sendTemplate()` in your bot code to send it.
+
+```javascript
+const { sendTemplate } = require("../services/messages");
+
+// Send a template with no variables
+await sendTemplate(to, "welcome_message", "en");
+
+// Send a template with body variables
+await sendTemplate(to, "appointment_reminder", "en", [
+  {
+    type: "body",
+    parameters: [
+      { type: "text", text: contactName },
+      { type: "text", text: appointmentDate },
+    ],
+  },
+]);
+
+// Send a template with a header variable and a URL button variable
+await sendTemplate(to, "order_shipped", "en", [
+  {
+    type: "header",
+    parameters: [{ type: "text", text: "Order Update" }],
+  },
+  {
+    type: "body",
+    parameters: [
+      { type: "text", text: contactName },
+      { type: "text", text: orderNumber },
+      { type: "text", text: deliveryDate },
+    ],
+  },
+  {
+    type: "button",
+    sub_type: "url",
+    index: "0",
+    parameters: [{ type: "text", text: orderNumber }],
+  },
+]);
+```
+
+**Parameters:**
+- `to` — recipient phone number (e.g. `"27821234567"`)
+- `templateName` — the exact name of the approved template
+- `languageCode` — language code used when the template was created (e.g. `"en"`, `"en_US"`, `"pt_BR"`)
+- `components` — array of component objects providing variable values at send time
+
+<Note>
+  Variable indices in the `components` array at send time must match the `{{1}}`, `{{2}}` placeholders in the template definition, in order.
+</Note>
+
+## Deleting a template
+
+To delete a template, navigate to the **Templates** section in your project dashboard and click the delete action next to the template. Deleting a template removes it from your WhatsApp Business Account on Meta. This action cannot be undone.

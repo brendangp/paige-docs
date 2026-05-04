@@ -1,0 +1,258 @@
+---
+title: "WhatsApp message types available in your Paige bot"
+sidebarTitle: "Message Types"
+description: "A reference for every message type your bot can send — text, buttons, list menus, images, documents, location requests, voice notes, and templates."
+---
+
+Paige bots can send nine types of WhatsApp messages. Each type is a JavaScript function available in your bot's `services/messages.js` file. The right message type depends on what you need the user to do: read information, pick from options, share their location, or receive a file. The examples below show the exact function signatures from the template, so you can use them directly in your bot code.
+
+<Note>
+  Interactive messages — buttons, list menus, URL buttons, and flows — are billed as "interactive" messages by WhatsApp. Plain text and media messages are billed as regular messages. Check the [Meta pricing page](https://developers.facebook.com/docs/whatsapp/pricing) for the current rates for your region.
+</Note>
+
+## Message types
+
+<Tabs>
+  <Tab title="Text">
+    Send a plain text message. Supports newlines using `\n`.
+
+    ```javascript
+    await sendText(conversationId, to, "Hello! How can I help you today?");
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID from your database
+    - `to` — the recipient's phone number (e.g. `"27821234567"`)
+    - `text` — the message body; use `\n` for line breaks
+
+    Text messages are the simplest message type and work in all WhatsApp clients. Use them for confirmations, plain responses, and any message that does not need user input.
+  </Tab>
+
+  <Tab title="Buttons">
+    Send up to three quick-reply buttons below a message body. Each button has an `id` (used in your code logic) and a `title` (shown to the user).
+
+    ```javascript
+    await sendInteractiveButtons(
+      conversationId,
+      to,
+      "What would you like to do?",
+      [
+        { id: "book_demo", title: "Book a demo" },
+        { id: "get_support", title: "Get support" },
+        { id: "learn_more", title: "Learn more" },
+      ]
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `bodyText` — the message text shown above the buttons
+    - `buttons` — array of up to 3 button objects, each with `id` and `title`
+
+    When the user taps a button, your webhook receives an `interactive` message with `message.interactive.button_reply.id` set to the button's `id`. Use that value in your state handler to branch the conversation.
+
+    <Warning>
+      Button titles are limited to 20 characters. Button IDs are limited to 256 characters and must be unique per message.
+    </Warning>
+  </Tab>
+
+  <Tab title="List menu">
+    Send a list menu — a scrollable list of options the user selects from by tapping "View Options". Lists support more items than buttons and work well for menus with 4 or more choices.
+
+    ```javascript
+    await sendMenu(
+      conversationId,
+      to,
+      "Choose a service:",
+      [
+        { id: "service_web", title: "Web design", description: "Custom websites" },
+        { id: "service_seo", title: "SEO", description: "Search optimisation" },
+        { id: "service_ads", title: "Paid ads", description: "Google & Meta ads" },
+      ]
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `bodyText` — the message text shown above the list button
+    - `menuRows` — array of row objects, each with `id`, `title`, and optional `description`
+
+    When the user selects a row, your webhook receives `message.interactive.list_reply.id` set to the row's `id`.
+  </Tab>
+
+  <Tab title="URL button">
+    Send a call-to-action button that opens a URL when tapped. Use this for links to web pages, booking portals, payment links, or any external resource.
+
+    ```javascript
+    await sendURLButton(
+      conversationId,
+      to,
+      "Your booking is confirmed. View the details below.",
+      "View booking",
+      "https://example.com/bookings/abc123"
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `bodyText` — the message text shown above the button
+    - `buttonText` — the button label
+    - `url` — the URL to open
+
+    URL buttons open in the in-app browser inside WhatsApp. They do not generate a reply to your webhook when tapped.
+  </Tab>
+
+  <Tab title="Image">
+    Send an image with an optional caption. The image must be accessible via a public URL.
+
+    ```javascript
+    await sendImage(
+      conversationId,
+      to,
+      "https://example.com/images/product.jpg",
+      "Our latest model — available now."
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `imageUrl` — public URL of the image (JPEG or PNG)
+    - `caption` — optional caption displayed below the image
+
+    Supported formats are JPEG and PNG. Images must be under 5 MB. If you omit the caption, pass `null` as the fourth argument.
+  </Tab>
+
+  <Tab title="Document">
+    Send a file (PDF or other document type) with a filename and optional caption. The file must be accessible via a public URL.
+
+    ```javascript
+    await sendPDF(
+      conversationId,
+      to,
+      "https://example.com/files/invoice.pdf",
+      "invoice_march_2025.pdf",
+      "Your invoice for March 2025."
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `pdfUrl` — public URL of the file
+    - `fileName` — the filename shown to the user (e.g. `"invoice.pdf"`)
+    - `caption` — optional caption shown below the document
+
+    Documents appear in WhatsApp with a download button. PDF is the most common format. Files must be under 100 MB.
+  </Tab>
+
+  <Tab title="Location request">
+    Ask the user to share their location. WhatsApp displays a "Send location" button that opens the native location picker.
+
+    ```javascript
+    await sendLocationRequest(
+      conversationId,
+      to,
+      "Please share your location so we can find the nearest branch."
+    );
+    ```
+
+    **Parameters:**
+    - `conversationId` — the conversation ID
+    - `to` — recipient phone number
+    - `bodyText` — the message text shown above the "Send location" button
+
+    When the user shares their location, your webhook receives a `location` message containing `latitude`, `longitude`, and optionally `name` and `address`. Access these via `message.location.latitude` and `message.location.longitude`.
+  </Tab>
+
+  <Tab title="Voice notes">
+    Your bot does not send voice notes, but it can receive and transcribe them. When a user sends a voice note, the AI bot template automatically transcribes the audio to text using OpenAI and passes the transcript into your conversation handler as if it were a plain text message. Your existing state handlers process voice notes without any changes on your part.
+
+    ```javascript
+    // Voice notes are handled automatically by the AI bot template.
+    // The transcript is passed to your state handler as a plain text message.
+    // No additional code is required on your end.
+    ```
+
+    <Info>
+      Voice note transcription requires an OpenAI API key stored as a secret in your project. See [Secrets](/guides/secrets) for how to add one.
+    </Info>
+  </Tab>
+
+  <Tab title="Templates">
+    Send a Meta-approved message template to a user who has not messaged you recently (outside the 24-hour window) or for proactive outbound notifications.
+
+    ```javascript
+    await sendTemplate(
+      to,
+      "appointment_reminder",
+      "en",
+      [
+        {
+          type: "body",
+          parameters: [
+            { type: "text", text: "Sarah" },
+            { type: "text", text: "tomorrow at 3pm" },
+          ],
+        },
+      ]
+    );
+    ```
+
+    **Parameters:**
+    - `to` — recipient phone number
+    - `templateName` — the approved template name
+    - `languageCode` — language code (e.g. `"en"`, `"en_US"`, `"es"`)
+    - `components` — array of component objects with variable values
+
+    Templates must be approved by Meta before they can be sent. See [Message Templates](/guides/templates) for how to create and manage them.
+  </Tab>
+</Tabs>
+
+## Carousel messages
+
+You can also send a carousel of up to 10 cards, each with an image, body text, and quick-reply buttons. Carousels are useful for product listings, plan comparisons, or multi-item promotions.
+
+```javascript
+await sendCarousel(
+  conversationId,
+  to,
+  "Here are our current plans:",
+  [
+    {
+      imageUrl: "https://example.com/images/starter.jpg",
+      bodyText: "Starter — $29/month. Up to 1,000 conversations.",
+      buttons: [{ id: "plan_starter", title: "Choose Starter" }],
+    },
+    {
+      imageUrl: "https://example.com/images/pro.jpg",
+      bodyText: "Pro — $79/month. Unlimited conversations.",
+      buttons: [{ id: "plan_pro", title: "Choose Pro" }],
+    },
+  ]
+);
+```
+
+Each card in the `cards` array takes `imageUrl`, `bodyText`, and a `buttons` array. Button clicks are returned via the webhook as `interactive` messages with `button_reply`.
+
+## Sending a WhatsApp Flow
+
+To open a multi-screen WhatsApp Flow from within a conversation, use `sendFlow`. The user taps the call-to-action button and the flow opens inline in WhatsApp.
+
+```javascript
+await sendFlow(
+  conversationId,
+  to,
+  {
+    flow_id: "1234567890",
+    flow_cta: "Book now",
+    body_text: "Fill in your details to complete your booking.",
+    screen: "BOOKING_SCREEN",
+  }
+);
+```
+
+See [Flows Builder](/guides/flows-builder) for how to create and publish flows.

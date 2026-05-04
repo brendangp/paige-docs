@@ -1,0 +1,134 @@
+---
+title: "Paige: WhatsApp bot builder platform"
+description: Everything you need to build, launch, and manage AI-powered WhatsApp bots — from interactive flows to automated conversations.
+mode: custom
+---
+
+<div data-product-guide-index className="flex w-full flex-col gap-8">
+  <div className="flex max-w-[540px] flex-col gap-2 self-center text-center">
+    <h1 className="font-serif text-[30px] font-medium leading-9 tracking-tight text-gray-900 dark:text-gray-50">
+      Paige Documentation
+    </h1>
+    <p className="text-balance text-sm leading-relaxed tracking-tight text-gray-600 dark:text-gray-400">
+      Build AI-powered WhatsApp bots with interactive flows, automated conversations, and a built-in database — no backend required.
+    </p>
+  </div>
+
+  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <Card
+      title={<span className="product-guide-feature-card-title">Get started</span>}
+      icon="rocket"
+      href="/quickstart"
+      className="product-guide-feature-card"
+      size={64}
+    >
+      <span className="product-guide-feature-card-description">Create your first WhatsApp bot in minutes.</span>
+    </Card>
+
+    <a
+      href="/concepts/flows"
+      className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+    >
+      <Icon icon="git-branch" color="rgb(var(--primary))" size={18} className="shrink-0" />
+      <div className="flex flex-col gap-1">
+        <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">WhatsApp Flows</span>
+        <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          Build multi-screen interactive experiences inside WhatsApp chats.
+        </span>
+      </div>
+    </a>
+    <a
+      href="/guides/ai-agent"
+      className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+    >
+      <Icon icon="bot" color="rgb(var(--primary))" size={18} className="shrink-0" />
+      <div className="flex flex-col gap-1">
+        <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">AI bot builder</span>
+        <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          Describe your bot in plain language and let the AI write the code.
+        </span>
+      </div>
+    </a>
+  </div>
+
+  <hr className="border-0 border-t border-border" />
+
+  <div className="flex flex-col gap-4">
+    <h2 className="font-serif text-xl font-medium leading-normal text-gray-900 dark:text-gray-50">Common tasks</h2>
+
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <a
+        href="/whatsapp-setup"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="phone" color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Connect WhatsApp</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Link your WhatsApp Business number via Meta embedded signup.
+          </span>
+        </div>
+      </a>
+      <a
+        href="/concepts/database"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="database" color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Manage your database</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Create tables and store bot data without leaving the dashboard.
+          </span>
+        </div>
+      </a>
+      <a
+        href="/guides/workspaces"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="users" color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Invite your team</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Create a workspace and collaborate with teammates on your bots.
+          </span>
+        </div>
+      </a>
+      <a
+        href="/guides/testing"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="flask-conical"  color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Test your bot live</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Link your phone to Paige Dev and chat with your bot in real time.
+          </span>
+        </div>
+      </a>
+      <a
+        href="/guides/templates"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="message-square" color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Send a template message</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Create and manage approved WhatsApp message templates for outbound notifications.
+          </span>
+        </div>
+      </a>
+      <a
+        href="/guides/version-history"
+        className="flex flex-col gap-4 rounded-none border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary"
+      >
+        <Icon icon="history" color="rgb(var(--primary))" size={18} className="shrink-0" />
+        <div className="flex flex-col gap-1">
+          <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">Restore a version</span>
+          <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            Roll back bot code to any previous commit with one click.
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
