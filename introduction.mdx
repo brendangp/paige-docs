@@ -1,52 +1,77 @@
 ---
-title: "Paige: Build AI-powered WhatsApp bots without code"
+title: "Welcome to Paige"
 sidebarTitle: "Introduction"
-description: "Paige lets you build, launch, and manage AI-powered WhatsApp bots — with interactive flows, a built-in database, and no backend required."
+description: "Paige is an AI-powered platform for building, deploying, and managing WhatsApp bots — with interactive flows, a built-in database, and no backend to maintain."
 ---
 
-Paige is a WhatsApp bot builder platform designed for teams that want to automate conversations on WhatsApp without writing infrastructure from scratch. You connect your WhatsApp Business number, describe what you want your bot to do, and Paige handles the rest — from generating the bot code to storing conversation data to delivering messages at scale.
+Paige lets you ship production-ready WhatsApp automations by describing what you want in plain language. You connect a WhatsApp Business number, chat with the AI to build the bot, and Paige handles the code, the database, the message delivery, and the Meta integration for you.
 
-## What you can build
+## Why use Paige
 
-With Paige you can automate customer support, run lead capture flows, send appointment reminders, collect feedback, and build any other conversational experience that fits your business. Whether you need a simple FAQ bot or a multi-step onboarding flow with conditional logic, Paige gives you the tools to build it.
+**Build with natural language.** Describe the behavior you want and the AI writes the bot code. Iterate by chatting — no need to manage a backend, write webhook handlers, or wire up infrastructure.
 
-## Key features
+**Native WhatsApp experiences.** Build interactive multi-screen forms with WhatsApp Flows, send Meta-approved templates, and handle every WhatsApp message type from a single project.
 
-**AI bot builder** — Chat with the AI assistant to write and edit your bot's code in plain language. You describe the behavior you want, and the AI translates it into working bot logic. You can refine it at any time by continuing the conversation.
+**Everything in one place.** Each project comes with its own bot code editor, database, conversation history, execution logs, secrets manager, and version history.
 
-**Visual flow builder** — Create multi-screen interactive forms that run natively inside WhatsApp using WhatsApp Flows. Flows let users tap through structured screens — picking options, submitting details, confirming bookings — without leaving the chat.
-
-**Built-in database** — Every project includes its own database. You can create tables, store contact data, log orders, or persist any state your bot needs, all from within the Paige dashboard.
-
-**Conversation and contact management** — View every conversation your bot has had, browse your contact list, and inspect message history from a single dashboard.
-
-**WhatsApp Business API integration** — Paige connects to Meta's WhatsApp Business API through an embedded signup flow. You link your existing WhatsApp Business Account or create a new one, and Paige manages the webhook connection and token handling for you.
-
-**Message templates** — Create and manage Meta-approved message templates for sending outbound notifications to users who haven't messaged you recently.
-
-**Secrets manager** — Store API keys and other sensitive values securely. Your bot code can reference secrets by name without exposing the underlying values.
-
-**Execution logs and version history** — Every time your bot runs, Paige logs the execution. If something breaks, you can inspect the logs and roll back to any previous version of your bot code with one click.
-
-**Live testing with Paige Dev** — Link your personal phone number to test your bot in a real WhatsApp conversation before deploying it to users.
-
-**Team workspaces** — Invite teammates to a shared workspace so multiple people can collaborate on the same projects.
+**Built for teams.** Invite teammates to a shared workspace, collaborate on the same projects, and manage billing in one place.
 
 ## Who Paige is for
 
-Paige is built for product and operations teams, freelancers, and agencies that need to ship WhatsApp automations quickly. You don't need to manage webhooks, write a backend service, or set up a database — Paige provisions all of that when you create a project.
+**Product and operations teams** automating customer support, lead capture, appointment booking, and other recurring conversational workflows.
 
-<CardGroup cols={2}>
+**Freelancers and agencies** shipping WhatsApp bots for clients without standing up infrastructure for each new project.
+
+**Founders and indie builders** validating ideas on WhatsApp before investing in custom backends.
+
+**Non-technical builders** who want to launch a working bot without writing code, while still being able to drop into the code when they need to.
+
+## What you can build
+
+- Customer support bots that answer FAQs and escalate to humans
+- Lead capture flows that qualify prospects and route them to your CRM
+- Appointment booking and reminders
+- Order tracking, status updates, and post-purchase notifications
+- Surveys, feedback collection, and contact forms
+- Onboarding sequences with conditional branches
+- Internal tools that staff trigger from WhatsApp
+
+## How Paige fits into your workflow
+
+<Steps>
+  <Step title="Create a project">
+    Sign up at [paigme.dev](https://paigme.dev) and Paige provisions a project with its own bot code, database, and WhatsApp connection.
+  </Step>
+  <Step title="Connect WhatsApp">
+    Link your WhatsApp Business number through Meta's embedded signup. Paige manages the webhook and tokens for you.
+  </Step>
+  <Step title="Build with the AI">
+    Describe what you want your bot to do. The AI writes the bot code and you refine it by continuing the conversation.
+  </Step>
+  <Step title="Test and deploy">
+    Test live with Paige Dev on your own phone, deploy with one click, and roll back to any previous version if something breaks.
+  </Step>
+</Steps>
+
+## Browse the docs
+
+<CardGroup cols={3}>
   <Card title="Quick start" icon="rocket" href="/quickstart">
-    Create your account, connect WhatsApp, and launch your first bot in minutes.
+    Step-by-step tutorial to launch your first bot.
+  </Card>
+  <Card title="Features" icon="sparkles" href="/concepts/projects">
+    Projects, flows, database, and the rest of Paige's core features.
   </Card>
   <Card title="Connect WhatsApp" icon="phone" href="/whatsapp-setup">
     Link your WhatsApp Business number through Meta embedded signup.
   </Card>
-  <Card title="Bot code" icon="code" href="/concepts/bot-code">
-    Learn how bot code works and how the AI helps you write it.
+  <Card title="Flow templates" icon="layout-template" href="/templates/overview">
+    Ready-made flows for booking, lead capture, feedback, and more.
   </Card>
-  <Card title="WhatsApp flows" icon="git-branch" href="/concepts/flows">
-    Build multi-screen interactive experiences inside WhatsApp chats.
+  <Card title="Prompting the AI" icon="message-circle" href="/guides/ai-agent">
+    Get the most out of the AI bot builder with effective prompts.
+  </Card>
+  <Card title="Changelog" icon="history" href="/changelog">
+    See what's new in Paige.
   </Card>
 </CardGroup>

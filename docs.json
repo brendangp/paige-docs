@@ -1,14 +1,21 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "almond",
-  "name": "Paige",
+  "theme": "mint",
+  "name": "paige",
   "description": "Build AI-powered WhatsApp bots with interactive flows, automated conversations, and a built-in database — no backend required.",
   "colors": {
-    "primary": "#82d441",
-    "light": "#151d36",
-    "dark": "#cfeabb"
+    "primary": "#81D741",
+    "light": "#cfeabb",
+    "dark": "#81D741"
   },
-  "favicon": "https://media.brand.dev/a3208a4c-a7ff-4d76-aae1-9cb74a5f55df.png",
+  "favicon": "/favicon.ico",
+  "logo": {
+    "light": "/logo/green-pages-logo.png",
+    "dark": "/logo/green-pages-logo.png"
+  },
+  "fonts": {
+    "family": "Geist"
+  },
   "icons": {
     "library": "lucide"
   },
@@ -18,30 +25,29 @@
   "contextual": {
     "options": ["copy", "view", "assistant"]
   },
+  "redirects": [
+    { "source": "/", "destination": "/introduction", "permanent": true }
+  ],
   "navigation": {
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Home",
-          "icon": "house",
-          "href": "/"
-        }
-      ]
-    },
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Introduction",
+        "icon": "rocket",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Welcome",
             "pages": [
-              "introduction",
-              "quickstart",
-              "whatsapp-setup"
+              "introduction"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Features",
+        "icon": "sparkles",
+        "groups": [
           {
-            "group": "Core Concepts",
+            "group": "Core concepts",
             "pages": [
               "concepts/projects",
               "concepts/bot-code",
@@ -51,7 +57,7 @@
             ]
           },
           {
-            "group": "Building Your Bot",
+            "group": "Building blocks",
             "pages": [
               "guides/ai-agent",
               "guides/message-types",
@@ -61,15 +67,7 @@
             ]
           },
           {
-            "group": "Testing & Monitoring",
-            "pages": [
-              "guides/testing",
-              "guides/logs",
-              "guides/version-history"
-            ]
-          },
-          {
-            "group": "Team & Billing",
+            "group": "Team & billing",
             "pages": [
               "guides/workspaces",
               "guides/billing"
@@ -78,10 +76,18 @@
         ]
       },
       {
-        "tab": "Flow Templates",
+        "tab": "Tutorials",
+        "icon": "graduation-cap",
         "groups": [
           {
-            "group": "Templates",
+            "group": "Quick start",
+            "pages": [
+              "quickstart",
+              "whatsapp-setup"
+            ]
+          },
+          {
+            "group": "Flow templates",
             "pages": [
               "templates/overview",
               "templates/appointment-booking",
@@ -93,6 +99,32 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Tips & Tricks",
+        "icon": "lightbulb",
+        "groups": [
+          {
+            "group": "Operate your bot",
+            "pages": [
+              "guides/testing",
+              "guides/logs",
+              "guides/version-history"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "icon": "history",
+        "groups": [
+          {
+            "group": "Release notes",
+            "pages": [
+              "changelog"
+            ]
+          }
+        ]
       }
     ]
   },
@@ -100,8 +132,8 @@
     "links": [],
     "primary": {
       "type": "button",
-      "label": "Get Started",
-      "href": "https://paige.app"
+      "label": "Start Building",
+      "href": "https://paigme.dev"
     }
   },
   "footer": {
