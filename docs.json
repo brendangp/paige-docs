@@ -25,9 +25,6 @@
   "contextual": {
     "options": ["copy", "view", "assistant"]
   },
-  "redirects": [
-    { "source": "/", "destination": "/introduction", "permanent": true }
-  ],
   "navigation": {
     "tabs": [
       {
@@ -37,7 +34,7 @@
           {
             "group": "Welcome",
             "pages": [
-              "introduction"
+              "index"
             ]
           }
         ]
