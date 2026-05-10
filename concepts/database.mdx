@@ -54,21 +54,11 @@ The dashboard lets you:
 - Clear all rows from a table
 - Drop a custom table
 
-### Via the AI agent
+### Via the Code Agent
 
-The AI agent in the bot code chat has full access to your database schema and can create and modify tables as part of building your bot. When you describe a feature that requires data storage, the agent will create the necessary tables before writing the bot code that references them.
+The [Code Agent](/agents/code-agent) has full access to your database schema and can create and modify tables as part of building your bot. When you describe a feature that requires data storage, the agent will create the necessary tables before writing the bot code that references them.
 
-The agent has access to the following database tools:
-
-| Tool | What it does |
-|---|---|
-| `create_table` | Create a table with specified columns and types |
-| `list_tables` | List all tables and their schemas |
-| `describe_table` | Get detailed column info for a single table |
-| `add_column` | Add a column to an existing table |
-| `drop_table` | Drop a custom table |
-| `query_table` | Read rows from a table (useful for debugging) |
-| `insert_rows` | Insert seed data or test records |
+You can ask it to create tables, add columns, query rows, or seed test data — all in plain language, without leaving the chat.
 
 ## Supported column types
 

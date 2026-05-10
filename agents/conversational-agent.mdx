@@ -1,0 +1,59 @@
+---
+title: "Talk to your users naturally with the Conversational Agent"
+sidebarTitle: "Conversational Agent"
+description: "The Conversational Agent is the in-bot AI that talks to your end users on WhatsApp — routing intent, answering questions, and collecting information in plain language."
+---
+
+<Note>
+  This page is a working draft. Review the descriptions below and let us know what to adjust.
+</Note>
+
+The Conversational Agent is the AI that runs **inside** your deployed bot. While the [Code Agent](/agents/code-agent) helps you build the bot, the Conversational Agent is what your end users actually chat with on WhatsApp. It understands what each user is asking, decides how to respond, and collects information from them in a natural, message-by-message conversation.
+
+You don't need to write the conversational logic yourself. When you describe the kind of bot you want, the Code Agent wires the Conversational Agent into your project with the right personality, knowledge, and goals.
+
+## What it does
+
+<CardGroup cols={2}>
+  <Card title="Understands intent" icon="brain">
+    Reads each incoming message, figures out what the user wants, and routes the conversation to the right next step — whether that's answering a question, starting a flow, or escalating.
+  </Card>
+  <Card title="Stays in character" icon="user-circle">
+    Replies in the tone and voice you've configured for your brand. Stays focused on the topics your bot is meant to handle and politely redirects off-topic messages.
+  </Card>
+  <Card title="Pulls from your knowledge" icon="book-open">
+    Answers questions using the knowledge base documents you've added to the project — product info, FAQs, policies, and anything else you want it to reference.
+  </Card>
+  <Card title="Collects information naturally" icon="messages-square">
+    Asks for the details your bot needs (name, email, preferred date, etc.) without forcing users through rigid forms. Validates and stores answers as it goes.
+  </Card>
+  <Card title="Hands off cleanly" icon="git-branch">
+    Knows when to step out of free-form chat and start a structured WhatsApp Flow, send a template, or hand the conversation to a human teammate.
+  </Card>
+  <Card title="Remembers context" icon="history">
+    Keeps track of where each user is in their conversation, so a user who returns hours or days later picks up exactly where they left off.
+  </Card>
+</CardGroup>
+
+## How to shape it
+
+You don't program the Conversational Agent directly. You shape its behavior by talking to the [Code Agent](/agents/code-agent) — for example:
+
+> "Make the bot greet users in Afrikaans and English, and only answer questions about our restaurant menu and bookings. For anything else, suggest they call us instead."
+
+The Code Agent updates the bot's prompts, knowledge base, and routing so the Conversational Agent behaves the way you described. You can iterate as often as you like — every conversation that happens after a deploy uses the new behavior.
+
+<Tip>
+  Add a knowledge base document for any topic you want the Conversational Agent to answer accurately. Bullet points and short FAQs work better than long marketing pages.
+</Tip>
+
+## When to use it
+
+The Conversational Agent shines whenever your bot needs to handle messages that aren't predictable button taps:
+
+- **Customer support** — answering FAQs, troubleshooting, and routing tricky questions to a human.
+- **Lead qualification** — asking the right follow-up questions based on what the user just said.
+- **Discovery and search** — helping users find a product, service, or piece of information by describing it.
+- **Onboarding** — walking a new user through setup with conversational prompts instead of static menus.
+
+If your bot only needs strict menu-driven logic, you can opt out of the Conversational Agent entirely — see the simple bot template described on the [Code Agent](/agents/code-agent) page.

@@ -18,7 +18,7 @@ A project is the top-level container for everything in Paige. When you create a 
   <Card title="Database" icon="database">
     A dedicated Postgres database provisioned exclusively for this project. Your bot code can read and write it, and you can manage it from the dashboard.
   </Card>
-  <Card title="Flows" icon="layout">
+  <Card title="Flows" icon="workflow">
     WhatsApp Flows are multi-screen interactive forms that run inside the WhatsApp chat. They are created and managed per project and synced to Meta via your connected phone number.
   </Card>
   <Card title="Conversations" icon="message-circle">
@@ -41,7 +41,9 @@ When you create a project, Paige provisions the infrastructure in the background
 
 ### Updating a project
 
-You can update a project's name and settings at any time from the project settings page. WhatsApp Business profile details — including your display name and profile photo — can also be updated from within the project.
+You can update a project's name and settings at any time from the project settings page.
+
+WhatsApp Business profile details — including your display name and profile photo — are managed in **Settings → WhatsApp**, and only become available once you've connected a WhatsApp number to the project.
 
 <Note>
   Display name changes require Meta approval and may take time to reflect on the WhatsApp number.
@@ -57,11 +59,20 @@ Resetting a project clears your bot code back to its initial state while preserv
 
 ### Suspending and restoring a project
 
-You can suspend a project to temporarily take it offline. Suspending a project backs up its data and removes the active runtime. A suspended project can be restored at any time.
+Project suspension is driven by billing — there is no manual "suspend" button. A suspended project is taken offline (the runtime stops responding to WhatsApp messages) but its data, bot code, database, flows, and conversation history are preserved.
+
+A project becomes suspended in two situations:
+
+- **End of the free trial.** Every new project includes a 14-day free trial. If the project is not on a paid plan when the trial ends, it is automatically suspended.
+- **Paused or cancelled billing.** If you pause or cancel billing on an active project, it continues to run until the end of the current paid 30-day cycle, then is suspended.
+
+To restore a suspended project, resume billing from the project's billing page. The bot returns to its previous state with no data loss.
 
 <Tip>
-  Suspend a project if you need to pause a bot without deleting it — for example, during a seasonal pause or while a project is being rebuilt.
+  Pause billing on a project if you need a temporary break — for example, during a seasonal pause or while a project is being rebuilt. The project keeps running until the end of the cycle you've already paid for, then suspends cleanly.
 </Tip>
+
+See [Billing](/guides/billing) for the full billing model and how to manage your plan.
 
 ### Transferring a project
 

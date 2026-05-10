@@ -10,91 +10,34 @@ Every Paige project has a bot codebase — a Node.js/Express application that ru
 
 Your bot tracks each contact's position in the conversation using a **state**. The state is a string stored in the database for every contact, and it determines which block of code handles their next message.
 
-The template uses two types of states:
+There are two types of states:
 
 - **SEND-STATE** — sends a message or interactive UI, then transitions the contact into an AWAIT state.
 - **AWAIT-STATE** — receives the user's response and processes it. It may send a reply and transition to another state, or stay in the same state.
 
-The default template ships with three states:
-
-| State | Type | Description |
-|---|---|---|
-| `unstructured` | AWAIT | Default state. A master router classifies the user's intent and routes to the appropriate sub-agent or state. |
-| `support` | AWAIT | AI-powered support conversation. |
-| `collect_info` | AWAIT | Gathers structured information from the contact. |
-
-You can add as many states as your bot needs. A state is just a string — the webhook handler uses a `switch` or `if/else` block to decide what to do when a message arrives for a contact in that state.
+You can add as many states as your bot needs. The Code Agent will create the right ones for you when you describe a new flow in plain language.
 
 <Note>
   A contact's state persists across messages. If a contact stops mid-conversation and comes back later, they resume in the same state.
 </Note>
 
-## The template
+## The starter template
 
-When you create a new project, Paige loads a production-ready starter template. The template includes:
+When you create a new project, Paige loads a production-ready starter template that handles the plumbing for you. Out of the box it gives you:
 
-- An Express server entry point (`app.js`)
-- The main webhook handler (`routes/whatsapp_webhook.js`) with the state machine pre-wired
-- Messaging service functions (`services/messages.js`) for sending text, buttons, menus, images, and more
-- Database service functions (`services/dbServices.js`) for reading and writing the project database
-- A logging utility and a prompts file for AI integration
-- An example knowledge base directory for AI context documents
+- A pre-wired webhook handler with the state machine ready to extend
+- Helpers for sending every WhatsApp message type
+- Helpers for reading and writing your project's database
+- Logging built in for debugging
+- A space for AI context documents (knowledge base)
 
-The template connects to your project's Postgres database automatically — no connection string configuration required inside the Paige environment.
+Your project's Postgres database is connected automatically — there is no connection string to configure.
 
-## The AI code agent
+## The Code Agent
 
-You build and edit your bot through Paige's AI chat interface. The AI agent understands your project's full codebase and has access to a set of built-in tools it can use on your behalf.
+You build and edit your bot through Paige's AI chat interface. The Code Agent understands your project's full codebase and uses a built-in toolset on your behalf — it can read and edit project files, manage the database schema and data, create and publish WhatsApp Flows, and create message templates, all without you leaving the conversation.
 
-<AccordionGroup>
-  <Accordion title="File tools">
-    The agent can read, write, edit, delete, and search files in your project. It uses targeted edits when possible to avoid overwriting whole files unnecessarily.
-
-    | Tool | What it does |
-    |---|---|
-    | `read_file` | Read a file by path |
-    | `write_file` | Create or overwrite a file with complete content |
-    | `edit_file` | Make a targeted replacement in an existing file |
-    | `multi_edit` | Apply multiple edits to a single file atomically |
-    | `delete_file` | Delete a file |
-    | `search_files` | Search across all project files by text or regex pattern |
-  </Accordion>
-  <Accordion title="Database tools">
-    The agent can inspect and modify your project's database schema and data as part of writing or debugging bot code.
-
-    | Tool | What it does |
-    |---|---|
-    | `create_table` | Create a new table with specified columns |
-    | `list_tables` | List all tables and their schemas |
-    | `add_column` | Add a column to an existing table |
-    | `drop_table` | Drop a custom table |
-    | `describe_table` | Get detailed column info for a single table |
-    | `query_table` | Read rows from a table |
-    | `insert_rows` | Insert seed or test data |
-  </Accordion>
-  <Accordion title="Flow tools">
-    The agent can create, update, publish, and manage WhatsApp Flows.
-
-    | Tool | What it does |
-    |---|---|
-    | `generate_flow` | Create a new WhatsApp Flow via the flows sub-agent |
-    | `update_flow` | Modify an existing flow |
-    | `list_flows` | List all flows and their status |
-    | `publish_flow` | Publish a draft flow to Meta |
-    | `delete_flow` | Delete a draft flow |
-    | `check_flow` | Validate a flow against Meta and check for errors |
-    | `upload_flow` | Re-upload an existing flow JSON to Meta as-is |
-  </Accordion>
-  <Accordion title="Template and debugging tools">
-    | Tool | What it does |
-    |---|---|
-    | `get_template` | Load the starter template for a new bot (`simple` or `ai` type) |
-    | `get_api_reference` | Get the API reference for `messages.js` and `dbServices.js` |
-    | `list_templates` | List all WhatsApp message templates for the project |
-    | `create_template` | Create a new WhatsApp message template |
-    | `get_recent_logs` | Fetch recent bot execution logs for debugging |
-  </Accordion>
-</AccordionGroup>
+For details on how to prompt the agent and what it can do, see the [Code Agent](/agents/code-agent) page.
 
 ## Version history (commits)
 
@@ -122,7 +65,7 @@ You can test your bot in real time using **Paige Dev** — a shared WhatsApp num
 
 ## Message types your bot can send
 
-Your bot can send any of the following message types using the functions in `services/messages.js`:
+Your bot can send any of the following message types using built-in messaging helpers:
 
 - Plain text
 - Interactive buttons (up to 3)

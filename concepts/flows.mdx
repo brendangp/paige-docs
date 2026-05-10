@@ -49,13 +49,13 @@ Each Flow is identified by a Meta Flow ID that is stored in your project. Your b
 
 <Steps>
   <Step title="Generate a Flow">
-    Describe the Flow you want to the AI agent in the bot code chat. For example: "Create a 3-screen appointment booking flow with a service dropdown, date picker, and confirmation screen." The agent uses the `generate_flow` tool to produce the Flow JSON and automatically uploads it to Meta as a Draft.
+    Describe the Flow you want to the Code Agent in the bot code chat. For example: "Create a 3-screen appointment booking flow with a service dropdown, date picker, and confirmation screen." The agent generates the Flow definition and uploads it to Meta as a Draft.
   </Step>
   <Step title="Preview and validate">
-    Use the Flow preview simulator in the Paige dashboard to step through the Flow screens. The agent can also run `check_flow` to surface any Meta validation errors.
+    Use the Flow preview simulator in the Paige dashboard to step through the Flow screens. You can also ask the agent to validate the Flow and surface any Meta errors.
   </Step>
   <Step title="Publish the Flow">
-    Once you are satisfied, publish the Flow from the dashboard or ask the AI agent to publish it. After publishing, the Flow can be sent to users.
+    Once you are satisfied, publish the Flow from the dashboard or ask the Code Agent to publish it. After publishing, the Flow can be sent to users.
   </Step>
   <Step title="Embed in your bot code">
     Reference the Flow by its ID in your bot code to send it to a contact at the right moment in the conversation. The submission payload arrives as a structured message that your webhook handler processes.
@@ -64,7 +64,7 @@ Each Flow is identified by a Meta Flow ID that is stored in your project. Your b
 
 ## Flow JSON format
 
-Flows are defined in JSON format (version `6.0`). Each Flow contains one or more screens, and each screen contains a layout of components. Paige's AI agent generates and edits this JSON for you — you rarely need to edit it by hand.
+Flows are defined in JSON format (version `6.0`). Each Flow contains one or more screens, and each screen contains a layout of components. Paige's Code Agent generates and edits this JSON for you — you rarely need to edit it by hand.
 
 Common Flow components include:
 
@@ -78,7 +78,7 @@ Common Flow components include:
 | `Footer` | A button at the bottom of a screen that advances to the next screen or submits the form |
 
 <Tip>
-  Use the `generate_flow` tool for new Flows and the `update_flow` tool for changes to existing ones. The agent preserves the existing Meta Flow ID when updating, so your bot code references remain valid.
+  Ask the Code Agent to generate new Flows or update existing ones in plain language. When updating, the agent preserves the existing Meta Flow ID so your bot code references remain valid.
 </Tip>
 
 ## Managing Flows from the dashboard

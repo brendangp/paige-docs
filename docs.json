@@ -54,9 +54,16 @@
             ]
           },
           {
+            "group": "AI agents",
+            "pages": [
+              "agents/code-agent",
+              "agents/conversational-agent",
+              "agents/help-agent"
+            ]
+          },
+          {
             "group": "Building blocks",
             "pages": [
-              "guides/ai-agent",
               "guides/message-types",
               "guides/templates",
               "guides/flows-builder",
@@ -135,5 +142,11 @@
   },
   "footer": {
     "socials": {}
-  }
+  },
+  "redirects": [
+    {
+      "source": "/guides/ai-agent",
+      "destination": "/agents/code-agent"
+    }
+  ]
 }
