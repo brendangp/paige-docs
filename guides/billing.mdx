@@ -6,6 +6,22 @@ description: "Paige charges per project with a subscription plan and AI credits 
 
 Billing in Paige is managed at the project level. Each project has its own subscription plan, and AI usage — such as the AI agent writing and modifying your bot code — is charged against a credits balance. Payments are processed securely through Paystack.
 
+## Free trial
+
+Every new project starts on a **14-day free trial** with full access to every paid feature — the **Conversations** tab, **Broadcasts**, the **Deploy** button, and bot runtime on your connected WhatsApp number. You can build, deploy, and run your bot end-to-end during the trial without entering payment details.
+
+When the trial ends and you have not subscribed:
+
+- **Locked.** The Conversations tab, Broadcasts tab, Deploy button, and bot runtime are gated until you subscribe. Inbound WhatsApp messages on your connected number are received but the bot will not reply.
+- **Still open.** The Code tab, the AI chat sidebar, every Settings section (including **WhatsApp**), the in-app preview, and the Paige Dev testing number remain available — so you can keep iterating and connect or re-configure your WhatsApp number whenever you're ready.
+
+Subscribe from **Settings → Billing** to lift the gate immediately. Your bot resumes responding on your real WhatsApp number from the moment your subscription becomes active.
+
+<Tip>
+  You can connect your WhatsApp Business number through Meta embedded signup at any point — during the trial, after the trial expires, or after you subscribe. The connection itself is never gated.
+</Tip>
+
+
 ## Subscription plans
 
 Each project requires an active subscription to stay live and accept messages. Plans are billed per project, so if you have multiple projects you manage each subscription separately.
@@ -45,6 +61,18 @@ When your credits run low, you can top up at any time without changing your subs
 <Tip>
   Keep an eye on your credit balance when doing a lot of AI-assisted development — longer, more complex sessions consume more credits than simple edits.
 </Tip>
+
+### Low-credit warning and zero-balance gating
+
+Paige warns you in-app well before your credits run out, and stops new AI requests cleanly when your balance hits zero.
+
+- **Low-credit warning.** Once your balance drops below one credit, a persistent banner appears above the chat input with a **Top up** button. Clicking it switches you straight to **Settings → Usage** so you can buy more without losing your place in the chat.
+- **Zero-balance gate.** When your balance reaches zero, the Code and Conversations agents stop accepting new requests. A request that is already streaming is allowed to finish — only the next one is blocked.
+- **Help Agent still works.** The [Help Agent](/agents/help-agent) is always free and bypasses the credit balance, so you can still ask Paige for help even when credits are out.
+
+<Info>
+  The banner balance is refreshed after every message and after every top-up, so as soon as your credits land the chat unblocks automatically.
+</Info>
 
 ## Pause, resume, and cancel
 

@@ -180,6 +180,25 @@ if (incoming.type === "interactive" && incoming.interactive?.nfm_reply) {
 }
 ```
 
+## Preview flows inside Paige
+
+You can preview every flow in your project from the **Flows** tab — open a flow on the left, then click **Try it** on the detail panel to load an interactive simulation in the right pane. **Inspect** and **Debug** modes are available alongside **Try it** for stepping through screens and validating the JSON.
+
+Preview works even if you haven't connected your own WhatsApp number yet. Paige dual-publishes every flow to the shared Paige Dev WhatsApp Business Account, so the preview falls back to the Paige Dev copy whenever your own copy isn't available. You don't have to do anything different — just open a flow and click **Try it**.
+
+### URL buttons in the in-app preview
+
+The phone-frame preview on the right side of the editor renders interactive **URL buttons** the same way real WhatsApp does. Tap a URL button in the preview to open the destination inside the phone frame using an embedded webview:
+
+- **Close** returns you to the chat preview.
+- **Open in new tab** opens the destination in a normal browser tab — useful for sites that block being embedded.
+
+If the destination blocks iframing (via `X-Frame-Options` or `Content-Security-Policy`), the preview shows an error state after a short timeout and keeps **Open in new tab** available so you can still verify the link works.
+
+<Info>
+  Tapping a URL button in the preview does not post a payload back to your bot. That matches how real WhatsApp handles URL CTAs — only **QUICK_REPLY** buttons send a reply event.
+</Info>
+
 ## Pre-built flow templates
 
 Paige provides pre-built flow templates for common use cases to help you get started quickly. See [Flow Templates](/templates/overview) for the full list.
