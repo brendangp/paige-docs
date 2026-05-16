@@ -145,6 +145,40 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
   </Accordion>
 </AccordionGroup>
 
+## Flow design rules to know
+
+Most of these rules are enforced automatically by the AI agent and Paige's local validator, but they shape how you should describe a flow so the agent picks a structure that Meta will accept.
+
+### Each input `name` must be unique per screen
+
+Every form input on a screen — `TextInput`, `Dropdown`, `RadioButtonsGroup`, `CheckboxGroup`, `DatePicker`, `CalendarPicker`, `ChipsSelector`, `OptIn`, `TextArea` — needs its own `name`. Meta rejects a flow that reuses the same `name` twice on one screen, often with a generic error.
+
+`If` and `Switch` branches all render on the **same screen surface**, so a `name` used in one `then`, `else`, or `case` branch counts as a duplicate when reused in another branch on that screen. Paige's local validator now catches this before the flow is uploaded and returns an actionable error like:
+
+```
+SCREEN PIZZA_BASE: duplicate field name "size" — two input components share this "name" on one screen
+(If/Switch then/else/cases branches count as the same screen). Meta rejects this; give each field a unique
+name or split into separate screens.
+```
+
+When two branches need the "same" logical field with different options (for example a `size` dropdown that shows different sizes depending on a base choice), either:
+
+- Keep **one** input on the screen and vary its `data-source` outside the branch, or
+- Give each branch's input a distinct `name` (`size_small_base`, `size_large_base`) and read both in your webhook, or
+- Split the choices into separate screens so each `name` lives on its own screen.
+
+### Keep flows small enough to generate in one pass
+
+The AI agent emits the entire flow JSON in a single tool call, which means very large flows can hit the model's output-token limit. If that happens, the agent stops with a specific error instead of silently producing a half-finished flow:
+
+> Flow generation exceeded the model output-token limit (response truncated at maxTokens) — the flow is too large to emit in one pass. Simplify or split the screens, or raise modelConfig flows.maxTokens.
+
+If you see this error:
+
+- **Reduce screen count.** Combine screens that collect related fields, or drop optional steps.
+- **Use `Switch` instead of duplicating screens.** When several screens share the same shape with different copy, one `Switch`-driven screen replaces N near-duplicates.
+- **Split into multiple flows.** Long onboarding journeys are often clearer as two or three smaller flows triggered in sequence by your bot.
+
 ## Updating an existing flow
 
 To modify an existing flow, ask the agent to update it — do not edit the flow JSON file directly.
