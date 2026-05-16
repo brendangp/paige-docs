@@ -36,13 +36,7 @@
             "pages": [
               "index"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Features",
-        "icon": "sparkles",
-        "groups": [
+          },
           {
             "group": "Core concepts",
             "pages": [
@@ -53,6 +47,19 @@
               "concepts/conversations"
             ]
           },
+          {
+            "group": "Get started",
+            "pages": [
+              "quickstart",
+              "whatsapp-setup"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Features",
+        "icon": "sparkles",
+        "groups": [
           {
             "group": "AI agents",
             "pages": [
@@ -80,16 +87,9 @@
         ]
       },
       {
-        "tab": "Tutorials",
-        "icon": "graduation-cap",
+        "tab": "Templates",
+        "icon": "layout-template",
         "groups": [
-          {
-            "group": "Quick start",
-            "pages": [
-              "quickstart",
-              "whatsapp-setup"
-            ]
-          },
           {
             "group": "Flow templates",
             "pages": [
