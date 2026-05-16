@@ -35,3 +35,4 @@ A staging-to-production release focused on smoother onboarding, trial-aware feat
 - `getFlowByRef` falls back to matching by name when a flow name is numeric.
 - Credit balance overdraft is no longer possible without a warning.
 - The personal-number placeholder in the PaigeDev card has been replaced with the live linked number.
+- **Large multi-screen flows now generate reliably.** Big flow definitions — for example a 5-screen ordering flow with 20+ options on a single screen — previously failed silently or truncated mid-generation. The agent now streams the full flow JSON in one pass, so complex flows complete without hitting an internal cap. If a flow is still too large to fit, the agent now surfaces a clear error instead of returning a partial result. See [Creating a flow with the AI agent](/guides/flows-builder#creating-a-flow-with-the-ai-agent).
