@@ -43,6 +43,19 @@ Open the **Flows** tab, pick the flow from the list, and click **Try it**. An in
   The interactive preview works whether or not you've connected your own WhatsApp number. If you haven't connected one yet, Paige previews the Paige Dev copy of the flow automatically.
 </Note>
 
+### URL buttons in the in-app preview
+
+The phone-frame preview on the right side of the editor renders interactive **URL buttons** the same way real WhatsApp does. Tap a URL button in the preview to open the destination inside the phone frame using an embedded webview:
+
+- **Close** returns you to the chat preview.
+- **Open in new tab** opens the destination in a normal browser tab — useful for sites that block being embedded.
+
+If the destination blocks iframing (via `X-Frame-Options` or `Content-Security-Policy`), the preview shows an error state after a short timeout and keeps **Open in new tab** available so you can still verify the link works.
+
+<Info>
+  Tapping a URL button in the preview does not post a payload back to your bot. That matches how real WhatsApp handles URL CTAs — only **QUICK_REPLY** buttons send a reply event.
+</Info>
+
 ## Creating a flow with the AI agent
 
 Describe the flow you want in plain language. Be specific about the screens, the type of inputs, and any logic between screens.

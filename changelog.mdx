@@ -1,12 +1,37 @@
 ---
 title: "Changelog"
 sidebarTitle: "Changelog"
-description: "Release notes and updates for Paige."
+description: "Release notes and updates for Paige — new features, improvements, and fixes shipped to the platform."
 ---
 
 Track new features, improvements, and fixes shipped to Paige.
 
-## 2026-05-14
+## May 2026
 
-- **Full-access free trial.** Every new project now gets 14 days of full access to Conversations, Broadcasts, Deploy, and bot runtime. After the trial these lock until you subscribe (R570/month) — but the Bot tab, AI chat, Settings, Preview, and the Paige Dev number stay open so you can keep building and connect a WhatsApp number any time. See [Billing](/guides/billing).
-- **Preview flows before connecting WhatsApp.** The interactive flow preview ("Try it") in the Flows tab now works as soon as a flow is generated, even if you haven't connected your own WhatsApp number — it falls back to the shared Paige Dev copy. See [Flows Builder](/guides/flows-builder).
+A staging-to-production release focused on smoother onboarding, trial-aware feature gating, clearer credit signals, and a richer in-app preview.
+
+### New features
+
+- **Guided onboarding tour.** New projects open with a contextual 7-step tour — chat, preview, Paige Dev test, connect WhatsApp, deploy, help. Each tip anchors to the relevant control and auto-advances when you complete the step. Click **Skip tour** to dismiss it permanently for that project. See the [Quick start](/quickstart).
+- **Open paid features during the trial.** The 14-day free trial now opens the full product — Conversations, Broadcasts, Deploy, and bot runtime on your connected WhatsApp number. Gating only kicks in after the trial expires. Connecting WhatsApp through embedded signup is never gated. See [Free trial](/guides/billing#free-trial).
+- **Help Agent from the header.** A new **?** button next to Feedback in the header opens the chat sidebar straight to the free [Help Agent](/agents/help-agent), making in-app guidance a first-class entry point.
+- **See Docs in the user menu.** The account dropdown now links to the full documentation site so you can pop open the docs without leaving your current view.
+- **URL buttons render in the in-app preview.** Tap a `cta_url` button in the phone preview to open the destination inside the phone frame, with **Close** and **Open in new tab** controls. If a site blocks iframing, the preview shows an error state and keeps **Open in new tab** available. See [URL buttons in the in-app preview](/guides/flows-builder#url-buttons-in-the-in-app-preview).
+- **Try-it preview before you connect WhatsApp.** The **Try it**, **Inspect**, and **Debug** controls in the Flows tab now work for projects that haven't connected their own WhatsApp number yet. Paige falls back to the Paige Dev copy of the flow so you can preview straight away.
+- **Try a test template on your Paige Dev tester.** The Paige Dev card has a new **Try now** button that delivers a pre-built Meta template — with an embedded flow-trigger button — to your linked phone in one click. Rate-limited to 5 successful sends per linked number per rolling 24 hours. See [Try a test template](/guides/testing#try-a-test-template-on-your-linked-phone).
+- **Faster signup with a warm Supabase project pool.** Paige now keeps a small pool of pre-provisioned project backends ready, so new signups land in a fully working project instantly instead of waiting for provisioning.
+
+### Improvements
+
+- **In-app low-credit warning and zero-balance gate.** A persistent banner above the chat input warns you below one credit and stops new requests when your balance hits zero — already-streaming requests finish cleanly. The **Top up** button switches straight to **Settings → Usage**. See [Low-credit warning and zero-balance gating](/guides/billing#low-credit-warning-and-zero-balance-gating).
+- **Markdown tables in the chat sidebar.** Long markdown tables emitted by the agents now scroll horizontally inside the sidebar instead of overflowing the layout.
+- **Inline row editing restored in Settings → Database.** Editing rows in place now sends only the columns you touched.
+- **Project rename updates the project switcher.** The dropdown in the header refreshes immediately after a rename.
+- **Cleaner invitee onboarding.** Invitees verifying their email land directly inside the workspace they were invited to, with access to the shared projects — no orphan personal project is created.
+
+### Fixes
+
+- Suspend cron now performs a backup and cleanly deletes the Supabase project, matching what the UI promises.
+- `getFlowByRef` falls back to matching by name when a flow name is numeric.
+- Credit balance overdraft is no longer possible without a warning.
+- The personal-number placeholder in the PaigeDev card has been replaced with the live linked number.
