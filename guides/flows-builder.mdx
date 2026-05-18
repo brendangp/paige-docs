@@ -102,7 +102,7 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
     ```
   </Accordion>
   <Accordion title="Dropdown">
-    A select menu with a list of options. Used for service selection, time slots, categories, and similar choices.
+    A select menu with a list of options. Used for service selection, time slots, categories, and similar choices. Supports up to **200 options**.
 
     ```json
     {
@@ -114,6 +114,42 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
         { "id": "seo", "title": "SEO" }
       ],
       "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="RadioButtonsGroup">
+    A single-select list rendered as radio buttons. Use it when you want every option visible at once — for example, urgency levels or short service menus. Supports up to **20 options**; for longer lists, use a `Dropdown` (max 200) instead.
+
+    ```json
+    {
+      "type": "RadioButtonsGroup",
+      "name": "urgency",
+      "label": "How urgent is this?",
+      "data-source": [
+        { "id": "low", "title": "Low" },
+        { "id": "medium", "title": "Medium" },
+        { "id": "high", "title": "High" }
+      ],
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="CheckboxGroup">
+    A multi-select list rendered as checkboxes. Use it when users can pick more than one option — for example, toppings, interests, or feature preferences. Supports up to **20 options**.
+
+    If you need more than 20 choices, ask the agent to split them across two screens chained by a navigate Footer, then combine the selections at the final submit step.
+
+    ```json
+    {
+      "type": "CheckboxGroup",
+      "name": "toppings",
+      "label": "Pick your toppings",
+      "data-source": [
+        { "id": "cheese", "title": "Extra cheese" },
+        { "id": "mushroom", "title": "Mushrooms" },
+        { "id": "olives", "title": "Olives" }
+      ],
+      "required": false
     }
     ```
   </Accordion>
