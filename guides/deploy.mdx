@@ -1,0 +1,88 @@
+---
+title: "Deploy your WhatsApp bot to production"
+sidebarTitle: "Deploy"
+description: "Deploy takes the version of your bot you've been building and testing and makes it live on your connected WhatsApp number. Your code and table structure always go live; copying table data and publishing flows are choices you make each time."
+---
+
+Everything you build in Paige happens in a preview version of your project — your own private copy that only you and [Paige Dev](/guides/testing) can see. Your customers keep talking to the version that's currently live. **Deploy** is the moment those two come together: it pushes your preview version onto your real WhatsApp number.
+
+The **Deploy** button sits in the top-right of the header, next to your account avatar.
+
+<Note>
+  Your very first deploy is what switches your bot on. Until then your project isn't processing customer messages at all — it only responds through Paige Dev.
+</Note>
+
+## What the Deploy button is telling you
+
+The button changes to reflect what's waiting to go live:
+
+<AccordionGroup>
+  <Accordion title="Connect — you haven't linked a WhatsApp number yet">
+    Before you can deploy, your project needs a WhatsApp number of its own. The button reads **Connect** and takes you to Settings → WhatsApp to [set one up](/whatsapp-setup). You can keep building and testing through Paige Dev in the meantime.
+  </Accordion>
+  <Accordion title="Deploy with an orange dot — you have code changes waiting">
+    A pulsing orange dot means you've changed your bot code since the last deploy. There's no number, because code changes are counted as one body of work rather than individually.
+  </Accordion>
+  <Accordion title="Deploy with an orange number — you have flows waiting">
+    The number is how many flows have changes that haven't gone live yet. Hover the button and it spells it out — for example, **Deploy — 2 flows pending**, or **Deploy — code + 2 flows pending** when you have both.
+  </Accordion>
+  <Accordion title="Deploy, greyed out with a lock — your subscription has lapsed">
+    Deploying is a paid feature. The tooltip reads **Subscribe to deploy** and clicking takes you to [Billing](/guides/billing). Your live bot keeps running; you just can't push new changes until you resubscribe.
+  </Accordion>
+</AccordionGroup>
+
+## The deploy dialog
+
+Clicking **Deploy** opens **Deploy to production**, where you choose what goes live alongside your code.
+
+### What always deploys
+
+Three things go live every single time, with nothing to tick:
+
+- **Your bot code and files** — the current version in your editor.
+- **Your table structure** — any new tables and new columns you've added. This is additive: existing production tables are never dropped or emptied as part of a structure sync.
+- **Your project going active** — on the first deploy, this is what starts your bot responding to real customers.
+
+### Also copy table data
+
+Under **Also copy table data**, you'll see a checkbox for each of your tables. This is where the real decision lives, and it's worth understanding before you tick anything.
+
+Ticking a table **replaces all of its production rows with your preview rows**. It isn't a merge — the live rows are cleared out and your preview data is written in their place.
+
+<Warning>
+  Ticking a table that's collecting real customer data will delete that data. If your bookings table has live bookings in it and your preview copy has three test bookings, ticking it leaves you with the three test bookings. Leave tables unticked unless you specifically want to overwrite what's live — for example, pushing an updated product list or a set of canned responses.
+</Warning>
+
+Nothing is ticked when the dialog opens, and your choices reset every time you open it. The safe default is simply not to tick anything: your structure still syncs and your live data is left alone.
+
+Only your own tables appear here. Paige's built-in tables — your contacts, conversations, messages, and execution logs — are never touched by a deploy.
+
+### Flows
+
+Under **Flows**, you pick which flows to publish to your WhatsApp number. Flows with unpublished edits carry an orange **changes pending** tag, so you can see at a glance which ones are waiting.
+
+Anything you leave unticked is left exactly as it is on your live number. You don't choose *how* a flow publishes — Paige works that out from where the flow currently stands:
+
+- A flow that's only ever existed in Paige is created on your WhatsApp number and published.
+- A draft flow is published as-is.
+- A flow that's already live is only re-sent if you've actually changed it.
+
+If your project has no tables and no flows, the dialog says so and deploying just updates your code, files, and table structure.
+
+## Deployed with warnings
+
+Publishing a flow means handing it to Meta for validation, and Meta can reject it. When that happens you'll get a red **Deployed with warnings — 1 flow didn't publish** message naming the flow and the reason.
+
+This is a partial success, not a failure. Your code and table structure went live; the named flows didn't. The most common causes are a flow that breaks one of Meta's structural rules, or selecting flows to publish before your WhatsApp number is connected.
+
+Your pending count drops by however many flows actually published, so a flow that didn't make it keeps its badge. That's deliberate — the badge is telling you something is still not live.
+
+## After you deploy
+
+The button flashes **Deployed!** for a few seconds, and you'll get a push notification titled **Build succeeded** (or **Build failed**) if you've turned notifications on for that device in Settings → Notifications. There's no separate deploy report to read — the button and the notification are the confirmation.
+
+If something looks wrong on your live bot afterwards, [your logs](/guides/logs) have a Production view that shows what your live bot is actually doing, and [version history](/guides/version-history) lets you go back to an earlier version of your code.
+
+<Tip>
+  Deploy is not a save button — your work is saved as you go. Deploy is specifically about making it live, so there's no cost to leaving changes undeployed while you keep building and testing through Paige Dev.
+</Tip>
