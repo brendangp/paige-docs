@@ -4,40 +4,60 @@ sidebarTitle: "Testing"
 description: "Link your real phone number to a project and chat with your bot in real time. Use Paige Dev to test messages, flows, and edge cases before going live."
 ---
 
-Paige Dev lets you connect your personal WhatsApp number directly to a project so you can test your bot exactly as your users will experience it — no staging environment needed. When your phone is linked, any message you send to your bot's number is processed live by your bot code, giving you immediate feedback on how it behaves.
+**Paige Dev** is a WhatsApp number Paige shares with everyone, so you can test your bot on real WhatsApp before you have a number of your own. Link your phone to it and message it, and your project's bot answers — same as a customer would experience, without a customer being involved.
+
+Everything you send runs against your **preview** copy, so test bookings and test contacts never touch your live data.
 
 ## Link your phone number
 
 <Steps>
-  <Step title="Open your project">
-    From the Paige dashboard, select the project you want to test.
+  <Step title="Open Settings → Project">
+    In your project, go to the **Settings** tab and select the **Project** section. Find the card headed **Paige Dev — test on your phone**.
   </Step>
-  <Step title="Go to Paige Dev">
-    In the project sidebar, click **Paige Dev**. You'll see your current link status.
+  <Step title="Enter your number">
+    Pick your country, type your phone number, and click **Link phone**.
   </Step>
-  <Step title="Link your number">
-    Click **Link my number** and follow the prompt to associate your WhatsApp phone number with this project. Once linked, your number is active for this project only.
+  <Step title="Message Paige Dev">
+    Open WhatsApp on your phone and message the Paige Dev number. Your bot answers.
   </Step>
 </Steps>
 
 <Note>
-  Each phone number can only be linked to one project at a time. If you want to test a different project, unlink from the current one first.
+  A number can only be linked to one project at a time, and a project can only have one linked number. Both of those are movable rather than blocking — see [When someone else has it linked](#when-someone-else-has-it-linked).
 </Note>
+
+<Tip>
+  The **Share Your WhatsApp** card just above has a **Paige Dev** tab with a QR code and a wa.me link. That's for opening a chat with the test number quickly — **scanning it doesn't link your phone**. Linking only happens by entering your number on the Paige Dev card.
+</Tip>
 
 ## Send test messages
 
-Once your number is linked, open WhatsApp on your phone and send a message to your bot's number. The message flows through your bot code in real time — you'll see a response just as any user would.
+Once your number is linked, message the Paige Dev number from WhatsApp. The message runs through your bot code in real time — you'll get a response just as any user would.
+
+The card also gives you **Clear test data** to wipe what your testing has accumulated, and **Unlink** when you're finished.
 
 ### Try a test template on your linked phone
 
 Once you've linked a phone, the Paige Dev card has a **Try now** button (tooltip: *Try it on your phone*). Click it and Paige delivers a pre-built Meta template — with an embedded flow-trigger button — straight to your linked WhatsApp number, so you can verify template rendering and flow buttons end-to-end without doing a full deploy.
 
-- The send is rate-limited to **5 successful sends per linked number, per rolling 24 hours**. Failed sends are recorded so you can retry without exhausting the limit on an error.
+- The send is rate-limited to **5 per number per rolling 24 hours**. If you hit it you'll see *Rate limit reached — try again in a few hours*.
 - If the test template hasn't been configured on your environment, the button shows a clear error instead of failing silently.
 
 <Tip>
   Use **Try now** when you want to confirm that a flow opens correctly from a tappable button — it bypasses the need to start an outbound conversation manually.
 </Tip>
+
+## Linking is visible to your team
+
+This is worth knowing before you link a personal number: **the link belongs to the project, not to you privately.** Anyone with access to the project sees that it's linked, which teammate linked it (by email), and a masked version of the number — `+27 ••• •• 1234`.
+
+If you'd rather not have your personal number visible to everyone in the workspace, that's the trade-off to weigh.
+
+### When someone else has it linked
+
+A project only holds one link at a time, so if a teammate is already testing, you'll see their email on the card and a **Take over** button instead of **Link phone**. Taking over unlinks their number and links yours — they aren't asked first, so it's worth a message.
+
+The same applies in reverse to your own number across projects. A number lives on one project at a time, so linking a number you've already used elsewhere offers to **Move it here**, unlinking it from the other project. There's also a **Move here** shortcut for pulling across a number you've linked before.
 
 <CardGroup cols={2}>
   <Card title="Test the happy path" icon="check">
@@ -70,8 +90,8 @@ The agent will run the test, show you the result, and can iterate on your code b
 
 ## Unlink your phone
 
-When you're done testing, you can unlink your phone from the project. Go to **Paige Dev** in the project sidebar and click **Unlink**. Your bot will continue operating normally for real users — only your personal test link is removed.
+When you're done testing, click **Unlink** on the Paige Dev card in **Settings → Project**. Your bot carries on serving real users exactly as before — only your test link is removed.
 
-<Warning>
-  While your phone is linked, all messages you send to the bot number are processed as real bot interactions. Avoid sending messages you wouldn't want logged or acted on.
-</Warning>
+<Note>
+  Messages you send while linked are processed as real bot interactions and recorded in your preview data and [logs](/guides/logs). They don't reach your live bot or your real customers, but they aren't invisible either — a teammate reading the preview logs will see them.
+</Note>

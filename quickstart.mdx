@@ -8,7 +8,7 @@ This guide walks you through everything you need to go from a new account to a w
 
 <Steps>
   <Step title="Create your account">
-    Go to [paigme.dev](https://paigme.dev) and sign up. You can create an account with your email address or sign in with Google.
+    Go to [paigeme.dev](https://paigeme.dev) and sign up. You can create an account with your email address or sign in with Google.
 
     After signing up with email, Paige will send you a verification link. Open the email and click the link to confirm your address before continuing.
 
@@ -20,44 +20,42 @@ This guide walks you through everything you need to go from a new account to a w
   <Step title="Create your first project">
     When you log in for the first time, Paige automatically creates a project called **My First Bot** and takes you straight to it. You don't need to do anything — the project is ready to use.
 
-    A project is your workspace for a single bot. It comes with its own bot code editor, database, conversation history, and settings. You don't need a WhatsApp number to start building — that comes later. Every new project includes a 14-day free trial with full access to every paid feature — Conversations, Broadcasts, Deploy, and your bot running on a connected WhatsApp number — so you can build and prove your bot end to end before subscribing. If you want to build a second bot for a different use case, you can create additional projects from the dashboard at any time.
+    A project is your workspace for a single bot. It comes with its own bot code, database, conversation history, and settings. You don't need a WhatsApp number to start building — that comes later. Every new project includes a 14-day free trial with full access to every paid feature — Conversations, Broadcasts, Deploy, and your bot running on a connected WhatsApp number — so you can build and prove your bot end to end before subscribing. If you want to build a second bot for a different use case, you can create additional projects from the dashboard at any time.
 
     <Info>
       If you already have projects from a previous session, Paige opens the most recently used one instead of creating a new one.
     </Info>
 
     <Tip>
-      The first time you open a new project, a **guided tour** walks you through the journey — sending your first chat message, opening the preview, testing on Paige Dev, connecting WhatsApp, and deploying. Each tip points at the matching UI control and auto-advances when you complete the step. Click **Skip tour** on any tip to dismiss it permanently for that project.
+      A short intro walks you through what Paige does when you first open a project — six slides covering prompting, the preview, testing on Paige Dev, connecting your number, deploying, and getting help. **Skip** dismisses it, and you can replay it later from the checklist.
+
+      That checklist lives in the header and tracks the same journey: **Prompted Paige**, **Tried the preview**, **Tested on Paige Dev**, **Connected WhatsApp**, **Deployed your bot**, and **Explored help & docs**. It ticks each row off as you go, so you can always see what's left.
     </Tip>
   </Step>
 
   <Step title="Build your bot with the AI assistant">
-    Open the **Bot** tab in your project. You'll see the AI chat interface on the left and your bot code on the right.
+    Your project has three columns: **the chat on the left**, whichever **tab you're on in the middle**, and **the phone preview on the right**. The tabs across the top are Code, Flows, Conversations, Broadcasts, Tools, and Settings — plus Preview, which shows and hides that right-hand phone.
 
-    Type a description of what you want your bot to do. For example:
+    Start on the **Code** tab and type a description of what you want your bot to do into the chat. For example:
 
     > "When someone messages me, greet them by name and ask if they want to know our opening hours or our location."
 
     The AI reads your request and writes (or rewrites) the bot code for you. You can keep refining it by sending follow-up messages — ask it to add conditions, change the wording, or handle edge cases.
 
     <Tip>
-      You don't need to know how to code to use the AI builder. Describe what you want in plain language and iterate from there. If you do know how to code, you can also edit the bot code directly.
+      You don't need to know how to code to use the AI builder. Describe what you want in plain language and iterate from there. If you do know how to code, the middle column shows you exactly what it wrote.
     </Tip>
-
-    When you're happy with the bot, click **Deploy** to make it the active version. Paige saves a version snapshot every time you deploy, so you can always roll back if something goes wrong.
   </Step>
 
   <Step title="Test your bot with the preview and Paige Dev">
     You don't need a WhatsApp number to test your bot. Paige gives you two test surfaces:
 
-    - **The in-app preview** — every change you make in the AI chat can be tested instantly inside the app.
-    - **Paige Dev** — a shared WhatsApp number that runs your bot exactly as it would in production.
+    - **The in-app preview** — the phone on the right. Message your bot there and it responds immediately, no setup at all.
+    - **Paige Dev** — a shared WhatsApp number that runs your bot on real WhatsApp, on your actual phone.
 
-    To use Paige Dev, open the **Test** section in your project and follow the instructions to link your phone to the Paige Dev number. Once linked, message Paige Dev from your phone and your project's bot will respond. Changes you deploy show up in your test conversation immediately.
+    To use Paige Dev, go to **Settings → Project** and find the **Paige Dev — test on your phone** card. Enter your phone number and click **Link phone**. Message the Paige Dev number from your phone and your project's bot answers.
 
-    <Info>
-      Paige Dev routes messages to the bot code in your project, so changes you make and deploy are reflected immediately in your test conversations.
-    </Info>
+    Everything you do here runs against your preview copy, so test bookings and test data never touch anything real. See [Testing your bot](/guides/testing) for the full walkthrough.
   </Step>
 
   <Step title="Connect WhatsApp to take it live">
@@ -70,24 +68,36 @@ This guide walks you through everything you need to go from a new account to a w
     <Note>
       You need a Facebook account to complete the Meta embedded signup. The phone number you connect must not already be registered as a personal WhatsApp account on an active device.
     </Note>
+  </Step>
 
-    Once connected, share your WhatsApp Business number with real users — your bot is live.
+  <Step title="Deploy">
+    Connecting a number gives your bot somewhere to live. **Deploy** is what actually puts it there.
+
+    Click **Deploy** in the top-right. Your first deploy switches your bot on — until then it isn't answering real customers, only Paige Dev. From that point on, share your WhatsApp Business number with real users and your bot is live.
+
+    Deploy is also how every later change reaches your customers, and it comes with some choices worth understanding before you press it — see [Deploy](/guides/deploy).
   </Step>
 </Steps>
 
 ## Next steps
 
 <CardGroup cols={2}>
+  <Card title="Deploy" icon="rocket" href="/guides/deploy">
+    What actually goes live when you deploy, and what stays behind.
+  </Card>
   <Card title="WhatsApp flows" icon="workflow" href="/concepts/flows">
     Add interactive multi-screen forms to your bot using WhatsApp Flows.
   </Card>
   <Card title="Message templates" icon="file-text" href="/guides/templates">
     Create Meta-approved templates for sending outbound notifications.
   </Card>
-  <Card title="Built-in database" icon="database" href="/concepts/database">
-    Store and query bot data using your project's built-in database.
-  </Card>
   <Card title="Invite your team" icon="users" href="/guides/workspaces">
     Collaborate with teammates by creating a shared workspace.
+  </Card>
+  <Card title="Tools" icon="wrench" href="/guides/tools">
+    Your bot's database, media, scheduled tasks, secrets, connectors, and logs.
+  </Card>
+  <Card title="Billing and credits" icon="credit-card" href="/guides/billing">
+    How the free trial, credits, and your subscription fit together.
   </Card>
 </CardGroup>
