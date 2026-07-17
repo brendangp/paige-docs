@@ -1,0 +1,72 @@
+---
+title: "Let your WhatsApp bot read and write Airtable records"
+sidebarTitle: "Airtable"
+description: "Connect an Airtable base and your bot can look up an order, log a booking, or update a status — using your real table and field names."
+---
+
+If your business already runs on an Airtable base, the Airtable connector lets your bot work in it directly: look up a customer's order when they ask, write a new booking as it's taken, mark a job done.
+
+Connect it from **Tools → Connectors**.
+
+## Connecting
+
+Two routes:
+
+<Tabs>
+  <Tab title="Sign in with Airtable">
+    Click **Connect with Airtable**. A popup asks you to sign in and choose which base to grant access to. Approve, and it closes itself.
+
+    <Note>
+      If you grant access to several bases, Paige uses the **first** one. To connect a specific base, grant just that one — or use a token instead, where you name the base explicitly.
+    </Note>
+  </Tab>
+  <Tab title="Paste a token">
+    Click **Or enter an access token manually** and provide:
+
+    - **Personal Access Token** — created in Airtable under Developer hub → Personal access tokens.
+    - **Base ID** — the `app...` id from your base's URL or API docs.
+
+    Your token needs `data.records:read`, `data.records:write`, **and** `schema.bases:read`. That last one is easy to forget and Paige will reject the token without it — it's what lets Paige read your table and field names.
+  </Tab>
+</Tabs>
+
+Paige checks the credentials with Airtable before saving, so you'll know immediately if the token is wrong or can't see the base.
+
+## What your bot can do
+
+Ask in plain language and the agent writes it — it looks up your real tables and fields first, so it uses your actual names rather than guessing:
+
+> "When someone gives me their order number, look it up in the Orders table and tell them the status."
+
+> "Log each completed booking as a row in the Bookings table."
+
+Under the hood your bot gets three operations: **query records** (with filters), **create records**, and **update records**.
+
+<Note>
+  There's no delete. A bot that can delete rows in your business's live base on a customer's say-so is a bad idea, so the connector doesn't offer it. Remove records in Airtable yourself.
+</Note>
+
+## Refresh schema
+
+Paige takes a snapshot of your base's structure — every table, every field — when you connect, and your bot code is written against it.
+
+If you **rename a table, add a field, or restructure your base in Airtable**, that snapshot goes stale. Your bot is still looking for a field that no longer exists, and starts failing.
+
+Click **Refresh schema** on the Airtable card to take a fresh snapshot.
+
+<Warning>
+  Refreshing updates your preview bot straight away, but your **live** bot doesn't get the new structure until you [deploy](/guides/deploy). If you change your base and your live bot starts throwing field errors, refresh *and* deploy.
+</Warning>
+
+<Tip>
+  If the agent seems confused about a table or field — insisting something doesn't exist when you can see it in Airtable — refresh the schema. It's working from the snapshot, not from your base.
+</Tip>
+
+## When it breaks
+
+Airtable errors surface in [your logs](/guides/logs). The usual causes:
+
+- **Field name doesn't match** — Airtable field names are case-sensitive, and `Order Number` is not `order number`.
+- **Schema is stale** — see above.
+- **Token lost access** — someone changed permissions in Airtable, or the token was revoked.
+- **It's running on a schedule** — connectors don't work in [scheduled tasks](/guides/scheduled-tasks) at all.
