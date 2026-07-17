@@ -4,6 +4,8 @@ sidebarTitle: "Quick Start"
 description: "Sign up, create a project, build your first bot with AI, test it on real WhatsApp via Paige Dev, and only connect your own WhatsApp number when you're ready to go live."
 ---
 
+import { PageDemo } from "/snippets/page-demo.jsx"
+
 This guide walks you through everything you need to go from a new account to a working WhatsApp bot. You'll build and test a fully working bot before ever connecting your own WhatsApp Business number — connecting WhatsApp is the last step, and it's what takes your bot live.
 
 <Steps>
@@ -40,6 +42,8 @@ This guide walks you through everything you need to go from a new account to a w
 
     > "When someone messages me, greet them by name and ask if they want to know our opening hours or our location."
 
+    <PageDemo src="/assets/videos/prompting.mp4" poster="/assets/videos/prompting.poster.jpg" />
+
     The AI reads your request and writes (or rewrites) the bot code for you. You can keep refining it by sending follow-up messages — ask it to add conditions, change the wording, or handle edge cases.
 
     <Tip>
@@ -53,7 +57,11 @@ This guide walks you through everything you need to go from a new account to a w
     - **The in-app preview** — the phone on the right. Message your bot there and it responds immediately, no setup at all.
     - **Paige Dev** — a shared WhatsApp number that runs your bot on real WhatsApp, on your actual phone.
 
+    <PageDemo src="/assets/videos/preview.mp4" poster="/assets/videos/preview.poster.jpg" />
+
     To use Paige Dev, go to **Settings → Project** and find the **Paige Dev — test on your phone** card. Enter your phone number and click **Link phone**. Message the Paige Dev number from your phone and your project's bot answers.
+
+    <PageDemo src="/assets/videos/paige-dev.mp4" poster="/assets/videos/paige-dev.poster.jpg" />
 
     Everything you do here runs against your preview copy, so test bookings and test data never touch anything real. See [Testing your bot](/guides/testing) for the full walkthrough.
   </Step>
@@ -62,6 +70,8 @@ This guide walks you through everything you need to go from a new account to a w
     This is the last step — and the only step that requires WhatsApp at all. Once your bot is ready for real users, link your own WhatsApp Business number to take it live.
 
     Open your project and go to **Settings → WhatsApp**. Click **Connect WhatsApp** to start the Meta embedded signup flow. You'll log in to your Facebook account, select or create a WhatsApp Business Account (WABA), and choose the phone number you want to use.
+
+    <PageDemo src="/assets/videos/connect-whatsapp.mp4" poster="/assets/videos/connect-whatsapp.poster.jpg" />
 
     See [Connect your WhatsApp Business number](/whatsapp-setup) for a full walkthrough of this process, including what to do if you don't have a WhatsApp Business Account yet.
 
@@ -75,9 +85,17 @@ This guide walks you through everything you need to go from a new account to a w
 
     Click **Deploy** in the top-right. Your first deploy switches your bot on — until then it isn't answering real customers, only Paige Dev. From that point on, share your WhatsApp Business number with real users and your bot is live.
 
+    <PageDemo src="/assets/videos/deploy.mp4" poster="/assets/videos/deploy.poster.jpg" />
+
     Deploy is also how every later change reaches your customers, and it comes with some choices worth understanding before you press it — see [Deploy](/guides/deploy).
   </Step>
 </Steps>
+
+## Stuck? Ask the Help agent
+
+The built-in **Help agent** answers questions about Paige itself — how a feature works, where something lives, or what a setting does. It's free, available on every tab, and it's the fastest way to get unstuck without leaving the app.
+
+<PageDemo src="/assets/videos/help.mp4" poster="/assets/videos/help.poster.jpg" />
 
 ## Next steps
 
