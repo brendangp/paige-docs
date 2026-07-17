@@ -1,16 +1,29 @@
 ---
-title: "Talk to your users naturally with the Conversational Agent"
-sidebarTitle: "Conversational Agent"
-description: "The Conversational Agent is the in-bot AI that talks to your end users on WhatsApp — routing intent, answering questions, and collecting information in plain language."
+title: "Give your bot AI conversation instead of menus"
+sidebarTitle: "AI in your bot"
+description: "Paige's AI bot template gives your bot natural conversation on WhatsApp — understanding what a customer means, answering from your own documents, and collecting details without a rigid form."
 ---
 
+Most bots are menus: press 1 for this, press 2 for that. Paige's **AI bot template** gives your bot something better — it reads what a customer actually wrote, works out what they want, and responds in their own words.
+
+This is the AI that runs **inside your deployed bot** and talks to your customers on WhatsApp. Ask the [Code Agent](/agents/code-agent) for an AI bot and it scaffolds this for you.
+
 <Note>
-  This page is a working draft. Review the descriptions below and let us know what to adjust.
+  **This is not the same as the Conversations assistant in the sidebar.** The two are easy to confuse and have nothing to do with each other:
+
+  - **The AI in your bot** (this page) talks to *your customers*, on WhatsApp, around the clock. It's part of the bot you deploy.
+  - **The [Conversations assistant](/concepts/conversations)** talks to *you*, in the Paige sidebar, when you're reading your inbox. It helps you find contacts and draft replies.
 </Note>
 
-The Conversational Agent is the AI that runs **inside** your deployed bot. While the [Code Agent](/agents/code-agent) helps you build the bot, the Conversational Agent is what your end users actually chat with on WhatsApp. It understands what each user is asking, decides how to respond, and collects information from them in a natural, message-by-message conversation.
+## It's your code, not a Paige feature
 
-You don't need to write the conversational logic yourself. When you describe the kind of bot you want, the Code Agent wires the Conversational Agent into your project with the right personality, knowledge, and goals.
+This matters, because it's what makes the AI bot flexible.
+
+The AI conversation isn't a service Paige runs on your behalf and lets you configure around the edges — it's **ordinary code in your project**, which the Code Agent wrote and which you can change at any time by asking. The prompts that decide your bot's personality, the rules for what it will and won't discuss, how it decides to escalate — all of it is yours.
+
+<Note>
+  The AI bot template calls **OpenAI**, so it needs an OpenAI API key stored as a [secret](/guides/secrets) named `OPENAI_API_KEY`. That's a separate account and a separate bill from Paige's own credits, which pay for the Code Agent building your bot rather than your bot talking to customers.
+</Note>
 
 ## What it does
 
@@ -37,23 +50,23 @@ You don't need to write the conversational logic yourself. When you describe the
 
 ## How to shape it
 
-You don't program the Conversational Agent directly. You shape its behavior by talking to the [Code Agent](/agents/code-agent) — for example:
+You don't program the AI in your bot directly. You shape its behavior by talking to the [Code Agent](/agents/code-agent) — for example:
 
 > "Make the bot greet users in Afrikaans and English, and only answer questions about our restaurant menu and bookings. For anything else, suggest they call us instead."
 
-The Code Agent updates the bot's prompts, knowledge base, and routing so the Conversational Agent behaves the way you described. You can iterate as often as you like — every conversation that happens after a deploy uses the new behavior.
+The Code Agent updates the bot's prompts, knowledge base, and routing so the AI in your bot behaves the way you described. You can iterate as often as you like — every conversation that happens after a deploy uses the new behavior.
 
 <Tip>
-  Add a knowledge base document for any topic you want the Conversational Agent to answer accurately. Bullet points and short FAQs work better than long marketing pages.
+  Add a knowledge base document for any topic you want the AI in your bot to answer accurately. Bullet points and short FAQs work better than long marketing pages.
 </Tip>
 
 ## When to use it
 
-The Conversational Agent shines whenever your bot needs to handle messages that aren't predictable button taps:
+The AI bot template shines whenever your bot needs to handle messages that aren't predictable button taps:
 
 - **Customer support** — answering FAQs, troubleshooting, and routing tricky questions to a human.
 - **Lead qualification** — asking the right follow-up questions based on what the user just said.
 - **Discovery and search** — helping users find a product, service, or piece of information by describing it.
 - **Onboarding** — walking a new user through setup with conversational prompts instead of static menus.
 
-If your bot only needs strict menu-driven logic, you can opt out of the Conversational Agent entirely — see the simple bot template described on the [Code Agent](/agents/code-agent) page.
+If your bot only needs strict menu-driven logic, you can opt out of the AI in your bot entirely — see the simple bot template described on the [Code Agent](/agents/code-agent) page.

@@ -45,10 +45,40 @@ The agent has access to a set of built-in tools it uses behind the scenes to com
   <Card title="Template tools" icon="file-text">
     List existing message templates and create new ones for outbound notifications, directly from within the conversation.
   </Card>
-  <Card title="Cron job tools" icon="clock">
-    Register scheduled tasks that run on a cron schedule — useful for daily reports or recurring notifications.
+  <Card title="Scheduled task tools" icon="clock">
+    Register [scheduled tasks](/guides/scheduled-tasks) that run on a repeating schedule — useful for daily reports or recurring notifications.
+  </Card>
+  <Card title="Connector tools" icon="plug">
+    Look up how [Airtable and Slack](/guides/connectors) really work before writing code against them — including your own tables and fields.
+  </Card>
+  <Card title="Media tools" icon="image">
+    Send images and documents from your [Storage](/guides/storage), embed images into flow screens, and save media customers send in.
   </Card>
 </CardGroup>
+
+### It knows what you've actually connected
+
+Two details worth knowing, because they change what the agent tells you.
+
+**It looks things up rather than guessing.** Before writing any Airtable or Slack code, the agent fetches the real reference — for Airtable, that includes a snapshot of your actual base, so it uses your real table and field names rather than plausible-sounding invented ones.
+
+**It knows whether you're connected.** Paige tells it, rather than letting it assume. So if you ask for Airtable code without an Airtable connection, it writes the code and then tells you plainly that you need to connect Airtable before the bot will work — instead of cheerfully reporting success on something that can't run.
+
+<Tip>
+  The same applies to [media capture](/guides/media-capture). The agent can check whether saving customer media is switched on, but it can't switch it on for you — it'll tell you to go and do it in Tools → Storage.
+</Tip>
+
+### The knowledge base
+
+Your bot can answer from your own documents — your menu, your policies, your FAQs, your price list.
+
+Add one by attaching it in chat with the paperclip, or uploading it in **Tools → Storage**. Paige reads PDFs, Word documents, and text files, and your bot can then answer questions from them.
+
+<Tip>
+  Upload a **photo** and Paige writes a description of it into the knowledge base, reading any text in the image. So a photo of a printed menu becomes something your bot can answer questions about — no typing required.
+</Tip>
+
+Keep these focused. Everything you add is read on every question your bot answers, so a tight FAQ works better than a long brochure — for cost as well as accuracy.
 
 ## How a new bot starts
 

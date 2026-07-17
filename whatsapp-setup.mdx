@@ -69,15 +69,71 @@ Once connected, Paige shows three pieces of information about your WhatsApp inte
 
 ## Update your business profile
 
-After connecting, you can update the WhatsApp profile that contacts see when they chat with your bot.
+After connecting, **Settings → WhatsApp** is where you shape what customers see when they open a chat with you. It's laid out in two columns.
 
-Go to **Settings → WhatsApp → Business profile** to edit the following:
+### On the left: your number and its health
 
-- **Display name** — The name shown to users in WhatsApp. This must match your registered business name and is subject to Meta's approval process (see below).
-- **Description** — A short description of your business, shown on your WhatsApp profile page.
-- **Profile photo** — Your business logo or a recognizable image. Paige accepts image files up to 5 MB.
+- **Profile photo** — your logo, via **Upload Photo**. JPEG or PNG.
+- **Phone number** — the connected number. Read-only.
+- **Display name** — the name customers see. Changing it needs Meta's approval; see below.
 
-To update the profile, make your changes and click **Save**. Changes to the description and photo take effect immediately. Display name changes require Meta approval.
+Below those, four numbers Meta reports about your number. They're worth glancing at now and then, because they're how you find out you're in trouble before your customers do:
+
+| | What it tells you |
+|---|---|
+| **Quality Rating** | How customers are reacting to your messages. **Green** is healthy; **yellow** means Meta has noticed blocks or reports; **red** means your sending is at risk. |
+| **Throughput** | How fast you can send — Standard is 80 messages a second, High is 1,000. |
+| **Messaging Limit** | How many *different* customers you can start a conversation with in 24 hours. Starts at 1,000 and rises as your quality stays good. Relevant when planning a [broadcast](/guides/broadcasts). |
+| **Business Verification** | Whether Meta has verified your business. Unverified numbers face tighter limits. |
+
+<Tip>
+  A yellow or red quality rating is a signal to slow down and look at what you're sending. Ratings fall when people block or report you — usually after a broadcast to an audience that didn't expect it. Left alone, it costs you your messaging limit and eventually your ability to send.
+</Tip>
+
+### On the right: your business profile
+
+Six fields, all under **Business Profile**:
+
+- **About** — a short line on your profile, up to 139 characters.
+- **Description** — a fuller description, up to 512 characters.
+- **Address**
+- **Email**
+- **Websites** — up to two.
+- **Industry** — pick the closest match from Meta's list.
+
+Click **Save Profile** when you're done. These take effect immediately — only the display name needs review.
+
+## Claim a WhatsApp username
+
+WhatsApp lets a business claim a **username** — an `@handle` customers can find you by without knowing your number. It's in the **Username** field in Settings → WhatsApp.
+
+Type the handle you want and click **Claim**. If you already have one, the button reads **Change** instead, and **Remove** gives it up.
+
+Your username has a status:
+
+- **reserved** — it's yours, waiting on Meta.
+- **approved** — live.
+
+<Note>
+  Usernames are globally unique across all of WhatsApp, and a number can hold one at a time. Meta decides who gets what — Paige just passes your request along, so a name can be refused for reasons outside Paige's control.
+</Note>
+
+If you haven't claimed one, Paige suggests handles based on your brand — click one to claim it directly.
+
+If the handle you want is already on **another of your own numbers**, you'll be told so and offered **Transfer & claim**, which moves it across. It comes off the other number in the process.
+
+## Share your number
+
+The **Share Your WhatsApp** card gives customers a way in that isn't typing a phone number:
+
+- A **QR code** they scan to open a chat. **Download PNG** to put it on a poster, a receipt, or a shop window.
+- A **wa.me link** to put on your website or in an email signature. **Copy** it.
+- A **Pre-filled Message** so the chat opens with text already typed — "Hi, I'd like to book a table" — which gives your bot something to work with from the first message.
+- **Share** buttons for WhatsApp, LinkedIn, and Instagram. Instagram has no share API, so that one copies the link for you to paste.
+
+<Note>
+  If you haven't connected a number yet, this card shows the **Paige Dev** test number instead, so you can scan and try your bot. That QR is for testing only — don't put it in front of customers.
+</Note>
 
 ### Display name approval
 

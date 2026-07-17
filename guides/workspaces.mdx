@@ -4,36 +4,59 @@ sidebarTitle: "Workspaces"
 description: "Workspaces let your team share access to Paige projects. Invite members by email, assign roles, transfer projects, and manage your team — all in one place."
 ---
 
-A workspace is a shared environment where you and your team can collaborate on Paige projects. Instead of each person working in isolation on their own account, a workspace gives everyone on your team a common home — with role-based access so you control who can do what. Projects inside a workspace are accessible to all members with the appropriate permissions.
+A workspace is a shared environment where you and your team can collaborate on Paige projects. Instead of each person working in isolation on their own account, a workspace gives everyone on your team a common home — with role-based access so you control who can do what.
+
+## Personal and workspace projects
+
+Every project you make starts in **Personal** — yours alone. Moving one into a workspace is a deliberate act, which is why the project switcher at the top of the screen groups projects by where they live: **Personal** first, then a section for each workspace you belong to, with your role in that workspace shown next to its name.
+
+<Note>
+  A workspace only appears in that dropdown once it has a project in it. A brand-new, empty workspace is invisible there — which is why Paige offers to add a project as soon as you've made one.
+</Note>
 
 ## Create a workspace
 
 <Steps>
-  <Step title="Open Workspaces">
-    From the Paige dashboard, click **Workspaces** in the top navigation or sidebar.
+  <Step title="Open the project switcher">
+    Click the project name at the top of the screen to open the dropdown.
   </Step>
-  <Step title="Create a new workspace">
-    Click **New workspace**, give it a name, and confirm. You become the owner of the workspace automatically.
+  <Step title="Click Create Workspace">
+    It's at the bottom, below **New Project**. Fill in your business name, website, and address — all three are required.
+  </Step>
+  <Step title="Add a project">
+    A new workspace has nothing in it, so Paige asks you to add one. Either **Create a new project** fresh, or move one of your existing personal projects across.
   </Step>
 </Steps>
+
+You're the owner of any workspace you create.
+
+## Managing a workspace
+
+Workspace management lives inside the projects themselves: open any project that belongs to the workspace and go to **Settings → Workspace**.
+
+<Note>
+  That section only exists on workspace projects. If you're looking at a personal project, there's no Workspace tab — nothing's broken, there's just no workspace to manage.
+</Note>
+
+That's where you rename the workspace, manage members and their permissions, send invitations, move a personal project in, transfer ownership, leave, or delete the whole thing.
 
 ## Invite team members
 
 <Steps>
-  <Step title="Go to workspace settings">
-    Open your workspace and click **Settings**, then navigate to the **Members** tab.
+  <Step title="Open Settings → Workspace">
+    From any project in the workspace, find the **Invite Member** card.
   </Step>
   <Step title="Send an invitation">
-    Enter the email address of the person you want to invite and select the role you want them to have. Click **Send invite**.
+    Enter their email address. If you're the owner you can also choose whether they join as a **Member** or an **Admin**; admins can only invite members.
   </Step>
   <Step title="Wait for them to accept">
-    The invitee receives an email with a link to join the workspace. Once they accept, they appear in your member list with the role you assigned.
+    They get an email with a link to join. It expires after 7 days, and you can cancel it from the **Pending Invitations** list before then.
   </Step>
 </Steps>
 
-<Info>
-  You can view and cancel pending invitations from the **Members** tab at any time.
-</Info>
+<Note>
+  A workspace holds **five members**, including you. The Members card shows where you are — "Members (3/5)".
+</Note>
 
 ### How invitees land in your workspace
 
@@ -63,42 +86,61 @@ Roles define what each member can see and do within a workspace.
   Use the admin role for trusted collaborators who need to manage the team, and the member role for contributors who should only work on projects.
 </Tip>
 
-## Transfer a project to a workspace
+## What each member can see
 
-If you have a project on your personal account that you want to share with your team, you can move it into a workspace.
+Roles decide who can manage the *workspace*. What someone can do inside a *project* is separate, and set per person from the switches on their row in the Members card.
 
-<Steps>
-  <Step title="Open the project">
-    From the dashboard, open the project you want to transfer.
-  </Step>
-  <Step title="Go to project settings">
-    Click **Settings** in the project sidebar.
-  </Step>
-  <Step title="Transfer to workspace">
-    Find the **Transfer project** option and select the workspace to transfer it to. Confirm the transfer.
-  </Step>
-</Steps>
+Ten switches, each one a part of Paige:
+
+| Switch | What it opens up | On by default? |
+|---|---|---|
+| **Code** | The Code tab and the bot's code | Yes |
+| **Flows** | The Flows tab | Yes |
+| **Conversations** | Your customer conversations | Yes |
+| **Broadcasts** | The Broadcasts tab | **No** |
+| **AI Chat** | The chat sidebar and its agents | Yes |
+| **History** | Version history | Yes |
+| **Preview** | The phone preview | Yes |
+| **Settings** | The Settings tab | **No** |
+| **Tools** | Database, Storage, Secrets, Connectors, Logs | **No** |
+| **Deploy** | Pushing changes live | Yes |
+
+<Note>
+  **A new member doesn't get everything.** Broadcasts, Settings, and Tools are off until you turn them on. That's deliberate — Tools holds your database and your API keys, and Broadcasts can message thousands of customers. Someone joining to help write bot replies doesn't need either on their first day.
+</Note>
+
+Turning **Code** off also turns **Deploy** off — deploying code you can't see isn't a sensible combination.
+
+Only owners and admins see these switches, and never on their own row or the owner's.
+
+## Transfer a project into a workspace
+
+If a project is sitting in Personal and you want the team on it, move it across from **Settings → Workspace** on any project already in that workspace. Find the **Transfer Project** card and pick the project.
 
 <Warning>
-  Once a project is transferred to a workspace, all workspace members with appropriate permissions can access it. Make sure you're transferring to the right workspace.
+  Transferring cannot be undone, and every workspace member gets access to the project immediately — including its [secrets](/guides/secrets), if their Tools switch is on. Check who's in the workspace before moving a project that holds live credentials.
 </Warning>
 
-## Manage your workspace
+## Managing members
 
 <CardGroup cols={2}>
   <Card title="Update member roles" icon="user-cog">
-    Go to **Settings → Members**, click the role next to a member's name, and select a new role.
+    Owners can change a member's role from the Members card. Only a transfer of ownership can make someone an owner.
   </Card>
   <Card title="Remove a member" icon="user-minus">
-    In the **Members** tab, find the member you want to remove and click **Remove**. They lose access immediately.
+    Click **Remove** on their row. They lose access to every project in the workspace immediately, and can be re-invited later.
   </Card>
   <Card title="Transfer ownership" icon="arrow-right-left">
-    Owners can hand off ownership to another member from **Settings → General**. You become an admin after transferring.
+    Owners can hand ownership to another member. You become an admin, and **billing moves with it** — the new owner sets up their own payment details from scratch.
   </Card>
   <Card title="Leave a workspace" icon="log-out">
-    Go to **Settings → Members**, scroll to your own entry, and click **Leave workspace**. You'll lose access unless re-invited.
+    Anyone but the owner can leave. If you're the owner, transfer ownership first — Paige won't let you leave a workspace with no one in charge.
   </Card>
 </CardGroup>
+
+<Warning>
+  **Deleting a workspace deletes its projects.** Not just the sharing — the projects themselves, along with member access and any pending invitations, permanently. If you want out of a workspace but want to keep a project, move it back to Personal first.
+</Warning>
 
 <Note>
   If you are the owner and want to leave a workspace, you must transfer ownership to another member first.

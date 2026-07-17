@@ -4,11 +4,7 @@ sidebarTitle: "Help Agent"
 description: "The Help Agent is the in-app assistant that answers your questions about Paige itself — how features work, how to do something, and where to find what you need."
 ---
 
-<Note>
-  This page is a working draft. Review the descriptions below and let us know what to adjust.
-</Note>
-
-The Help Agent is your in-app guide to Paige. While the [Code Agent](/agents/code-agent) builds your bot for you and the [Conversational Agent](/agents/conversational-agent) talks to your end users, the Help Agent is there to help **you** — the builder — figure out the platform itself.
+The Help Agent is your in-app guide to Paige. While the [Code Agent](/agents/code-agent) builds your bot for you and [the AI inside your bot](/agents/conversational-agent) talks to your customers, the Help Agent is there to help **you** — the builder — figure out the platform itself.
 
 If you've ever wanted to ask "how do I do X in Paige?" without leaving the app, that's what the Help Agent is for.
 
@@ -32,13 +28,17 @@ You have two ways to jump straight into the Help Agent from anywhere in the dash
   <Card title="Walks you through tasks" icon="map">
     Gives you step-by-step instructions for things like connecting WhatsApp, creating a flow, inviting a teammate, or rolling back a deploy.
   </Card>
-  <Card title="Points you to the right page" icon="compass">
-    Cites the documentation pages it draws answers from, so you can read the full context if you want more depth.
+  <Card title="Answers short" icon="message-circle">
+    Two to four sentences of plain prose, not an essay. It's built to answer the question you asked and stop.
   </Card>
-  <Card title="Suggests the next step" icon="arrow-right">
-    When you're partway through something, the Help Agent can recommend what to do next based on the state of your project.
+  <Card title="Says when it doesn't know" icon="circle-help">
+    Rather than improvising, it tells you when something isn't covered by what it knows — so a confident-sounding wrong answer is unlikely.
   </Card>
 </CardGroup>
+
+<Note>
+  The Help Agent is a question-answering assistant and nothing more. It can't read your bot's code, change anything, or run a test — ask it to and it'll tell you to switch to the Code Agent. That's deliberate: it's the one agent you can talk to freely without it touching your project.
+</Note>
 
 ## When to use it
 
