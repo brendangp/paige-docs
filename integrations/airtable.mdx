@@ -4,11 +4,19 @@ sidebarTitle: "Airtable"
 description: "Connect an Airtable base and your bot can look up an order, log a booking, or update a status — using your real table and field names."
 ---
 
-If your business already runs on an Airtable base, the Airtable connector lets your bot work in it directly: look up a customer's order when they ask, write a new booking as it's taken, mark a job done.
+If your business already runs on an Airtable base, the Airtable integration lets your bot work in it directly: look up a customer's order when they ask, write a new booking as it's taken, mark a job done.
 
 Connect it from **Tools → Connectors**.
 
-## Connecting
+## What it does
+
+Under the hood your bot gets three operations: **query records** (with filters), **create records**, and **update records**. That covers looking a record up, logging a new one, and changing one that already exists.
+
+<Note>
+  There's no delete. A bot that can delete rows in your business's live base on a customer's say-so is a bad idea, so the integration doesn't offer it. Remove records in Airtable yourself.
+</Note>
+
+## How to authenticate
 
 Two routes:
 
@@ -32,19 +40,13 @@ Two routes:
 
 Paige checks the credentials with Airtable before saving, so you'll know immediately if the token is wrong or can't see the base.
 
-## What your bot can do
+## How to prompt the coding agent to use it
 
 Ask in plain language and the agent writes it — it looks up your real tables and fields first, so it uses your actual names rather than guessing:
 
 > "When someone gives me their order number, look it up in the Orders table and tell them the status."
 
 > "Log each completed booking as a row in the Bookings table."
-
-Under the hood your bot gets three operations: **query records** (with filters), **create records**, and **update records**.
-
-<Note>
-  There's no delete. A bot that can delete rows in your business's live base on a customer's say-so is a bad idea, so the connector doesn't offer it. Remove records in Airtable yourself.
-</Note>
 
 ## Refresh schema
 
@@ -69,4 +71,4 @@ Airtable errors surface in [your logs](/guides/logs). The usual causes:
 - **Field name doesn't match** — Airtable field names are case-sensitive, and `Order Number` is not `order number`.
 - **Schema is stale** — see above.
 - **Token lost access** — someone changed permissions in Airtable, or the token was revoked.
-- **It's running on a schedule** — connectors don't work in [scheduled tasks](/guides/scheduled-tasks) at all.
+- **It's running on a schedule** — integrations don't work in [scheduled tasks](/guides/scheduled-tasks) at all.

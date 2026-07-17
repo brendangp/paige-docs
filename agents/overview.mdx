@@ -1,0 +1,60 @@
+---
+title: "The AI agents in Paige"
+sidebarTitle: "Overview"
+description: "Paige has four builder agents in the chat sidebar, each scoped to what you're doing. Three of them bill against your credits; the Help Agent is always free."
+---
+
+Paige gives you four AI agents in the chat sidebar. Each is scoped to a part of the dashboard, so the agent you're talking to matches whatever you're doing.
+
+<CardGroup cols={2}>
+  <Card title="Code Agent" icon="code" href="/agents/code-agent">
+    Builds and edits your bot from plain-language instructions. Your main way to change what the bot does.
+  </Card>
+  <Card title="Conversations Agent" icon="messages-square" href="/agents/conversations-agent">
+    Helps you work through your inbox — finding contacts, reading history, and drafting replies for you to send.
+  </Card>
+  <Card title="Broadcasting Agent" icon="megaphone" href="/agents/broadcasting-agent">
+    Builds audiences, drafts templates, and assembles campaigns for you to approve. Never sends on its own.
+  </Card>
+  <Card title="Help Agent" icon="circle-help" href="/agents/help-agent">
+    Answers questions about Paige itself — how features work and where to find things. Always free.
+  </Card>
+</CardGroup>
+
+<Note>
+  These builder agents are separate from **[the AI in your bot](/guides/ai-in-your-bot)** — the AI that runs inside your deployed bot and talks to your customers on WhatsApp. That one is your own code and bills differently; see [Free versus billed](#free-versus-billed) below.
+</Note>
+
+## Free versus billed
+
+Only one of the four agents is free.
+
+| Agent | Cost |
+|---|---|
+| [Code Agent](/agents/code-agent) | Billed against your credits |
+| [Conversations Agent](/agents/conversations-agent) | Billed against your credits |
+| [Broadcasting Agent](/agents/broadcasting-agent) | Billed against your credits |
+| [Help Agent](/agents/help-agent) | **Free** |
+
+The **Help Agent is free** and always will be. It never looks at your credit balance — the check that decides whether a request is allowed short-circuits before it, and its usage is never recorded against your account. That's why it keeps working even when your credits have run out: you're never locked out of asking Paige for help.
+
+The **Code, Conversations, and Broadcasting agents bill** against your [credits](/guides/billing#ai-credits). The more work you ask of them, the more they use.
+
+## Where your spend shows up
+
+Go to **Settings → Usage** and you'll see spend broken out **per agent**, each as its own labelled line item:
+
+- **Code Agent**
+- **Conversations Agent**
+- **Broadcasts Agent**
+- **Help Agent** — shown, but marked **Free** rather than carrying a credit figure
+
+So you can see exactly which agent spent what, rather than a single lumped total.
+
+{/* TODO: screenshot — Settings → Usage showing per-agent line items */}
+
+<Warning>
+  **The AI in your bot never appears in this ledger.** The AI inside your deployed bot calls **OpenAI** using your own API key, so you pay OpenAI directly on your own account — that spend has nothing to do with your Paige credits and never shows up under Settings → Usage. See [The AI in your bot](/guides/ai-in-your-bot).
+</Warning>
+
+For everything about credits, top-ups, and the subscription that runs your bot, see [Billing](/guides/billing).

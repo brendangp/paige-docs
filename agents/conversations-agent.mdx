@@ -1,0 +1,103 @@
+---
+title: "Manage your inbox with the Conversations Agent"
+sidebarTitle: "Conversations Agent"
+description: "The Conversations Agent helps you work through your WhatsApp inbox — finding contacts, reading history, and changing conversation states. It drafts replies for you to send, but never sends anything itself."
+---
+
+The Conversations Agent is your assistant for the [Conversations tab](/guides/conversations-tab). Open that tab and the chat sidebar switches to it. It knows about your contacts, their conversation history, and the state each conversation is in, so it can help you triage the inbox and prepare replies.
+
+<Warning>
+  **It can only draft — it never sends.** When you ask it to reply to a customer, it hands you a **draft** to review and send yourself from the conversation view. There is no tool for it to send a message, so "just send it" won't work. This is deliberate: a message going out on your WhatsApp number is always your decision.
+</Warning>
+
+## Don't confuse it with the AI in your bot
+
+These are two different things that both involve conversations, so it's worth separating them clearly.
+
+- **The Conversations Agent** (this page) talks to *you*, in the Paige sidebar, while you read your inbox. It helps you find contacts, understand context, and draft replies.
+- **[The AI in your bot](/guides/ai-in-your-bot)** talks to *your customers*, on WhatsApp, as part of the bot you deploy.
+
+<Note>
+  The Conversations Agent works on conversations that already exist in your inbox. It doesn't change how your bot behaves — for that, use the [Code Agent](/agents/code-agent).
+</Note>
+
+## Open the Conversations Agent
+
+Open the **Conversations** tab in the dashboard. The chat sidebar switches to the Conversations Agent automatically, ready to answer questions about your contacts and messages.
+
+> "Show me contacts waiting in handover."
+
+> "What did the customer on +2782… last say?"
+
+> "Draft a reply letting them know their order ships tomorrow."
+
+## What it can do
+
+<CardGroup cols={2}>
+  <Card title="Find contacts" icon="users">
+    List and search your contacts by name, phone, or conversation state — and see at a glance who's still inside the 24-hour messaging window.
+  </Card>
+  <Card title="Read history" icon="message-square">
+    Pull the recent messages for a contact so it has the context it needs before suggesting or drafting a reply.
+  </Card>
+  <Card title="Change states" icon="shuffle">
+    Move a single conversation — or a batch at once — into a different state, such as handing a conversation over to a human.
+  </Card>
+  <Card title="Draft replies" icon="pen-line">
+    Compose a reply for you to review, copy, and send yourself. It never sends on its own.
+  </Card>
+</CardGroup>
+
+## The tools it uses
+
+The agent has six built-in tools it uses behind the scenes to complete your requests.
+
+<CardGroup cols={2}>
+  <Card title="list_contacts" icon="users">
+    Lists contacts with optional filters (state, search, pagination). Each contact is tagged with a computed **`in_24h_window`** field so you can see instantly who you can still message freely.
+  </Card>
+  <Card title="get_contact_messages" icon="message-square">
+    Fetches recent messages for a contact, so the agent can read the conversation before drafting a reply.
+  </Card>
+  <Card title="list_conversation_states" icon="list">
+    Returns every unique conversation state currently in use across your inbox.
+  </Card>
+  <Card title="update_conversation_state" icon="pencil">
+    Changes the state of a single conversation. Can't update conversations that have ended.
+  </Card>
+  <Card title="bulk_update_state" icon="layers">
+    Changes the state for many conversations in one call — capped at 100 per call.
+  </Card>
+  <Card title="draft_message" icon="pen-line">
+    Returns a draft reply for a contact. It never sends — you copy the draft and send it from the conversation view.
+  </Card>
+</CardGroup>
+
+## The 24-hour window and handover
+
+Two rules gate what the agent can do, and both exist to keep you on the right side of WhatsApp's messaging policy.
+
+### Drafting is gated by both the window and handover
+
+Before it will draft a message, `draft_message` checks **two** conditions — and both must be true:
+
+1. **The contact is inside the open 24-hour window.** WhatsApp only lets you send a free-form message within 24 hours of the customer's last inbound message. Outside that window you need a pre-approved template, so the agent won't draft a free-form reply.
+2. **The conversation is in a handover state.** Handover means the bot has stepped back so a human can reply. If the conversation isn't in handover, the agent tells you to enable handover first.
+
+If either condition fails, the agent explains which one and stops — it won't hand you a draft that couldn't be sent anyway.
+
+### Moving a conversation into handover is checked too
+
+When you ask the agent to move a conversation **into handover**, that change runs an eligibility check first: the contact has to be inside the open 24-hour window. If they're outside it, the move is refused with a clear reason, because there'd be no way to reply to them free-form once handed over.
+
+<Note>
+  **Bulk changes re-check every conversation individually.** `bulk_update_state` handles up to **100** conversations per call, and when you're moving them into handover it runs the same eligibility check on **each** one. Some may succeed while others are refused — the agent reports back which conversations it updated and which it couldn't, with the reason for each.
+</Note>
+
+## What it can't do
+
+<Note>
+  The Conversations Agent works only with your existing conversation data. It **can't** send a message, delete a contact or conversation, change your bot's code, or reach any system outside your inbox. Ask it to write or fix bot behavior and it'll point you to the [Code Agent](/agents/code-agent).
+</Note>
+
+{/* TODO: screenshot — Conversations tab with the Conversations Agent open in the sidebar, showing a draft reply */}

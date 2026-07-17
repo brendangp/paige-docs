@@ -1,0 +1,127 @@
+---
+title: "Plan broadcasts with the Broadcasting Agent"
+sidebarTitle: "Broadcasting Agent"
+description: "The Broadcasting Agent builds audiences, drafts templates, and assembles whole campaigns from a conversation — then hands them to you to approve. It can never send a broadcast on its own."
+---
+
+The Broadcasting Agent is your assistant for the [Broadcasts](/guides/broadcasts) tab. Open that tab and the chat sidebar switches to it. Like the [Code Agent](/agents/code-agent), it's a full agent in its own right — a peer, not a sub-feature of Broadcasts — with its own tab and its own set of tools. It knows about your contacts, your segments, your templates, and your past broadcasts.
+
+It's most useful for the things the forms make tedious:
+
+> "How many opted-in contacts do we have tagged vip?"
+
+> "Make a segment of everyone who tapped Book now in the last 30 days."
+
+> "Draft a utility template telling people we're closed on the 24th."
+
+> "Put together a campaign for that segment using the closed_notice template, for Friday at 9am."
+
+<Warning>
+  **It can never send a broadcast on its own.** Its most it can do is *assemble* a campaign and hold it for your approval — there's no tool to send, launch, approve, cancel, or retry a broadcast. Asking it to "just send it" won't work; approving is yours to do in the Broadcasts tab.
+</Warning>
+
+## What it can do
+
+<CardGroup cols={2}>
+  <Card title="Answer questions" icon="circle-help">
+    Explains your broadcasts, segments, templates, and audience sizes — with real numbers pulled live, never guessed.
+  </Card>
+  <Card title="Check an audience" icon="users">
+    Counts how many contacts an audience reaches before you commit. The number it gives is the same one a real send would use.
+  </Card>
+  <Card title="Build segments" icon="filter">
+    Creates and edits saved segments, including targeting by **buttons people tapped** — something the Segments form can't do.
+  </Card>
+  <Card title="Author templates" icon="file-text">
+    Drafts a template, shows it to you, and only submits it to Meta once you say so — then tells you whether Meta has approved it yet.
+  </Card>
+  <Card title="Assemble campaigns" icon="layers">
+    Combines an audience, a template, its variables, and a schedule into one campaign, held for your approval.
+  </Card>
+  <Card title="Enforce opt-in" icon="shield-check">
+    Refuses to assemble a marketing campaign to an audience that isn't restricted to opted-in contacts.
+  </Card>
+</CardGroup>
+
+## The tools it uses
+
+The agent's own system prompt groups its eleven tools into two tiers: tools that only **read** your data, and tools that **write** — creating segments, authoring templates, and staging a campaign. Nothing in either tier ever sends a message.
+
+### Read
+
+<CardGroup cols={2}>
+  <Card title="list_broadcasts" icon="megaphone">
+    Lists your broadcasts newest-first, with their status and delivery counts (queued, sent, delivered, read, failed, canceled).
+  </Card>
+  <Card title="list_segments" icon="filter">
+    Lists your saved audience segments, each with its filter and a live contact count.
+  </Card>
+  <Card title="list_templates" icon="file-text">
+    Lists your WhatsApp templates from Meta with their approval status — only APPROVED templates can actually be sent.
+  </Card>
+  <Card title="preview_audience" icon="users">
+    Returns the live count of contacts an audience would reach right now, for a saved segment or an ad-hoc filter. Opted-out and not-on-WhatsApp contacts are always excluded.
+  </Card>
+  <Card title="get_template_status" icon="badge-check">
+    Looks up the current Meta approval status of a template (PENDING, APPROVED, REJECTED) by name and language.
+  </Card>
+  <Card title="list_button_interactions" icon="hand-pointer">
+    Lists the buttons and list items your contacts have actually tapped, with labels and tap counts — so you can pick one to target.
+  </Card>
+</CardGroup>
+
+### Write
+
+<CardGroup cols={2}>
+  <Card title="create_segment" icon="plus">
+    Saves a new reusable segment from a filter (opt-in, tags, or a button-tap criterion) and returns its live count.
+  </Card>
+  <Card title="update_segment" icon="pencil">
+    Updates a saved segment's name or filter, then re-resolves its live count.
+  </Card>
+  <Card title="draft_template" icon="pen-line">
+    Composes a new template and returns a structured preview. This never touches Meta — it only validates and formats the draft.
+  </Card>
+  <Card title="submit_template" icon="send">
+    Submits an approved draft to Meta, which creates it on your WhatsApp Business Account. Meta approval is asynchronous — minutes to hours.
+  </Card>
+  <Card title="assemble_campaign" icon="layers">
+    Stages a complete campaign — audience, template, variables, schedule — and holds it in a **pending approval** state. This never sends and never schedules a real send.
+  </Card>
+</CardGroup>
+
+## It never sends anything
+
+<Note>
+  The agent cannot send, launch, approve, cancel, or retry a broadcast. There's no tool for it, and the system refuses to send a campaign in the state the agent leaves it in. `assemble_campaign` only builds the campaign and holds it as **pending approval** — it never arms a real send. Approving is yours to do.
+</Note>
+
+That's deliberate. An agent that could send a promotion to four thousand people because it misread a sentence is not a good agent.
+
+## The approval card
+
+When you ask it to assemble a campaign, a card appears in the chat with everything laid out: the name, how many recipients, the estimated cost, the schedule, a preview of the template as your customers will see it, and each variable with what it resolves to.
+
+Three buttons:
+
+- **Approve** — you're happy. The campaign is scheduled and sends at its time.
+- **Edit** — tell the agent what to change and it reassembles.
+- **Reject** — discard it.
+
+<Warning>
+  **Approve means it will send.** If the campaign has no schedule, or a time that's already passed, approving sends it at the next opportunity — within minutes. Your Approve click *is* the decision, so check the schedule line on the card before you click.
+</Warning>
+
+If the campaign uses a template Meta hasn't approved yet, the agent still assembles it — the campaign waits, and sends by itself once Meta approves and the scheduled time arrives. If Meta rejects the template instead, the campaign is cancelled and you'll get a **Campaign needs attention** notification.
+
+## Marketing templates and opt-in
+
+The agent refuses to assemble a **marketing** campaign to an audience that isn't restricted to opted-in contacts, and tells you to fix the audience. Marketing messages to people who never opted in are exactly the thing that gets a WhatsApp number restricted.
+
+<Note>
+  The manual wizard doesn't enforce this — you can untick **Opted in only** and pick a marketing template there. The agent is stricter than the form on purpose. Being stopped here is a reason to reconsider the audience, not to go and do it by hand.
+</Note>
+
+It also won't assemble a campaign with no audience at all, rather than quietly targeting every contact you have.
+
+{/* TODO: screenshot — the Broadcasting Agent's approval card in the chat sidebar */}

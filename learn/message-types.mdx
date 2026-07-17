@@ -1,16 +1,50 @@
 ---
-title: "WhatsApp message types available in your Paige bot"
+title: "WhatsApp message types"
 sidebarTitle: "Message Types"
-description: "A reference for every message type your bot can send — text, buttons, list menus, images, documents, location requests, voice notes, and templates."
+description: "The building blocks of a WhatsApp conversation — text, media, reply buttons, list menus, CTA buttons, flows, and templates. What each one looks like and what it's for."
 ---
 
-Paige bots can send nine types of WhatsApp messages. Each type is a JavaScript function available in your bot's `services/messages.js` file. The right message type depends on what you need the user to do: read information, pick from options, share their location, or receive a file. The examples below show the exact function signatures from the template, so you can use them directly in your bot code.
+WhatsApp gives you a fixed set of message types to build a conversation from. Some are plain — text, an image, a document. Others are *interactive*: reply buttons, scrollable lists, call-to-action links, and multi-screen flows that open inside the chat. Knowing what each one looks like, and what it's good for, is most of what it takes to design a conversation that feels natural.
+
+These are platform building blocks — they exist on WhatsApp itself, whatever tool you use to send them. The code samples on this page show how each maps to a function in a Paige bot, so you can use them directly, but the *shape* of each message type is the same everywhere.
 
 <Note>
   Interactive messages — buttons, list menus, URL buttons, and flows — are billed as "interactive" messages by WhatsApp. Plain text and media messages are billed as regular messages. Check the [Meta pricing page](https://developers.facebook.com/docs/whatsapp/pricing) for the current rates for your region.
 </Note>
 
-## Message types
+## The gallery
+
+Scan these to recognise each type the way a customer sees it in a chat. Below the gallery, each type is covered in detail with the code to send it.
+
+<Frame caption="Text — a plain message with no controls. The workhorse of any conversation.">
+  {/* TODO: screenshot — WhatsApp text message as it appears in-chat */}
+</Frame>
+
+<Frame caption="Media — an image, video, or document, with an optional caption.">
+  {/* TODO: screenshot — WhatsApp media message (image with caption) as it appears in-chat */}
+</Frame>
+
+<Frame caption="Reply buttons — up to three tappable quick-reply buttons under a message.">
+  {/* TODO: screenshot — WhatsApp interactive reply buttons message as it appears in-chat */}
+</Frame>
+
+<Frame caption="List menu — a 'View options' button that opens a scrollable list of choices.">
+  {/* TODO: screenshot — WhatsApp list message (list menu open) as it appears in-chat */}
+</Frame>
+
+<Frame caption="CTA / URL button — a button that opens a web link in the in-app browser.">
+  {/* TODO: screenshot — WhatsApp CTA/URL button message as it appears in-chat */}
+</Frame>
+
+<Frame caption="Flow — a call-to-action that opens a multi-screen form inside WhatsApp.">
+  {/* TODO: screenshot — WhatsApp flow launch message and an open flow screen as it appears in-chat */}
+</Frame>
+
+<Frame caption="Template — a Meta-approved message for reaching people outside the 24-hour window.">
+  {/* TODO: screenshot — WhatsApp template message (e.g. with variables and buttons) as it appears in-chat */}
+</Frame>
+
+## Message types in detail
 
 <Tabs>
   <Tab title="Text">
@@ -255,4 +289,4 @@ await sendFlow(
 );
 ```
 
-See [Flows Builder](/guides/flows-builder) for how to create and publish flows.
+For the thinking behind *when* to use a flow, see [Thinking in flows](/learn/thinking-in-flows). For how to create and publish one in Paige, see [Flows Builder](/guides/flows-builder).

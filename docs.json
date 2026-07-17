@@ -58,23 +58,41 @@
         ]
       },
       {
+        "tab": "Learn",
+        "icon": "graduation-cap",
+        "groups": [
+          {
+            "group": "WhatsApp platform",
+            "pages": [
+              "learn/index",
+              "learn/why-whatsapp",
+              "learn/whatsapp-products",
+              "learn/message-types",
+              "learn/thinking-in-flows"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Features",
         "icon": "sparkles",
         "groups": [
           {
             "group": "AI agents",
             "pages": [
+              "agents/overview",
               "agents/code-agent",
-              "agents/conversational-agent",
+              "agents/conversations-agent",
+              "agents/broadcasting-agent",
               "agents/help-agent"
             ]
           },
           {
             "group": "Building blocks",
             "pages": [
-              "guides/message-types",
               "guides/templates",
-              "guides/flows-builder"
+              "guides/flows-builder",
+              "guides/ai-in-your-bot"
             ]
           },
           {
@@ -82,7 +100,6 @@
             "pages": [
               "guides/broadcasts",
               "guides/broadcasts/segments",
-              "guides/broadcasts/broadcasting-assistant",
               "guides/contacts-import"
             ]
           },
@@ -94,10 +111,7 @@
               "guides/storage",
               "guides/media-capture",
               "guides/scheduled-tasks",
-              "guides/secrets",
-              "guides/connectors",
-              "guides/connectors/airtable",
-              "guides/connectors/slack"
+              "guides/secrets"
             ]
           },
           {
@@ -110,19 +124,15 @@
         ]
       },
       {
-        "tab": "Templates",
-        "icon": "layout-template",
+        "tab": "Integrations",
+        "icon": "plug",
         "groups": [
           {
-            "group": "Flow templates",
+            "group": "Connectors",
             "pages": [
-              "templates/overview",
-              "templates/appointment-booking",
-              "templates/lead-capture",
-              "templates/contact-form",
-              "templates/customer-feedback",
-              "templates/support-ticket",
-              "templates/survey"
+              "integrations/index",
+              "integrations/airtable",
+              "integrations/slack"
             ]
           }
         ]
@@ -171,6 +181,58 @@
     {
       "source": "/guides/ai-agent",
       "destination": "/agents/code-agent"
+    },
+    {
+      "source": "/guides/message-types",
+      "destination": "/learn/message-types"
+    },
+    {
+      "source": "/guides/connectors",
+      "destination": "/integrations"
+    },
+    {
+      "source": "/guides/connectors/airtable",
+      "destination": "/integrations/airtable"
+    },
+    {
+      "source": "/guides/connectors/slack",
+      "destination": "/integrations/slack"
+    },
+    {
+      "source": "/agents/conversational-agent",
+      "destination": "/guides/ai-in-your-bot"
+    },
+    {
+      "source": "/guides/broadcasts/broadcasting-assistant",
+      "destination": "/agents/broadcasting-agent"
+    },
+    {
+      "source": "/templates/overview",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/appointment-booking",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/lead-capture",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/contact-form",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/customer-feedback",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/support-ticket",
+      "destination": "/"
+    },
+    {
+      "source": "/templates/survey",
+      "destination": "/"
     }
   ]
 }

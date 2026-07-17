@@ -1,0 +1,83 @@
+---
+title: "Which WhatsApp product, and when"
+sidebarTitle: "Which WhatsApp product"
+description: "There are three WhatsApp products — consumer WhatsApp, the Business App, and the Business Platform. How they differ, what each is right for, and why the wrong choice is the costliest mistake."
+---
+
+"WhatsApp" is really three different products wearing the same green icon. They look alike in a chat, but underneath they're built for very different jobs — and the gap between them is where most early mistakes happen. Picking the wrong one means rebuilding later on a number you may not be able to move cleanly. It's worth getting right the first time.
+
+## The three products
+
+<CardGroup cols={3}>
+  <Card title="Consumer WhatsApp" icon="user">
+    The app on your phone for talking to friends and family. Free, personal, one account per number. Not built for running a business.
+  </Card>
+  <Card title="Business App" icon="store">
+    A free app for small businesses. Adds a business profile, catalog, quick replies, and labels — but it's a person tapping a phone. No automation, no API.
+  </Card>
+  <Card title="Business Platform" icon="server">
+    The programmable, cloud-based version — also called the Cloud API. Automation, multiple agents, templates, flows, and broadcasts at scale. This is what Paige builds on.
+  </Card>
+</CardGroup>
+
+## At a glance
+
+| | Consumer app | Business App | Business Platform (Cloud API) |
+|---|---|---|---|
+| **Who it's for** | Personal use | A small team, one person on chats | Automation and scale |
+| **Cost** | Free | Free | Meta charges per conversation, plus your build |
+| **Where it runs** | A phone | A phone | The cloud — no app to open |
+| **Automation** | None | None | Full — bots, scheduled sends, AI |
+| **Who can reply** | You | Effectively one person at a time | A whole team, shared history |
+| **Templates** | — | — | Yes — Meta-approved outbound messages |
+| **Flows** (in-chat forms) | — | — | Yes |
+| **Broadcasts** | Limited native tool | Limited native tool | At scale, with opt-outs handled |
+| **Integrations** (CRM, DBs) | — | — | Yes, programmatically |
+
+## When each one is right
+
+**Consumer WhatsApp** is for personal messaging. If you're chatting with customers off your own personal account, you've outgrown it the moment it stops feeling personal — there's no business profile, no separation, and no way to automate anything.
+
+**The Business App** is genuinely good for a small operation: one person, a manageable trickle of chats, a catalog to show, a few saved replies. It's free and it runs on a phone. Its ceiling is that everything is manual. There's no automation, no programmatic integration with your other systems, and the chat history is tied to that one phone — so it strains as soon as more than one person needs to help, or the volume climbs.
+
+**The Business Platform** is the programmable one. It has no app — it lives in the cloud and is driven by software. That's what makes automation, AI agents, a shared team inbox, approved templates, in-chat flows, and large broadcasts possible. It's the right choice the moment a business needs any of those.
+
+<Tip>
+  A rough signal it's time for the Platform: you're handling more than a few dozen messages a day, replies are slipping past an hour, you want to broadcast to more than a couple of hundred people, you need it to talk to your CRM or database, or losing one staff member would mean losing your chat history.
+</Tip>
+
+## What choosing the Platform implies
+
+The Platform is more capable, but it asks more of you up front. None of this is hard — it's just worth knowing before you start, because some of it is difficult to undo.
+
+<AccordionGroup>
+  <Accordion title="A Meta Business account and verification" icon="badge-check">
+    The Platform runs on top of a Meta Business account, and Meta expects your business to be verified. Verification is what unlocks higher sending limits and a display name customers trust.
+  </Accordion>
+  <Accordion title="A dedicated phone number" icon="phone">
+    The number you put on the Platform **cannot also be running in the WhatsApp Business App or consumer app**. If it's currently a personal or Business App number, you'll have to free it up first — and that means losing the chat history tied to it. Many businesses use a fresh number to avoid the disruption.
+  </Accordion>
+  <Accordion title="Templates for anything outside the 24-hour window" icon="clock">
+    When a customer messages you, a 24-hour window opens in which you can reply freely with any message. Outside that window — a reminder, a proactive update, a broadcast — you can only send a **template** that Meta has approved in advance. Approval takes anywhere from minutes to a day or two, so proactive messages need a little planning ahead.
+  </Accordion>
+  <Accordion title="Per-conversation pricing" icon="receipt">
+    Unlike the free apps, Meta charges for messaging on the Platform, priced by conversation type. Customer-initiated replies inside the window are the cheapest; business-initiated marketing is the most expensive. Rates change and vary by region, so check [Meta's current WhatsApp pricing](https://developers.facebook.com/docs/whatsapp/pricing) for the numbers that apply to you.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  The costliest mistake is starting on the wrong product. Building a business presence on consumer WhatsApp or the Business App, then moving to the Platform later, can mean giving up the number and the history attached to it. If there's any chance you'll need automation, a team, or scale, start on the Platform.
+</Warning>
+
+## Building on the Platform
+
+You don't wire up Meta's Cloud API by hand unless you want to. Most businesses reach the Platform through a provider that handles the integration, the tokens, and the webhooks for them — [Paige](/) is one such route, and its [WhatsApp setup guide](/whatsapp-setup) walks through connecting a number to the Platform step by step.
+
+<CardGroup cols={2}>
+  <Card title="Connect your number" icon="link" href="/whatsapp-setup">
+    Link a WhatsApp Business number to the Platform through Meta's embedded signup.
+  </Card>
+  <Card title="Message types" icon="layout-list" href="/learn/message-types">
+    See what the Platform can actually send — text, buttons, lists, media, flows, and templates.
+  </Card>
+</CardGroup>

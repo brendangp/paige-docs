@@ -1,0 +1,81 @@
+---
+title: "Integrations: connect your bot to the systems you already run"
+sidebarTitle: "Overview"
+description: "Integrations link your bot to the tools your business already lives in — Airtable, Slack, and more — so it can read and write there without you handling API keys."
+---
+
+Your bot doesn't work in isolation. It might need to log a booking to the spreadsheet your team already lives in, or tell someone in Slack that a customer needs help. **Integrations** connect your bot to the systems you already run, and turn each one into a sign-in rather than a credentials exercise.
+
+You'll find them in **Tools → Connectors**.
+
+## Why use an integration
+
+You could do all of this with [secrets](/guides/secrets) — generate an API key, paste it in, ask the agent to write the calls. An integration removes the fiddly parts:
+
+- **You don't handle a token.** Sign in through the service and Paige stores what it needs.
+- **Your bot gets a ready-made helper**, so the agent writes `postMessage(...)` rather than hand-rolling HTTP calls against an API it's half-remembering.
+- **The agent knows the service.** It looks up the real reference before writing anything, including your actual Airtable tables and fields.
+
+<Tip>
+  For Airtable and Slack, use the integration rather than storing a raw token as a secret. Secrets are still the right answer for everything else.
+</Tip>
+
+## Every integration follows the same shape
+
+Each integration page is laid out the same way, so once you've connected one you know how the next one works:
+
+- **What it does** — the reads and writes it gives your bot.
+- **How to authenticate** — sign in once, or paste a token you made yourself.
+- **How to prompt the coding agent to use it** — the plain-language instructions that turn the connection into working bot behaviour.
+
+## Available integrations
+
+<CardGroup cols={2}>
+  <Card title="Airtable" icon="table" href="/integrations/airtable">
+    Read and write records in an Airtable base — look up an order, log a booking, update a status.
+  </Card>
+  <Card title="Slack" icon="slack" href="/integrations/slack">
+    Post messages to a Slack channel — alert your team when someone needs a human.
+  </Card>
+</CardGroup>
+
+### Conversations
+
+**Conversations** is also listed under **Tools → Connectors**, but it's a different sort of thing. There's no account to sign in to and no token — clicking **Connect** simply asks the Code agent to add a small piece of code to your bot, and that's what lets you reply to customers from the [Conversations tab](/concepts/conversations).
+
+It only appears on Paige-hosted projects. Once it's in, the card reads **Active**.
+
+## Connecting
+
+Each card offers up to two routes:
+
+- **Connect with *service*** — the one-click route. A popup opens, you sign in and approve, and it closes itself.
+- **Or enter an access token manually** — paste a token you've made yourself. Useful when your organisation restricts app installs, or you want to control exactly which permissions the token carries.
+
+Either way Paige checks the credential with the service before saving it, so a typo fails immediately rather than at 3am inside your bot.
+
+## Integrations and deploy
+
+Your connection is **shared between your preview bot and your live bot**, and doesn't need a deploy — connect once and both can use it.
+
+<Note>
+  One exception: Airtable's **Refresh schema** writes an updated list of your tables and fields into your bot code, which *does* need a [deploy](/guides/deploy) to reach your live bot. See [the Airtable page](/integrations/airtable#refresh-schema).
+</Note>
+
+Connections are per-project. Two projects in the same workspace connect separately.
+
+## Disconnecting
+
+**Disconnect** removes the credential. There's no confirmation step — one click and it's gone.
+
+<Warning>
+  Disconnecting doesn't remove the code that used it. Your bot keeps the Airtable or Slack calls the agent wrote, and they'll now fail at runtime with a missing-credential error. If you're removing a service for good, ask the agent to take the code out too — otherwise the failures show up in [your logs](/guides/logs) rather than anywhere obvious.
+</Warning>
+
+## A limitation worth knowing
+
+<Warning>
+  **Integrations don't work in [scheduled tasks](/guides/scheduled-tasks).** Code that posts to Slack or writes to Airtable works when triggered by a customer's message, and fails every time the same code runs on a schedule — the credential isn't there.
+
+  That rules out the two most obvious uses, a nightly Airtable sync and a daily Slack summary. If you need one now, generate a real API key, store it as a [secret](/guides/secrets), and have the task use that instead of the integration.
+</Warning>

@@ -4,11 +4,15 @@ sidebarTitle: "Slack"
 description: "Connect Slack and your bot can post to a channel — telling your team when a customer needs a human, a booking comes in, or something goes wrong."
 ---
 
-The Slack connector gives your bot a voice in your team's workspace. The obvious use is handover — a customer asks for a person, and someone actually finds out. But it's equally good for a heads-up when a big order lands, or when your bot hits something it can't handle.
+The Slack integration gives your bot a voice in your team's workspace. The obvious use is handover — a customer asks for a person, and someone actually finds out. But it's equally good for a heads-up when a big order lands, or when your bot hits something it can't handle.
 
 Connect it from **Tools → Connectors**.
 
-## Connecting
+## What it does
+
+Your bot can post a message to a channel. That's the whole surface — posting. Your bot can't read Slack messages, reply in threads on its own, or react to what your team says there. Slack is where your bot tells you things, not a second place it holds conversations.
+
+## How to authenticate
 
 <Steps>
   <Step title="Sign in with Slack">
@@ -17,7 +21,7 @@ Connect it from **Tools → Connectors**.
   <Step title="Pick a default channel">
     After signing in, choose a channel from the **Default channel** dropdown on the card. Your bot posts here unless its code names a different channel.
 
-    This step is easy to skip and the connector doesn't work without it — signing in doesn't pick a channel for you.
+    This step is easy to skip and the integration doesn't work without it — signing in doesn't pick a channel for you.
   </Step>
   <Step title="Invite the bot to the channel">
     In Slack, run `/invite @paige` in the channel you chose. Slack won't let a bot post somewhere it hasn't been invited.
@@ -28,15 +32,13 @@ Connect it from **Tools → Connectors**.
   The dropdown lists your **public** channels. If you need your bot to post in a private channel, connect with a token instead — a Slack app token carrying the `groups:read` permission can see private channels the bot has been invited to.
 </Note>
 
-## What your bot can do
+## How to prompt the coding agent to use it
 
-Your bot can post a message to a channel. Ask for what you want:
+Ask for what you want and the agent writes it:
 
 > "When someone asks to speak to a person, post their name and question to Slack."
 
 > "Post to Slack whenever a booking over R5000 comes in."
-
-That's the whole surface — posting. Your bot can't read Slack messages, reply in threads on its own, or react to what your team says there. Slack is where your bot tells you things, not a second place it holds conversations.
 
 <Tip>
   Pair this with [handover](/concepts/conversations). Have your bot post to Slack **and** flag the conversation for handover in the same breath — your team gets the ping and the conversation is already waiting for them in Paige.
@@ -49,4 +51,4 @@ Slack errors show up in [your logs](/guides/logs):
 - **`not_in_channel`** — the bot hasn't been invited. Run `/invite @paige` in that channel.
 - **`channel_not_found`** — the channel was renamed, archived, or is private and the bot can't see it.
 - **No default channel set** — you connected but never picked one from the dropdown.
-- **It's running on a schedule** — connectors don't work in [scheduled tasks](/guides/scheduled-tasks), so a daily Slack summary won't work today.
+- **It's running on a schedule** — integrations don't work in [scheduled tasks](/guides/scheduled-tasks), so a daily Slack summary won't work today.

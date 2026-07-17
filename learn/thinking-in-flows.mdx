@@ -1,0 +1,115 @@
+---
+title: "Thinking in flows"
+sidebarTitle: "Thinking in flows"
+description: "Flow design as a way of thinking — when a structured flow beats free text, how to order the questions, how to write messages people tap, and the common shapes conversations take."
+---
+
+A good WhatsApp conversation is designed, not just written. The difference between a flow people finish and one they abandon usually isn't the technology — it's the *shape*: what you ask first, how much you ask at once, and whether tapping is easier than typing.
+
+This page is about that thinking. It's not about the buttons in the builder — for how to actually create, preview, and publish flows in Paige, see **[Flows Builder](/guides/flows-builder)**. Here we're one level up: how to decide what the conversation should look like before you build it.
+
+<Info>
+  "Flow" is used two ways. Broadly, it means the shape of a whole conversation — the order you take someone through. Specifically, a **[WhatsApp Flow](/concepts/flows)** is a multi-screen form that opens inside the chat. This page is mostly about the first sense, and it'll tell you when to reach for the second.
+</Info>
+
+## When a flow beats free text — and when it doesn't
+
+Structure helps when the answer needs to be *specific*. It gets in the way when the question is *open*.
+
+<Columns cols={2}>
+  <Card title="Reach for structure" icon="list-checks">
+    - You need a specific value — a date, a choice from a set, a valid email.
+    - There's a right set of options and you want to prevent typos and dead ends.
+    - The same information gets collected every time (bookings, intake, sign-ups).
+    - You want the data clean enough to save straight to a database.
+  </Card>
+  <Card title="Leave it open" icon="message-square">
+    - The customer has a question you can't predict.
+    - You're offering support, advice, or anything conversational.
+    - Forcing buttons would feel robotic or block what they're trying to say.
+    - One free-text reply is genuinely faster than three taps.
+  </Card>
+</Columns>
+
+<Tip>
+  A strong pattern is to lead with **free text** ("Hi, how can I help?"), understand intent, and only *then* drop into a **structured flow** once you know the person wants to book, sign up, or file something. Structure is a tool you reach for at the right moment — not a cage you put every conversation in.
+</Tip>
+
+## How to structure the steps
+
+Once you've decided a stretch of the conversation should be structured, the order and size of the steps decide whether people finish.
+
+<Steps>
+  <Step title="Ask the easy, motivating thing first">
+    Open with a low-effort choice that moves things forward — a "Book a table" button, a "Get started" tap. Momentum early makes people more likely to stay. Save anything that feels like *work* (long text fields, personal details) for after they're committed.
+  </Step>
+  <Step title="One idea per screen">
+    Don't stack five questions on one screen. Ask for a little, confirm it, move on. Short steps feel fast even when there are several of them; one crowded step feels like a form and gets abandoned.
+  </Step>
+  <Step title="Order by drop-off risk">
+    People leave when effort spikes. Put the highest-friction step (payment details, a long note) as late as you can, so anyone who was going to drop off has already got value from the earlier steps.
+  </Step>
+  <Step title="Confirm at the end">
+    Close with a short summary of what you captured and a clear confirmation. It reassures the person it worked, and it's your last chance to catch a wrong date before it becomes a problem.
+  </Step>
+</Steps>
+
+<Note>
+  If a flow starts feeling long, that's a design signal, not a reason to cram. Cut optional steps, combine related fields, or split one long journey into two shorter flows triggered in sequence. Fewer, cleaner steps almost always beat one exhaustive form.
+</Note>
+
+## How to craft the messages
+
+WhatsApp is not email. The whole thing is read on a phone, in a thread that's mostly friends and family, in a few seconds. Write for that.
+
+- **Keep it short.** A sentence or two per message. If you're scrolling to read it, it's too long. Break a big idea into two messages rather than one wall of text.
+- **Match the register.** Warm and direct, the way a helpful person texts — not the way a company writes a policy. Contractions are fine. A well-placed emoji is fine. A paragraph of legalese is not.
+- **Make the next step obvious.** Every message should make it clear what to do next. If you're asking a question, ask *one*.
+- **Write buttons as actions.** A button gets tapped when its label says exactly what happens — "Book a table", "See today's menu", "Talk to a person". Vague labels like "OK" or "Continue" make people hesitate. Keep them short; long labels get truncated.
+
+### Buttons vs. a list
+
+Both let people tap instead of type. Which one depends on how many options there are.
+
+| | Reply buttons | List menu |
+|---|---|---|
+| **Best for** | 2–3 clear choices | 4 or more options |
+| **How it looks** | Buttons sit right under the message | A single "View options" opens a scrollable list |
+| **Feels like** | A quick fork in the road | A menu to browse |
+| **Rule of thumb** | Use when the choice is obvious and small | Use when there are too many buttons to show at once |
+
+<Tip>
+  If you can phrase it as two or three options, use buttons — they're visible without a tap, so people act faster. Reach for a list only when the choices genuinely outgrow that. See [Message Types](/learn/message-types) for what each looks like in a chat.
+</Tip>
+
+## Common shapes
+
+Most useful conversations are a variation on a handful of shapes. Recognising which one you're building tells you how to order the steps.
+
+<CardGroup cols={2}>
+  <Card title="Capture" icon="user-plus">
+    Turn a stranger into a known contact. Get the few details you need — name, and one way to reach them — and nothing more. Short is the whole point; every extra field costs you completions.
+  </Card>
+  <Card title="Qualify" icon="filter">
+    Work out who this person is and what they need before spending time on them. A couple of routing questions — what are you after, how soon, what budget — then branch to the right next step.
+  </Card>
+  <Card title="Book" icon="calendar-check">
+    Get someone to a confirmed slot. Choose a service, pick a date and time, confirm. A [WhatsApp Flow](/concepts/flows) shines here because dates and time slots want proper pickers, not typed text.
+  </Card>
+  <Card title="Confirm" icon="badge-check">
+    Close the loop after something happened — an order, a booking, a submission. Summarise what you've got, confirm it back, and tell them what comes next. Short, reassuring, done.
+  </Card>
+</CardGroup>
+
+Most real conversations chain these together: *qualify* to find out someone wants to book, *book* them in, *confirm* the slot, then *capture* anything you'll need for next time.
+
+## Where to next
+
+<CardGroup cols={2}>
+  <Card title="Flows Builder" icon="wrench" href="/guides/flows-builder">
+    Ready to build one? This is the hands-on guide to generating, previewing, and publishing flows.
+  </Card>
+  <Card title="Message types" icon="layout-list" href="/learn/message-types">
+    The full set of building blocks — buttons, lists, media, and more — with what each is for.
+  </Card>
+</CardGroup>
