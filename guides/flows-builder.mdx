@@ -19,29 +19,52 @@ Each flow is defined as a JSON file stored in your project at `flows/{name}.json
     Ask the AI agent to create a flow. Describe the screens, inputs, and logic you need. The agent writes the JSON, saves it to `flows/{name}.json`, and uploads it to Meta as a DRAFT.
   </Step>
   <Step title="Check for validation errors">
-    After generating, the agent checks the flow against Meta's API. If there are validation errors, the agent fixes them automatically.
+    Every flow is uploaded to the shared Paige Dev number first, so Meta can validate it before it goes anywhere near your own number. If Meta reports errors, the agent gets one automatic attempt to fix them and try again. If it still can't, it stops and shows you what Meta said rather than claiming success.
   </Step>
-  <Step title="Publish the flow">
-    Once the draft looks right, publish it. Published flows can be sent to users. Ask the agent "publish my [flow name] flow" or use the **Flows** section in your project dashboard.
+  <Step title="Deploy the flow">
+    Click [**Deploy**](/guides/deploy) and tick the flow. Paige registers it on your WhatsApp number and publishes it, and from then on your bot can send it to customers.
   </Step>
   <Step title="Embed in your bot">
     Use `sendFlow()` in your bot code to send the flow to a user. When they submit it, your webhook receives the data and your bot can process it.
   </Step>
 </Steps>
 
-<Info>
-  When you update a published flow, Meta moves it back to DRAFT status automatically. You need to republish it after any update.
-</Info>
+## Changing a flow that's already live
+
+Editing a live flow is safe, and it's the normal way to work — there's no need to deprecate it or make a copy first.
+
+The moment you ask the agent for a change, the **Paige Dev copy updates**, so you can test the new version immediately. Your customers keep seeing the version you last deployed. Nothing they experience changes until you [**Deploy**](/guides/deploy) and tick that flow.
+
+While a flow is in that in-between state, Paige shows you in three places:
+
+- The flow in the list carries an orange **Pending** tag — or **New**, if it's never been deployed.
+- Its detail pane says **Changes pending deploy**.
+- The **Deploy** button shows a count of how many flows are waiting.
+
+<Note>
+  Flows are only ever published to your number when you tick them in the Deploy dialog. Nothing is ticked by default, so a deploy won't republish a flow behind your back — but it also means a flow you forgot to tick stays pending, which is why the count sticks around.
+</Note>
 
 ## Preview a flow before going live
 
 You don't need to connect your own WhatsApp number to test a flow. As soon as the AI agent generates a flow, Paige also publishes a copy to the shared **Paige Dev** number, so you can preview it straight away.
 
-Open the **Flows** tab, pick the flow from the list, and click **Try it**. An interactive simulation of the flow loads on the right — step through every screen exactly as a user would. Use **Inspect** and **Debug** to check the flow's structure and the data each screen submits.
+Open the **Flows** tab, pick the flow from the list, and click **Try it**. An interactive simulation of the flow loads on the right — step through every screen exactly as a user would. **Debug** appears once you're stepping through, and shows the data each screen submits. Click **Inspect** to go back to looking rather than clicking.
 
 <Note>
-  The interactive preview works whether or not you've connected your own WhatsApp number. If you haven't connected one yet, Paige previews the Paige Dev copy of the flow automatically.
+  The interactive preview works whether or not you've connected your own WhatsApp number. If you haven't connected one yet, Paige previews the Paige Dev copy of the flow automatically and tells you so above the preview.
 </Note>
+
+### Previewing the live version vs. your version
+
+Once a flow is live on your own number, a **Paige Dev** / **Production** toggle appears above the preview. This is how you see both sides of a pending change at once:
+
+- **Paige Dev** renders your current version — the one with your unpublished edits in it.
+- **Production** renders what your customers are actually seeing right now.
+
+Selecting a flow defaults to **Production** if it's live on your number, and **Paige Dev** if it isn't. The toggle is hidden entirely until there's a live version to compare against.
+
+The preview refreshes itself whenever a flow is republished, so you don't need to reload the page after a deploy to see the new version.
 
 ### URL buttons in the in-app preview
 
@@ -163,24 +186,22 @@ The agent reads the current flow JSON, applies your changes, re-validates the st
 
 <Tabs>
   <Tab title="Publish">
-    Publish a draft flow to make it available to send to users.
+    For most flows, **[Deploy](/guides/deploy) is how you publish** — tick the flow in the deploy dialog and Paige registers and publishes it on your number in one go. That's the path to use for a new flow, and for pushing changes to a live one.
 
-    From the AI agent:
-
-    > "Publish my appointment_booking flow."
-
-    From the dashboard: navigate to the **Flows** section, find the flow, and click **Publish**.
+    The **Publish** button in the Flows tab is narrower than it looks: it only appears for a flow that's already registered on your number and sitting in draft. A flow that's still LOCAL has no Publish button, because there's nothing on your number to publish yet.
 
     <Note>
-      You can only publish flows that have no validation errors. If publishing fails, ask the agent to check the flow for errors.
+      A flow with validation errors won't publish. The errors are listed in the flow's detail pane — ask the agent to fix them and it will re-run the flow through Meta's validation.
     </Note>
   </Tab>
   <Tab title="Deprecate">
-    Deprecating a flow takes it offline. Users who receive a message containing a deprecated flow will see an error if they try to open it. Deprecation cannot be undone.
+    Deprecating a flow takes it offline. Users who receive a message containing a deprecated flow will see an error if they try to open it.
 
-    From the dashboard: navigate to the **Flows** section, find the published flow, and click **Deprecate**.
+    From the dashboard: open the **Flows** tab, select the published flow, and click **Deprecate**.
 
-    Use deprecation when you are replacing a flow with a newer version and want to prevent the old one from being opened.
+    <Warning>
+      Deprecation cannot be undone — there's no way to bring a deprecated flow back to published. If you're changing a flow rather than retiring it, edit it and deploy instead; you don't need to deprecate anything.
+    </Warning>
   </Tab>
 </Tabs>
 
