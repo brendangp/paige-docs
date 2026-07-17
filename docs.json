@@ -51,7 +51,8 @@
             "group": "Get started",
             "pages": [
               "quickstart",
-              "whatsapp-setup"
+              "whatsapp-setup",
+              "guides/deploy"
             ]
           }
         ]
@@ -73,8 +74,30 @@
             "pages": [
               "guides/message-types",
               "guides/templates",
-              "guides/flows-builder",
-              "guides/secrets"
+              "guides/flows-builder"
+            ]
+          },
+          {
+            "group": "Broadcasts",
+            "pages": [
+              "guides/broadcasts",
+              "guides/broadcasts/segments",
+              "guides/broadcasts/broadcasting-assistant",
+              "guides/contacts-import"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "guides/tools",
+              "guides/database-tab",
+              "guides/storage",
+              "guides/media-capture",
+              "guides/scheduled-tasks",
+              "guides/secrets",
+              "guides/connectors",
+              "guides/connectors/airtable",
+              "guides/connectors/slack"
             ]
           },
           {
@@ -113,7 +136,8 @@
             "pages": [
               "guides/testing",
               "guides/logs",
-              "guides/version-history"
+              "guides/version-history",
+              "guides/mobile-app"
             ]
           }
         ]
@@ -137,7 +161,7 @@
     "primary": {
       "type": "button",
       "label": "Start Building",
-      "href": "https://paigme.dev"
+      "href": "https://paigeme.dev"
     }
   },
   "footer": {
