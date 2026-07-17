@@ -1,0 +1,71 @@
+---
+title: "Manage the images and documents your bot sends"
+sidebarTitle: "Storage"
+description: "Storage holds the media your bot can send — price lists, menus, banners, brochures. Upload a file, give it a short name, and your bot can send it by that name."
+---
+
+If your bot needs to send a picture or a document — a menu, a price list, a welcome banner, a PDF brochure — that file lives in **Tools → Storage**. Upload it once, give it a short name, and your bot sends it by that name from then on.
+
+## Adding a file
+
+Two ways in:
+
+- **Click Upload** in Tools → Storage.
+- **Attach it in chat** using the paperclip next to the message box. This is usually the easier one: you can hand the agent a picture and describe what to do with it in the same message.
+
+Paige accepts **PNG, JPEG, PDF, DOCX, TXT, and MD files, up to 20 MB each**.
+
+## Bot-facing names
+
+Every file gets a short name — a **slug** — and that's what your bot uses to refer to it. Upload `Summer Menu 2026.pdf` and you get `summer-menu-2026`; set your own in the **Bot-facing name** field if you'd rather.
+
+Once a file is uploaded, your bot can send it:
+
+```javascript
+const { sendMedia } = require("../utils/sendMedia");
+
+await sendMedia(from, "summer-menu-2026", {
+  caption: "Here's our current menu!",
+});
+```
+
+Paige works out from the file whether that's an image or a document — you don't have to say.
+
+<Note>
+  Uploading a file doesn't make it available to your **live** bot straight away. The file is there and your preview bot can use it immediately, but your live bot won't know the name until your next [deploy](/guides/deploy). If your live bot can't find a file you just uploaded, that's why.
+</Note>
+
+## Managing your files
+
+Each file in the grid has:
+
+- **A caption** you can set, sent alongside the file by default.
+- **An intent tag** — *knowledge*, *flow*, *runtime*, or *multi*. This is a label for your own benefit, to help you keep a large library straight; it doesn't change how the file behaves.
+- **Download**, to get the original back.
+- **Rename**, to change the bot-facing name.
+- **Delete**.
+- **Re-register with Meta** — see below.
+
+### Renaming and deleting
+
+Renaming is blocked while a file is referenced by your bot code or a flow — Paige will tell you where it's used, and you remove the reference first. That's deliberate: renaming out from under a reference would break the send.
+
+<Warning>
+  Deleting is less protective than renaming. A file that's embedded in a **flow** can't be deleted, but one that's only referenced from **bot code** can be — and nothing warns you. Your bot will then fail at the moment it tries to send it. Before deleting, check the usage chips on the file's card.
+</Warning>
+
+### Re-registering with Meta
+
+WhatsApp keeps its own copy of each file, and that copy expires after about a month. Paige refreshes them for you before they lapse, so most of the time this looks after itself.
+
+If a file's badge says **expired**, or a send fails complaining about media, click **Re-register with Meta** to push a fresh copy across.
+
+## Media your customers send you
+
+Storage also holds photos, PDFs, and voice notes that customers send *in* — proof of payment, an ID document, a photo of a broken part. That's off by default; see [Capturing customer media](/guides/media-capture) for how to turn it on and what to weigh up first.
+
+Anything captured that way shows a green **From WhatsApp** badge, and once you have some, a **Filter by source** control appears so you can separate your own uploads from customers' files.
+
+<Note>
+  Your bot can't re-send a customer's file with `sendMedia()` — captured media is deliberately excluded. It's there for you to look at, not for the bot to pass around.
+</Note>

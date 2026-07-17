@@ -12,13 +12,29 @@ Every time your bot handles a message, any `console.log`, `console.error`, `cons
   <Step title="Open your project">
     From the Paige dashboard, select the project you want to inspect.
   </Step>
-  <Step title="Go to Logs">
-    In the project sidebar, click **Logs**. The logs panel shows the most recent execution output for your bot.
+  <Step title="Go to Tools → Logs">
+    Open the **Tools** tab and select **Logs**. The panel shows the most recent execution output for your bot, newest at the bottom, grouped under **Today** and **Yesterday** headings.
+  </Step>
+  <Step title="Pick which bot you're looking at">
+    Switch between **Preview** and **Production** at the top. This is the first thing to check when a log you expect isn't there — see below.
   </Step>
   <Step title="Filter by log level">
-    Use the log level filter to narrow results. You can show all levels or focus on a specific one — for example, filter to **error** when tracking down a specific failure.
+    Use the level filter to narrow results — **All Levels**, **Error**, **Warn**, **Info**, or **Log**. Search box next to it matches on message text.
   </Step>
 </Steps>
+
+## Preview vs Production — which bot am I reading?
+
+You have two bots running, and they keep separate logs. The toggle at the top of the panel decides which set you're reading, and it defaults to **Preview**.
+
+- **Preview** is the bot you're testing — what runs when you chat in the preview panel or message through [Paige Dev](/guides/testing).
+- **Production** is the live bot your customers are talking to on your own WhatsApp number.
+
+If a customer reports a problem and you're staring at an empty log, this is almost always why: you're reading Preview and the failure happened in Production. Switching reloads the panel from scratch.
+
+<Tip>
+  Turn on **Auto: On** to poll for new entries every few seconds. Handy when you're sending yourself a test message and want to watch the output land without clicking Refresh.
+</Tip>
 
 ## Log levels
 
@@ -100,6 +116,18 @@ console.log("Order found:", order.id, "status:", order.status);
     If the same log entry appears many times in rapid succession, your bot may be re-triggering itself. Check your reply logic for conditions that might cause a loop.
   </Card>
 </CardGroup>
+
+## Let the Code agent read your logs
+
+You don't have to diagnose things from the logs yourself. The Code agent reads these same entries — just describe the symptom in chat and it will go and look:
+
+> "Customers say the booking confirmation never arrives. Check the logs."
+
+By default it searches **both** Preview and Production and tells you which one each line came from, which is often enough to establish whether a bug is live or only in your test copy. It's the fastest route from "something's broken" to a fix, because it can read the logs and change the code in the same conversation.
+
+<Note>
+  A single run records at most 500 log entries. If your code is unusually chatty — logging inside a loop over every contact, say — you'll see `Log limit reached (500). Remaining logs truncated.` and the rest of that run's output is dropped. Individual messages are cut off at 4,000 characters.
+</Note>
 
 <Tip>
   Use [Paige Dev](/guides/testing) while reviewing logs — link your phone, send a test message, and watch the log entries appear. This gives you a direct line between your action and the output.

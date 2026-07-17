@@ -1,0 +1,77 @@
+---
+title: "Run your bot on a schedule with Scheduled Tasks"
+sidebarTitle: "Scheduled Tasks"
+description: "Scheduled Tasks run part of your bot code on a repeating schedule — a morning reminder, a nightly sync, a weekly report — without anyone messaging your bot first."
+---
+
+Your bot normally only wakes up when someone messages it. **Scheduled Tasks** let it act on its own: send appointment reminders at 7am, sync yesterday's orders to your spreadsheet overnight, message you a summary every Monday.
+
+A scheduled task is a file in your bot code that Paige runs on a repeating schedule. You'll find them under **Tools → Scheduled Tasks**.
+
+## Setting one up
+
+There are two halves: the code, and the schedule that runs it.
+
+<Steps>
+  <Step title="Write the task">
+    Ask the Code agent for what you want — "add a scheduled task that sends tomorrow's appointment reminders" — and it writes the file for you. Tasks live in `src/cron/`.
+  </Step>
+  <Step title="Deploy it">
+    **This step isn't optional.** Scheduled tasks only ever run your live code, so a task can't point at a file you haven't [deployed](/guides/deploy) yet. Paige won't even let you create one — you'll get "File not found in production. Deploy first."
+  </Step>
+  <Step title="Add the schedule">
+    Go to **Tools → Scheduled Tasks**, click **Add Scheduled Task**, and fill in the name, schedule, file path, and an optional description. Click **Create**.
+  </Step>
+</Steps>
+
+## Writing the schedule
+
+Schedules use cron notation — five fields meaning minute, hour, day of month, month, and day of week. `0 9 * * *` is "every day at 9:00".
+
+There's a **Presets** dropdown next to the field with the common ones — every hour, daily at 9am, weekdays at 9am, weekly on Monday, monthly on the 1st — which fills in the expression for you.
+
+<Warning>
+  **Schedules run in UTC, not your local time.** "Daily at 9am" means 09:00 UTC. If you're in South Africa (UTC+2), that arrives at 11:00 your time — so for a genuine 9am local reminder you need `0 7 * * *`. There's no timezone setting; do the arithmetic yourself, and remember it if your country observes daylight saving.
+</Warning>
+
+The shortest interval you can set is **one minute**, and a project can have at most **five scheduled tasks**.
+
+## What a task file looks like
+
+A task exports a single function that takes no arguments:
+
+```javascript
+// src/cron/daily-reminder.js
+module.exports = async function () {
+  const bookings = await db.query(
+    "SELECT * FROM bookings WHERE date = CURRENT_DATE + 1"
+  );
+
+  for (const booking of bookings) {
+    await sendText(booking.phone, `Reminder: you're booked in tomorrow at ${booking.time}.`);
+  }
+
+  console.log(`Sent ${bookings.length} reminders`);
+};
+```
+
+Anything you `console.log` shows up in [Logs](/guides/logs), which is how you check a task did what you expected.
+
+<Note>
+  A scheduled task doesn't get quite the same environment as the rest of your bot. Your [secrets](/guides/secrets) are available, but **Connector credentials aren't** — code that talks to Airtable or Slack through a Connector works when triggered by a message and fails on a schedule. If a task needs a third-party service, give it its own secret with a real API key.
+</Note>
+
+## Managing your tasks
+
+Each task in the list shows its schedule, its description, its file, when it last ran, and — in red — the error from its last failure, if there was one. That error line is the first place to look when a task silently stops doing its job.
+
+- **Enabled / Disabled** — click to pause a task without deleting it.
+- **Run now** — trigger it immediately, rather than waiting for the schedule.
+- **Edit** — change the schedule or description. The name and file path are fixed once created.
+- **Delete** — stops all future runs.
+
+<Tip>
+  **Run now** is how you check a task before trusting it to a schedule. Click it, then open Logs and confirm it did what you meant — much better than setting a 7am reminder and finding out tomorrow that it didn't work.
+</Tip>
+
+A task has two minutes to finish. Longer than that and it's stopped, and you'll see a timeout error on the row — which usually means it's looping over more records than it can handle in one run.

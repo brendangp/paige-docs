@@ -1,0 +1,60 @@
+---
+title: "Save the photos and documents customers send your bot"
+sidebarTitle: "Capturing customer media"
+description: "Customers send proof of payment, ID documents, and photos. Media capture saves those files to your project instead of letting them age out of WhatsApp. It's off by default, with four modes to choose from."
+---
+
+Customers send your bot things: a proof of payment, a photo of a damaged delivery, a signed form, an ID document. WhatsApp only keeps those files for about a month, and your bot has no memory of them unless you save them somewhere.
+
+**Media capture** saves them into your project's [Storage](/guides/storage). It's **off by default**, and you turn it on from the **Capture from conversations** card in **Tools → Storage**.
+
+<Note>
+  This needs a connected WhatsApp number — saving a customer's file means downloading it from WhatsApp, so there has to be a number to download it from. Until you've [connected one](/whatsapp-setup), the control is greyed out. It's also only available on Paige-hosted projects, and only the project owner or a workspace admin can change it.
+</Note>
+
+## Decide before you switch it on
+
+This setting quietly changes what your business holds. The moment you pick **Save all**, every photo and document your customers send starts accumulating in your project — including things you never asked for and may not want: ID documents, bank statements, photos with people in them.
+
+<Warning>
+  Paige doesn't set a retention period, doesn't delete captured media automatically, and doesn't tell your customers this is happening. Saved files stay until you delete them by hand. Whatever obligations you have to the people who sent them — under POPIA, GDPR, or your own privacy policy — are yours, and turning this on is what starts them.
+
+  The narrower the mode you can live with, the better. **Selective** exists precisely so you can keep the one document you need and nothing else.
+</Warning>
+
+## The four modes
+
+<AccordionGroup>
+  <Accordion title="Off — don't save anything (the default)">
+    Customer media is never saved. Your bot can still react to a photo in the moment; the file just isn't kept once WhatsApp lets it go.
+  </Accordion>
+  <Accordion title="Save from Conversations — save individual files by hand">
+    Nothing is saved automatically. Instead, a **Save to Storage** button appears on media in the Conversations tab, and you click it on the ones worth keeping.
+
+    This is the best starting point for most businesses: nothing accumulates without a decision, and you keep exactly what you need.
+
+    It only works on recent messages — once WhatsApp's roughly 30-day window has passed, the file is gone and you'll be told it's too old to save.
+  </Accordion>
+  <Accordion title="Save all — save every inbound file automatically">
+    Every image, PDF, video, and voice note your customers send is saved, with no filtering.
+
+    Useful when the media *is* the business — a claims process where every message carries evidence. On a busy number it adds up fast, in storage and in obligations. Reach for this deliberately, not as a default.
+  </Accordion>
+  <Accordion title="Selective — let your bot decide what's worth keeping">
+    Nothing is saved unless your bot code explicitly asks for it. You describe the rule in chat — "save the photo when someone's sending proof of payment, but not otherwise" — and the Code agent wires it up.
+
+    This is the mode to aim for once you know what you actually need. You keep the proof-of-payment images and none of the small talk.
+  </Accordion>
+</AccordionGroup>
+
+Photos, documents, videos, and voice notes are all covered.
+
+## Where saved media goes
+
+Everything captured lands in **Tools → Storage** alongside your own uploads, in a private area of your project, marked with a green **From WhatsApp** badge and the contact it came from. Once you have some, a **Filter by source** control lets you separate customers' files from your own.
+
+To delete something, delete it from Storage — that's the only way it goes away.
+
+<Note>
+  Your bot can't send a captured file back out with `sendMedia()`. Captured media is deliberately kept out of the list of things your bot can send, so a customer's document can't accidentally end up going to someone else.
+</Note>

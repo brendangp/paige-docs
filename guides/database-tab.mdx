@@ -1,0 +1,75 @@
+---
+title: "Browse, edit, export, and query your bot's database"
+sidebarTitle: "Database tab"
+description: "The Database tab is where you look at what your bot has actually recorded — browse tables, fix a value by hand, download a table as CSV or Excel, or run SQL against your data."
+---
+
+[Your project's database](/concepts/database) is where your bot keeps everything it remembers. **Tools → Database** is where you get to look at it: browse the tables, correct a wrong value, pull a table into a spreadsheet, or ask a question of the data directly in SQL.
+
+## Preview and Production hold different data
+
+The toggle at the top of the tab is the most important control on the page.
+
+- **Preview** is your testing data — whatever your bot recorded while you were trying things out.
+- **Production** is your real data — actual customers, actual bookings.
+
+They're two separate sets of rows. A booking you made while testing isn't in Production, and a real customer's booking isn't in Preview. The tab opens on **Preview**, so if you're looking for a real customer's record and can't find it, check the toggle first.
+
+<Note>
+  In Production you'll see a **Data only** badge. That means you can't change the *shape* of the database there — no new tables, no new columns, no dropping anything. Those changes belong in Preview, and reach Production when you [deploy](/guides/deploy). You can still fix the rows in your own tables.
+</Note>
+
+## Browsing and editing
+
+Select a table to see its rows, 50 at a time. From there:
+
+- **Edit a value** — double-click a cell (or tap it on a phone).
+- **Add or delete a row** — **Add Row**, or the bin icon on a row.
+- **Clear a table** — **Clear** empties every row but keeps the table itself.
+- **Filter** — narrow rows by a column using *equals*, *not equals*, *contains*, *greater than*, or *less than*.
+- **Change the shape** — **New Table**, **Add Column**, and **Drop Table**, in Preview only.
+
+### System tables
+
+Three tables come with every project and are managed by Paige: your **contacts**, **conversations**, and **messages**. They carry a **System** badge, and selecting one shows a warning — for good reason.
+
+Your bot's execution logs live in the database too, but they're deliberately kept out of this tab — read them in [Logs](/guides/logs) instead, which is built for them.
+
+<Warning>
+  Editing system tables by hand can break your bot in ways that are hard to trace. Your bot uses these rows to know who it's talking to and where it got to in a conversation; changing them out from under it is like moving someone's furniture in the dark. Read them freely — but leave the editing to your bot unless you know exactly why you're there.
+</Warning>
+
+## Downloading a table
+
+Click **Download** on any table and pick **CSV**, **Excel**, or **JSON**.
+
+The switch inside the dropdown decides how much you get:
+
+- **Full table** (the default) — every row, ignoring whatever filter you have on screen.
+- **Current view** — only the rows matching your filter, in the order you're looking at them.
+
+The file is named after the table and the date — `bookings_2026-07-17.csv`. Large tables are prepared in the background and download on their own when they're ready, so you don't need to wait around on the page.
+
+## The SQL editor
+
+Click **SQL** in the top-right for a query box. This is the tool for questions the browser can't answer — "how many bookings came in per day last week", "which contacts never finished the signup flow".
+
+```sql
+SELECT status, COUNT(*) FROM bookings GROUP BY status;
+```
+
+It runs against whichever schema the Preview/Production toggle is on, and the badge above the editor tells you which. Results show up to 500 rows, though the true count is always reported.
+
+### Read-only by default
+
+The editor won't change anything until you turn on the **Write** toggle. Try an `UPDATE` without it and you'll be told to enable Write rather than have it run.
+
+With Write on, an amber banner appears and you can run anything — `INSERT`, `UPDATE`, `DELETE`, and schema changes, **including on the system tables the point-and-click view protects**.
+
+<Warning>
+  Write mode has no undo and no confirmation step. A `DELETE` without a `WHERE` clause runs the instant you click **Run**, against real customer data if you're on Production. Get in the habit of writing the `SELECT` first, checking the rows it returns, and only then turning it into an `UPDATE` or `DELETE`.
+</Warning>
+
+<Tip>
+  You rarely need this to be your first stop. Ask the Code agent in plain language — "how many bookings did we get last week?" — and it will query the database and answer. The SQL editor is for when you want to see the query, or run something the agent shouldn't be guessing at.
+</Tip>

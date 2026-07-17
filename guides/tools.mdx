@@ -1,0 +1,51 @@
+---
+title: "The Tools tab — your bot's building blocks"
+sidebarTitle: "Tools overview"
+description: "The Tools tab holds the six pieces of infrastructure behind your bot: its database, its media, scheduled tasks, secrets, connectors, and logs. Everything your bot needs at runtime lives here."
+---
+
+Your bot is more than its code. It needs somewhere to keep data, somewhere to keep images, a way to run on a schedule, credentials for the services it talks to, and a record of what it did. All six of those live in the **Tools** tab.
+
+<Note>
+  If you've used Paige before, or followed an older guide, these used to live under Settings. They moved to their own tab — Settings is now just for configuring your project, while Tools is for the machinery your bot actually runs on.
+</Note>
+
+## What's in the tab
+
+<CardGroup cols={2}>
+  <Card title="Database" icon="database" href="/guides/database-tab">
+    Browse and edit your tables, export them, and run SQL. Where your bookings, contacts, and everything else your bot remembers actually live.
+  </Card>
+  <Card title="Storage" icon="hard-drive" href="/guides/storage">
+    The images and documents your bot can send, plus anything customers have sent in that you've chosen to keep.
+  </Card>
+  <Card title="Scheduled Tasks" icon="clock" href="/guides/scheduled-tasks">
+    Run part of your bot on a repeating schedule — a morning reminder, a nightly sync, a weekly report.
+  </Card>
+  <Card title="Secrets" icon="key" href="/guides/secrets">
+    API keys and tokens your bot code reads at runtime, kept out of your code.
+  </Card>
+  <Card title="Connectors" icon="plug">
+    One-click connections to Airtable and Slack, so your bot can read and write there without you handling a token.
+  </Card>
+  <Card title="Logs" icon="scroll-text" href="/guides/logs">
+    What your bot printed while it ran. The first place to look when something misbehaves.
+  </Card>
+</CardGroup>
+
+## How Tools relates to Deploy
+
+This trips people up, so it's worth being explicit — the six sections don't all behave the same way when you [deploy](/guides/deploy).
+
+| Section | Preview and live are… |
+|---|---|
+| **Database** | **Separate.** Your preview tables and your live tables are different data. Deploy syncs the *structure*; copying the rows is an opt-in tick per table. |
+| **Logs** | **Separate.** Preview logs and Production logs are two different lists, with a toggle between them. |
+| **Storage** | **Shared, with a catch.** The file is available the moment you upload it, but your *live* bot can't reference it until your next deploy. |
+| **Secrets** | **Shared.** One value, used by both. No deploy needed. |
+| **Connectors** | **Shared.** Connect once and both use it. |
+| **Scheduled Tasks** | **Live only.** Tasks always run your deployed code — you can't schedule a file you haven't deployed. |
+
+<Tip>
+  You don't have to visit this tab to use most of what's in it. Ask in chat and the Code agent will create tables, write scheduled tasks, and use your stored media for you. Tools is where you go to look at what it did — or to do something by hand.
+</Tip>
