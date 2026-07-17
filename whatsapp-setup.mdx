@@ -1,55 +1,142 @@
 ---
 title: "How to connect your WhatsApp Business number to Paige"
 sidebarTitle: "WhatsApp Setup"
-description: "Link a WhatsApp Business phone number to your Paige project through Meta embedded signup, then configure your business profile and display name."
+description: "Set up Meta Business Suite, verify your business, and link a WhatsApp Business phone number to your Paige project through Meta embedded signup — step by step, screenshot by screenshot."
 ---
 
-Before your bot can send or receive messages, you need to connect a WhatsApp Business number to your project. Paige uses Meta's embedded signup flow to link your WhatsApp Business Account and phone number directly — you stay inside the Paige dashboard the entire time, and Paige handles the API token and webhook configuration automatically.
+Connecting a WhatsApp Business number is the step that takes your bot live. It runs through Meta — the company that owns WhatsApp — so most of this page is about Meta's side of the process: what Meta Business Suite is, how business verification works, and what you'll see as you click through Meta's signup. Paige launches that signup from inside your dashboard and handles the technical wiring (the API token and webhooks) for you, so you never leave Paige and never touch code.
+
+<Note>
+  New to the WhatsApp Business Platform? Read [Which WhatsApp product, and when](/learn/whatsapp-products) first. It explains why the Platform — the programmable version Paige builds on — needs a Meta business account and a dedicated number in the first place. This page assumes you've decided the Platform is right for you.
+</Note>
 
 ## What you'll need
 
-- A **Facebook account**. Meta uses this to verify your identity and associate your business assets.
-- A **WhatsApp Business Account (WABA)**. This is a Meta business asset that holds your phone number and messaging settings. If you don't have one yet, you can create it during signup.
-- A **phone number** to register with WhatsApp Business API. This can be a mobile or landline number, but it must not already be an active WhatsApp personal account on a device.
+- A **Facebook account**. Meta uses it to identify you and tie your business assets together. It doesn't need a Facebook Page or any posts — it's just the login Meta recognises you by.
+- A **phone number** for WhatsApp. It can be a mobile or landline number, but it **must not** already be running as a WhatsApp account — personal or Business App — on a phone. Many businesses use a fresh number to avoid disruption.
+- A few **business details** — your legal business name, address, website, and (for verification) a document or two that proves the business is real. More on that below.
 
 <Warning>
-  If the phone number you want to use is currently registered as a personal WhatsApp account, you need to delete that account in the WhatsApp app before you can register it with the Business API. This action cannot be undone — you'll lose the message history on that account.
+  If the number you want is currently a personal WhatsApp account, delete that account in the WhatsApp app before you register it here. That step can't be undone — you'll lose the chat history on it.
 </Warning>
+
+## Meta Business Suite, in one minute
+
+The WhatsApp Business Platform isn't a standalone app you sign up for — it lives inside **Meta Business Suite** (you may also see it called Meta Business Manager), the same place businesses manage Facebook Pages, Instagram, and ad accounts. Meta groups everything a business owns — including your **WhatsApp Business Account**, or **WABA** — under one business portfolio there.
+
+Two terms are worth knowing before you start, because they show up throughout signup:
+
+- **Business portfolio** — the top-level container for everything your business owns in Meta. You'll create one during signup if you don't have one.
+- **WhatsApp Business Account (WABA)** — the asset inside that portfolio that holds your phone number(s) and messaging settings. One WABA can hold several numbers; each Paige project connects to one number.
+
+You don't need to set any of this up in advance. Meta's embedded signup — the flow Paige launches — creates the portfolio and the WABA for you as you go. Knowing the words just makes the screens easier to follow.
+
+## Verifying your business
+
+Meta wants to know a real business is behind a number before it grants full sending power. That's **business verification**, and it's done in Meta Business Suite, separately from connecting your number.
+
+**You can connect and start messaging before you're verified.** An unverified number works — it just runs under tighter limits (a lower cap on how many new people you can message a day, and a stricter path to a custom display name). Verification lifts those limits. So the usual order is: connect your number now, start testing and going live, and submit for verification in parallel.
+
+<Accordion title="What Meta asks for" icon="file-check">
+  Verification confirms your business's legal name, address, and phone number. Meta checks these against official records, so they must match your paperwork exactly. You'll typically be asked for **one document that proves the business is a legal entity** (for example a certificate of incorporation, a business licence, or a tax registration) and sometimes **one that confirms the address** (such as a utility bill or bank statement in the business's name). {/* TODO: verify — Meta's exact accepted-document list changes by country; link out to Meta's current help article rather than enumerating here */}
+</Accordion>
+
+<Accordion title="How long it takes" icon="clock">
+  Meta usually reviews verification within a few business days, though it can be faster or slower depending on your documents and region. You submit once and wait for Meta's decision — there's nothing to do in Paige while it's in review.
+</Accordion>
+
+<Accordion title="What you can and can't do while waiting" icon="hourglass">
+  You **can** connect your number, build, test on [Paige Dev](/quickstart), deploy, and message customers within the daily limit of an unverified number. You **can't** raise those limits or lock in a fully custom display name until verification clears. Nothing you build is wasted — verification only widens what an already-working number can do.
+</Accordion>
+
+## Your business info: display name and category
+
+Two pieces of business info shape how you appear to customers, and both have downstream effects worth understanding before you pick them.
+
+**Display name** — the name customers see at the top of the chat. Meta reviews every display name against your verified business and its own [display name guidelines](/whatsapp-setup#display-name-approval), so it should be your real brand name, not a generic word like "Support." A name that doesn't match your verified business is the most common rejection. Until verification and name approval complete, your number can still send — it just shows a less-polished name.
+
+**Category** — the industry that best describes your business (retail, hospitality, professional services, and so on). It sets how your business is classified in Meta's systems and appears on your business profile. Pick the closest honest match; a wildly off category can slow verification.
+
+<Note>
+  You set your final display name, profile photo, and business profile details inside Paige after connecting — see [Update your business profile](/whatsapp-setup#update-your-business-profile) below. During signup, just give Meta a sensible business name to start with.
+</Note>
 
 ## Connect your number
 
+You connect WhatsApp from inside your project. Open your project, go to **Settings**, and select the **WhatsApp** tab in the sidebar — that's `/projects/<your-project-id>?tab=settings&section=whatsapp` if you want to link straight to it. Everything below happens on that one screen. (If your bot isn't connected yet, you'll also see a **Connect** button in the project header that jumps you here.)
+
 <Steps>
-  <Step title="Open WhatsApp settings in your project">
-    Inside your project, go to **Settings** and select the **WhatsApp** tab. You'll see your current connection status and a button to start the signup process.
+  <Step title="Open the WhatsApp tab in your project">
+    In your project, go to **Settings → WhatsApp**. When no number is connected, the tab shows a **Connect your WhatsApp number** panel with two boxes you need to tick first:
+
+    - **I have a Meta Business Suite account.**
+    - **I have a phone number that can receive an OTP** (a one-time code by SMS or call).
+
+    Once both are ticked, the **Connect WhatsApp** button becomes available.
+
+    <Frame caption="The WhatsApp tab before connecting — the two readiness checkboxes and the Connect WhatsApp button.">
+      {/* TODO: manual screenshot (GRE-434) — Paige Settings → WhatsApp tab in the not-connected state, showing the two pre-flight checkboxes and the Connect WhatsApp button */}
+    </Frame>
   </Step>
 
   <Step title="Start Meta embedded signup">
-    Click **Connect WhatsApp**. A Meta popup will open inside the Paige dashboard. Log in to your Facebook account if prompted.
+    Click **Connect WhatsApp**. A Meta popup opens on top of the Paige dashboard. Log in to Facebook if you're prompted.
 
     <Info>
-      The popup is served by Meta, not Paige. Paige only receives the result of the signup — your WhatsApp Business Account ID, phone number ID, and an access token — once you complete the flow.
+      This popup is served by Meta, not Paige. You're signing in to Meta directly — Paige never sees your Facebook password. Paige only receives the result of the signup (your WABA ID, phone number ID, and an access token) once you finish.
     </Info>
+
+    <Frame caption="Meta's embedded signup opens in a popup over Paige, starting with a Facebook login and a get-started screen.">
+      {/* TODO: manual screenshot (GRE-434) — the Meta embedded-signup popup as it first appears over the Paige dashboard (Facebook login / Meta "Continue" intro screen) */}
+    </Frame>
+  </Step>
+
+  <Step title="Choose or create your business portfolio">
+    Meta asks which business portfolio this WhatsApp account belongs to. Select an existing portfolio if your business already has one, or create a new one by entering your business name and details.
+
+    <Frame caption="Selecting an existing business portfolio or creating a new one inside Meta's signup.">
+      {/* TODO: manual screenshot (GRE-434) — Meta signup step where the user picks an existing business portfolio or creates a new one */}
+    </Frame>
   </Step>
 
   <Step title="Select or create a WhatsApp Business Account">
-    During signup, Meta will ask you to choose an existing WhatsApp Business Account or create a new one.
-
-    - If your business is already set up in Meta Business Manager, select the existing WABA.
-    - If this is your first time, choose **Create a new WhatsApp Business Account** and follow the prompts to enter your business name and details.
+    Next, choose an existing WhatsApp Business Account (WABA) or create a new one. First-timers create one here and confirm the business name that will be attached to it.
 
     <Note>
-      A single WABA can hold multiple phone numbers, but each Paige project connects to one phone number at a time.
+      A single WABA can hold multiple phone numbers, but each Paige project connects to one number at a time.
     </Note>
+
+    <Frame caption="Choosing an existing WhatsApp Business Account or creating a new one.">
+      {/* TODO: manual screenshot (GRE-434) — Meta signup step for selecting or creating a WhatsApp Business Account (WABA) */}
+    </Frame>
   </Step>
 
-  <Step title="Add your phone number">
-    Enter the phone number you want to register. Meta will send a verification code via SMS or voice call to confirm you own the number. Enter the code to complete verification.
+  <Step title="Enter your business profile details">
+    Meta collects the basics for your WhatsApp business profile — business name, and often a website or description. These populate your profile and feed into verification, so use your real business details.
+
+    <Frame caption="Entering business profile details — name and website — during Meta signup.">
+      {/* TODO: manual screenshot (GRE-434) — Meta signup step collecting business profile details (business name, website/description) */}
+    </Frame>
+  </Step>
+
+  <Step title="Add and verify your phone number">
+    Enter the phone number you want to register. Meta then confirms you control it by sending a verification code — you can choose **SMS** or **voice call**. Enter the code Meta sends to finish.
+
+    <Info>
+      Some numbers verify by a **"send a message" method** instead — Meta gives you a code to send from the number to a Meta WhatsApp number, which confirms ownership without an SMS or call. If you see that option, follow the on-screen instructions; the effect is the same. {/* TODO: verify — confirm whether Paige's embedded-signup config surfaces the send-a-message verification method to end users */}
+    </Info>
+
+    <Frame caption="Entering the phone number, choosing SMS or voice, and entering Meta's verification code.">
+      {/* TODO: manual screenshot (GRE-434) — Meta signup phone-number entry and the verification-code screen (SMS/voice choice and code input) */}
+    </Frame>
   </Step>
 
   <Step title="Finish and return to Paige">
-    After verification, close the Meta popup. Paige automatically receives your connection details and configures the webhook. Your project's WhatsApp status will update to **Connected**.
+    Once verification succeeds, close the Meta popup. Paige takes over: it exchanges the signup result for an access token, subscribes to Meta's webhooks, registers your phone number, and stores the credentials securely. You'll see a short **Setting up WhatsApp…** progress sequence, then **WhatsApp Connected!** The WhatsApp tab then shows your live number and its details. You never touch tokens or webhooks by hand.
 
-    You'll now see your **phone number ID** and **WhatsApp Business Account ID** in the settings panel. Paige stores the access token securely — you don't need to manage it manually.
+    <Frame caption="Back in Paige: the WhatsApp tab now shows the connected number, its display name, and account details.">
+      {/* TODO: manual screenshot (GRE-434) — Paige Settings → WhatsApp tab just after a successful connection, showing the connected number, display name, and the WhatsApp Business Account details panel */}
+    </Frame>
   </Step>
 </Steps>
 
@@ -59,13 +146,14 @@ Before your bot can send or receive messages, you need to connect a WhatsApp Bus
 
 ## Understanding the connection details
 
-Once connected, Paige shows three pieces of information about your WhatsApp integration:
+Once connected, the WhatsApp tab shows what Meta reports about your account. Under **WhatsApp Business Account** you'll see:
 
-**WhatsApp Business Account (WABA)** — The top-level Meta business asset associated with your number. Your WABA ID is used when working with Meta's API directly, for example when submitting message templates for review.
+- **Account Name** — the name on your WhatsApp Business Account.
+- **Status** — the account's standing with Meta.
+- **Business Verification** — whether Meta has verified your business (see [Verifying your business](/whatsapp-setup#verifying-your-business)).
+- **Currency** and **Timezone** — the account's billing currency and time zone, set from your Meta business settings.
 
-**Phone number ID** — A unique identifier for the specific phone number registered with the Business API. Paige uses this internally to route messages. You may need it if you're integrating with other Meta tools.
-
-**Access token** — A credential that allows Paige to send and receive messages on your behalf. Paige manages token storage and refresh automatically.
+The technical identifiers behind the scenes — your WABA ID, phone number ID, and access token — are handled by Paige and kept securely on the server. You don't need them for day-to-day use, and Paige manages token storage and refresh automatically.
 
 ## Update your business profile
 
@@ -124,7 +212,7 @@ If the handle you want is already on **another of your own numbers**, you'll be 
 
 ## Share your number
 
-The **Share Your WhatsApp** card gives customers a way in that isn't typing a phone number:
+The **Share Your WhatsApp** card — under **Settings → Project** — gives customers a way in that isn't typing a phone number:
 
 - A **QR code** they scan to open a chat. **Download PNG** to put it on a poster, a receipt, or a shop window.
 - A **wa.me link** to put on your website or in an email signature. **Copy** it.
@@ -157,4 +245,4 @@ If your request is rejected, you can update your business verification details i
 
 **My phone number verification code isn't arriving** — Make sure the number can receive SMS or voice calls and isn't already registered as a WhatsApp personal account. If you've requested multiple codes, wait at least 10 minutes before requesting another.
 
-**My project shows "Connection failed" after signup** — Go to **Settings → WhatsApp** and click **Reconnect**. If the problem persists, contact Paige support with your project ID.
+**Signup ended in an error** — If the flow fails, the WhatsApp tab shows an error instead of the connected view. Click **Connect WhatsApp** again to restart Meta's signup from the top. If the problem persists, contact Paige support with your project ID. {/* TODO: verify — confirm exact error-state copy and whether a dedicated retry/re-register control is surfaced in the WhatsApp tab (repo shows a "Re-register with Meta" action under Settings → Storage, not the WhatsApp tab) */}
