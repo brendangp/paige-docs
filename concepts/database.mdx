@@ -31,17 +31,34 @@ Paige automatically creates and maintains three system tables in every project d
 
 | Table | Description |
 |---|---|
-| `contacts` | One row per unique phone number that has messaged the bot |
+| `contacts` | One row per person who has messaged your bot, identified by phone number, WhatsApp ID, or both |
 | `conversations` | One row per conversation, linked to a contact; stores the current state |
 | `messages` | Every inbound and outbound message, linked to a conversation |
 
+Useful columns on `contacts`:
+
+| Column | What it's for |
+|---|---|
+| `number` | Their phone number. Empty for a username-only contact |
+| `username` | Their WhatsApp username, if they have one |
+| `wa_user_id` | The ID WhatsApp issues for this person, specific to your business |
+| `opted_in` | Whether they can be included in a broadcast. Set to `false` automatically when someone replies STOP |
+| `on_whatsapp` | Whether the number is actually on WhatsApp. Empty means *not yet known* — which is different from `false` |
+| `tags` | Your own labels for this contact, for building broadcast segments |
+
+<Note>
+  `on_whatsapp` is worth reading carefully. Empty and `false` are not the same: empty means nobody has checked yet — normal for freshly imported contacts — while `false` means WhatsApp has confirmed the number isn't reachable.
+</Note>
+
 <Warning>
-  You cannot drop or modify the system tables (`contacts`, `conversations`, `messages`). They are managed by Paige and power the conversations dashboard.
+  You can't drop the system tables, and in Production you can't edit their rows either. Paige uses them to know who it's talking to and where each conversation got to — changing them by hand is how bots start behaving inexplicably.
 </Warning>
+
+Your bot's **execution logs** and **broadcast delivery records** also live in the database, but they're deliberately kept out of the Database tab — they have their own homes in [Logs](/guides/logs) and the Broadcasts tab, which present them far better than a raw table would.
 
 ## Creating and managing tables
 
-You can create custom tables from the **Database** section of the dashboard or by asking the AI agent.
+You can create custom tables by asking the AI agent, or by hand in **Tools → Database**.
 
 ### From the dashboard
 
@@ -53,6 +70,10 @@ The dashboard lets you:
 - Insert, edit, and delete rows
 - Clear all rows from a table
 - Drop a custom table
+- Download a table as CSV, Excel, or JSON
+- Run SQL directly against your data
+
+See [the Database tab](/guides/database-tab) for how each of those works, and for the difference between your preview data and your live data.
 
 ### Via the Code Agent
 

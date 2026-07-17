@@ -45,13 +45,13 @@ Every time you save changes to your bot code, Paige creates a commit. Commits ar
 
 <Steps>
   <Step title="Browse your commit history">
-    Open the **Version History** panel in the editor to see a list of all commits with timestamps.
+    Click the **History** icon in the header, just right of the Paige logo, to see every commit with its timestamp.
   </Step>
   <Step title="Inspect a commit">
     Click any commit to see what changed — which files were added, modified, or deleted.
   </Step>
   <Step title="Restore a commit">
-    Click **Restore** on any commit to roll your codebase back to that point. A new commit is created for the restore so you never lose history.
+    Click **Restore this version** to roll your working copy back to that point. A new commit is created for the restore, so you never lose history — and your live bot is unaffected until you [deploy](/guides/deploy).
   </Step>
 </Steps>
 
@@ -65,7 +65,7 @@ You can test your bot in real time using **Paige Dev** — a shared WhatsApp num
 
 ## Message types your bot can send
 
-Your bot can send any of the following message types using built-in messaging helpers:
+Your bot can send any of the following using built-in messaging helpers:
 
 - Plain text
 - Interactive buttons (up to 3)
@@ -73,6 +73,10 @@ Your bot can send any of the following message types using built-in messaging he
 - URL buttons
 - Images with captions
 - Documents (PDF and others)
+- Carousels
 - Location requests
-- Voice notes (with automatic transcription on receipt)
+- [WhatsApp Flows](/concepts/flows)
 - Message templates
+- Anything in your [Storage](/guides/storage), by name
+
+Some things your bot can **receive but not send**: customers can send you voice notes (transcribed automatically for your bot to read) and videos, but there's no helper to send either back.

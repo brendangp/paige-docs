@@ -8,13 +8,28 @@ Every time someone messages your bot, Paige records the conversation and links i
 
 ## Contacts
 
-A contact represents a unique phone number that has messaged your bot. Paige creates a contact record automatically the first time a message is received from a given number.
+A contact is one person who has messaged your bot. Paige creates the record automatically the first time a message arrives.
 
 Each contact can have multiple conversations over time. From the contacts list you can:
 
 - Browse all contacts that have messaged your bot
 - View all conversations for a specific contact
 - See the full message history across a contact's conversations
+
+### Phone numbers and usernames
+
+WhatsApp is moving to usernames, so a contact isn't always a phone number. Paige recognises a person by their number, by a WhatsApp-issued ID, or both:
+
+- **Phone only** — someone you imported, or who messaged before usernames existed.
+- **Phone and ID** — most people, once they've messaged you.
+- **Username only** — someone who's adopted a WhatsApp username and hasn't shared a number. They show as `@name` in your contacts list.
+
+You don't manage any of this. When someone you imported messages you for the first time, Paige links the two automatically rather than creating a second contact.
+
+Two practical consequences worth knowing:
+
+- **A contact you imported can be broadcast to, but not chatted with** until they message you — you have a number, but nothing to attach a conversation to yet.
+- **A username-only contact is the reverse**: you can chat with them, but Broadcasts can't reach them, because a broadcast needs a phone number. Some message types also don't work for them, and you'll see an error under the message saying so.
 
 ## Conversations
 
@@ -54,22 +69,50 @@ The conversations list can be filtered by state. Use the **States** filter to vi
 
 You can also fetch the list of unique states currently active across all conversations. This is useful for getting a quick overview of where your contacts are in the conversation flow.
 
-## Sending messages from the dashboard
+## Taking over from your bot
 
-You can send a message directly to any contact from the conversation view. This is useful for:
+Sometimes a bot should get out of the way — the customer is upset, the request is unusual, or they've asked for a person. **Handover** is how you step in.
 
-- Following up with a contact manually
-- Testing a specific message flow without going through the bot logic
-- Sending a response when the bot is unable to handle a situation automatically
+Click **Handover** at the top of a conversation and your bot stops responding to that contact entirely. It doesn't try to help, doesn't half-answer, doesn't run at all. Messages still arrive and are still recorded; they just wait for you. The contact gets an orange marker in the list so you can see at a glance who's waiting.
 
 <Warning>
-  Messages sent from the dashboard are delivered through your project's WhatsApp number. They count against your WhatsApp Business API messaging limits. If you are outside the 24-hour customer service window, you will need to use an approved message template.
+  **You can't type to a customer until handover is on.** The message box is deliberately disabled otherwise, and it tells you why: *Enable handover mode to send messages*. This catches people out — they open a conversation, try to reply, and find they can't. Turn on handover first.
 </Warning>
+
+### Handing back
+
+Turning handover off is a little more involved than turning it on, and it's worth knowing why. Click **Handover ON** and you're asked to pick a conversation state to hand back to — there's no plain "give it back to the bot" button.
+
+That's because your bot needs to know *where* the conversation is when it resumes. Dropping it back mid-flow with no state would leave it confused. Picking a state — usually your bot's default, like `unstructured` — tells it where to pick up.
+
+<Note>
+  Handover doesn't time out. A conversation stays in handover until you hand it back, however long that takes. If you take one over on a Friday afternoon, your bot won't quietly resume over the weekend.
+</Note>
+
+## The 24-hour window
+
+WhatsApp only lets a business message a customer freely for **24 hours** after that customer's last message. This is Meta's rule, not Paige's, and it applies to everything you send from the dashboard.
+
+Once the window closes, the message box is disabled and shows *24-hour messaging window has expired*, and the handover control reads **24h expired**. To reach the contact after that you need an approved [message template](/guides/templates).
+
+<Warning>
+  Messages sent from the dashboard go out through your project's real WhatsApp number and count toward your WhatsApp Business messaging limits — the same as anything your bot sends.
+</Warning>
+
+## Media customers send you
+
+Photos, PDFs, and voice notes appear inline in the conversation. If you've turned on [media capture](/guides/media-capture) in *Save from Conversations* mode, each one gets a **Save to Storage** button so you can keep the ones that matter — a proof of payment, a signed form — before WhatsApp drops them after about 30 days.
 
 ## How conversations are recorded
 
 Paige logs messages automatically as your bot handles them. Every inbound message your bot receives and every outbound message it sends is stored in the database and associated with the correct conversation — you do not need to write any logging code yourself.
 
-<Note>
-  The conversations module must be installed in your project for the conversations dashboard to display data. If you see a notice that the module is not installed, ask the AI agent to add it to your bot code.
-</Note>
+## Replying from the dashboard needs a small addition to your bot
+
+Reading conversations works out of the box. **Sending** from the dashboard needs a piece of code in your bot that receives the message and passes it to WhatsApp — and that isn't there by default.
+
+You'll find **Conversations** listed in **Tools → Connectors**. It sits alongside Airtable and Slack, but it works differently from both: there's no account to sign in to and no token to paste. Clicking **Connect** simply asks the Code agent to add the necessary file to your bot. Once it has, the message box works.
+
+If you'd rather just ask, this does the same thing:
+
+> "Install the conversations module so I can send messages from the dashboard."
