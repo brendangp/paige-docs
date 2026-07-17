@@ -80,28 +80,69 @@ A template is made up of components. The only required component is a BODY. You 
   </Accordion>
 </AccordionGroup>
 
+## Placeholder rules
+
+Two rules trip people up, both of them Meta's:
+
+### Number them in order from `{{1}}`
+
+Placeholders must run `{{1}}`, `{{2}}`, `{{3}}` with no gaps. A body using only `{{2}}`, or jumping from `{{1}}` to `{{3}}`, is rejected — you'll see *"Body variables must be sequential starting at {{1}} (no gaps)."*
+
+A header or a URL button can hold **one** placeholder, and it must be `{{1}}`.
+
+### Give each one an example
+
+Meta's reviewers read your template as a message, not a form — so they need to see what real content looks like in it.
+
+When you build a template in the dashboard, a **Variable examples** card appears once your numbering is valid, with a box per placeholder. Fill in every one. The dialog won't submit until you do.
+
+For a body reading `Hi {{1}}, your order {{2}} has shipped`, sensible examples are `Jane` and `A-4471`.
+
+<Warning>
+  For a **URL button**, the example is just the bit that replaces the placeholder — not the whole address. For `https://example.com/track/{{1}}`, the example is `A-4471`, not `https://example.com/track/A-4471`. Meta rejects the full-URL version.
+</Warning>
+
 ## Creating a template
 
-You can create a template from the Paige dashboard or by asking the AI agent to create one for you.
+Three ways, depending on where you are.
 
 <Tabs>
-  <Tab title="Via the Code Agent">
-    Tell the Code Agent what template you need. The agent creates the template and handles the Meta API submission for you.
+  <Tab title="Via the dashboard">
+    Open **Settings → Templates** and click **Create Template**. Fill in the name, category, language, and body, add a header, footer, or buttons if you want them, and fill in an example for each placeholder.
 
-    Example prompt:
+    A live preview on the left shows the message as your customer will see it. Click **Create Template** to submit it to Meta.
+
+    <Note>
+      The live preview is hidden on phones, so you'd be composing blind. Templates are worth doing at a desk.
+    </Note>
+  </Tab>
+  <Tab title="Via the Code Agent">
+    Tell the Code Agent what template you need, and it creates and submits it.
 
     > "Create a UTILITY template called order_shipped in English. The body should say 'Hi {'{{1}}'}, your order {'{{2}}'} has shipped and will arrive by {'{{3}}'}.'"
 
-    The agent will create the template and confirm when it has been submitted to Meta for approval.
-
-    <Info>
-      Template names must be lowercase letters, numbers, and underscores only, and must start with a letter. For example: `order_confirmation`, `appt_reminder_v2`.
-    </Info>
+    <Tip>
+      Give the agent your example values in the same message — "use Jane, A-4471 and Friday as the examples". If you don't, it fills in generic placeholders like `example1`, and Meta's reviewer sees those instead of anything meaningful. Approval is a human reading your message; realistic examples help.
+    </Tip>
   </Tab>
-  <Tab title="Via the dashboard">
-    Navigate to your project, open the **Templates** section, and click **New template**. Fill in the template name, category, language, and components. Submit the template for Meta approval when ready.
+  <Tab title="Via the Broadcasting assistant">
+    On the **Broadcasts** tab, the [Broadcasting assistant](/guides/broadcasts/broadcasting-assistant) can draft a template, show it to you, submit it once you're happy, and tell you when Meta has approved it — without leaving the campaign you're planning.
+
+    > "Draft a utility template telling customers we're closed on the 24th."
+
+    <Note>
+      Templates for broadcasts are more restricted: placeholders can only go in the **body**. A template with a variable in its header or its URL button can't be used in a broadcast, because a broadcast only fills body variables.
+    </Note>
   </Tab>
 </Tabs>
+
+<Info>
+  Template names must be lowercase letters, numbers, and underscores only, and must start with a letter. For example: `order_confirmation`, `appt_reminder_v2`.
+</Info>
+
+<Note>
+  Templates live under **Settings → Templates**. They didn't move to the Tools tab with the database and the rest — a template belongs to your WhatsApp number rather than your bot's runtime.
+</Note>
 
 ## Template approval
 
@@ -111,7 +152,11 @@ After you submit a template, Meta reviews it. Approval times vary by category:
 - **AUTHENTICATION** — typically approved within minutes
 - **MARKETING** — can take hours to a few days
 
-You can check the approval status of your templates from the **Templates** section in your project dashboard or by asking the AI agent to list your templates.
+Your template appears straight away with a yellow **PENDING** badge, turning green when Meta approves it.
+
+<Note>
+  Nothing tells you when that happens — there's no notification and the page doesn't refresh itself. Come back to **Settings → Templates** and reload, or ask an agent to check for you. If you're planning a broadcast around a new template, submit it well ahead of when you need it.
+</Note>
 
 <Warning>
   Templates that are rejected can be edited and resubmitted, but the name cannot be changed. If your template was rejected, review Meta's messaging policies, adjust the content, and resubmit.

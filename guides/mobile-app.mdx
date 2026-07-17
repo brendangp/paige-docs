@@ -1,0 +1,91 @@
+---
+title: "Use Paige on your phone"
+sidebarTitle: "Mobile app"
+description: "Install Paige to your phone's home screen and get push notifications when a customer needs you. Most of Paige works on mobile — editing code is the one thing that doesn't."
+---
+
+Paige works in your phone's browser, but it's much better installed to your home screen: it opens like a real app, and it can notify you when a customer needs a person.
+
+## Install it
+
+<Tabs>
+  <Tab title="Android">
+    Open Paige in Chrome and you'll get a prompt: **Install Paige — Add Paige to your home screen for the full app experience.** Tap **Install**.
+
+    Missed it or dismissed it? Open the drawer (☰) and look for **Install to home screen**, or use Chrome's menu → **Install app**.
+  </Tab>
+  <Tab title="iPhone and iPad">
+    Safari doesn't prompt, so you do it yourself: tap the **Share** button, then **Add to Home Screen**.
+
+    <Warning>
+      On iPhone this isn't optional if you want notifications. Apple only allows push notifications for apps added to the Home Screen — in a normal Safari tab the notification toggle is disabled and reads *"Not supported on this browser"*. Install first, then turn notifications on from the installed app. Requires iOS 16.4 or later.
+    </Warning>
+
+    Use Safari for this. Chrome and Firefox on iPhone can't add to the home screen.
+  </Tab>
+</Tabs>
+
+## Getting around
+
+Everything lives behind the **☰** menu in the top-left: **Build**, **Conversations**, **Flows**, **Broadcasts**, **Tools**, **Settings**, and **Help**. One screen at a time, rather than the three columns you get on a desktop.
+
+The useful trick is **swiping**. Most tabs are a pair, and you swipe left and right between them:
+
+| Tab | Swipe between |
+|---|---|
+| **Build** | the chat ↔ the phone preview |
+| **Conversations** | your conversations ↔ the Conversations assistant |
+| **Broadcasts** | your broadcasts ↔ the Broadcasting assistant |
+| **Flows** | your flows ↔ the chat |
+
+So on Build you describe a change, then swipe right to try it — which is most of what building a bot actually is.
+
+<Note>
+  **Build** is the Code tab renamed. On a phone the front door is the chat, not the code.
+</Note>
+
+## What doesn't work on a phone
+
+<Warning>
+  **You can't edit code on mobile.** You can view your bot's file structure from the **Files** button in the Build chat, but tapping a file only shows you its path — there's no editor. Everything the AI writes is fine; it's hand-editing that's desktop-only.
+</Warning>
+
+Also worth knowing: the live preview when creating a [message template](/guides/templates) is hidden on phones, so you're composing without seeing it rendered. Templates are worth doing at a desk.
+
+## Notifications
+
+**Settings → Notifications** has a single switch: **Push notifications**. Turning it on asks your browser's permission — say yes.
+
+Paige notifies you about three things:
+
+<AccordionGroup>
+  <Accordion title="A customer message that needs you">
+    Titled with the contact's name, showing their message. You get this when a conversation is [in handover](/concepts/conversations) — you've taken over and they've replied — or when someone starts a **new conversation** after 24 hours of silence.
+
+    You won't get pinged for every message your bot handles by itself. That's the point: it's telling you when your bot *isn't* handling it.
+
+    Everyone with access to Conversations on the project gets these.
+  </Accordion>
+  <Accordion title="Your deploy finished">
+    **Build succeeded** or **Build failed**, naming the project. Only the person who clicked Deploy gets this.
+  </Accordion>
+  <Accordion title="A broadcast changed state">
+    **Campaign sending** when it starts, **Campaign sent** when it finishes, and **Campaign needs attention** if it was cancelled because Meta didn't approve its template in time. Only the person who created it gets these.
+  </Accordion>
+</AccordionGroup>
+
+### Per device, but every device
+
+The switch controls **this device only** — turning it on on your phone doesn't turn it on on your laptop.
+
+But once a device is subscribed it gets everything. So with your phone and laptop both on, every notification arrives on both.
+
+<Note>
+  **You won't get a notification while you're looking at Paige.** If a Paige window is open and focused, the notification is suppressed — you'd see the message arrive on screen anyway. They show up when Paige is in the background, on another tab, or closed. If you're testing notifications and nothing appears, switch away from Paige first.
+</Note>
+
+If you've blocked notifications for Paige, the switch is disabled and can't be re-enabled from inside Paige — you'll need to allow them again in your browser or phone settings, then reload.
+
+## Offline
+
+Paige needs a connection — it's a live view of a bot running on a server. Lose signal and you'll get a **You're offline** screen with a **Try again** button.
