@@ -1,0 +1,60 @@
+---
+title: "The Preview tab"
+sidebarTitle: "Preview tab"
+description: "The Preview panel is a phone that runs your bot. Type messages to test it, switch between test contacts, and reset a contact to start a conversation fresh — all without touching your live bot or picking up your phone."
+---
+
+{/* TODO: video — Preview tab walkthrough */}
+{/*
+<PageDemo
+  src="/assets/videos/preview-tab.mp4"
+  poster="/assets/videos/preview-tab.poster.jpg"
+  caption="A tour of the Preview panel"
+/>
+*/}
+
+**Preview** opens a WhatsApp-styled phone alongside your work that runs your bot's **preview** copy. Type into it and your bot answers exactly as it would for a customer — so you can try a change the moment it's built, without deploying and without messaging from your own phone.
+
+Everything you do here runs against preview data, so test conversations never reach your live customers or touch your production data.
+
+## Send a test message
+
+Type in the message box at the bottom and send — with the send button or by pressing **Enter**. Your bot processes the message in real time and replies in the chat, with a typing indicator while it works.
+
+You're not limited to text:
+
+- **Send an image** with the image button, to test how your bot handles media.
+- **Send a location** to test location-based logic.
+- **Tap buttons and list options** in your bot's replies just as a customer would, to walk through an interactive flow.
+
+<Tip>
+  Open **Tools → Logs** while you test to watch your bot's `console.log` output land against each message. See [Execution logs](/guides/logs).
+</Tip>
+
+## Switch between test contacts
+
+The preview simulates separate people so you can test how your bot treats different contacts. The contact selector at the top of the phone shows who you're currently messaging as — **Contact 1**, **Contact 2**, and so on.
+
+- Open the dropdown to switch to another contact.
+- Choose **New Contact** to add a fresh one — useful for testing a first-time greeting or a flow from the very start. You can have up to ten.
+
+Each contact keeps its own conversation and state, so you can check that a returning contact picks up where they left off while a new one starts clean.
+
+## Reset a contact
+
+To start a conversation over — say you want to re-test your welcome flow from scratch — use the reset control at the top of the phone:
+
+- **Reset this contact** clears the current contact's conversation and state, so your next message is treated as their first.
+- **Reset all contacts** wipes every preview contact back to a single default one.
+
+<Note>
+  Resetting clears conversation history and state. Any custom tables your bot wrote to in the preview database may need to be cleared separately.
+</Note>
+
+<Tip>
+  The Preview panel tests your **preview** bot. To test the same bot over real WhatsApp — buttons, flows, and templates delivered to an actual phone — link your number with [Paige Dev](/guides/testing).
+</Tip>
+
+<Note>
+  On a phone, the preview is the other half of the **Build** tab — describe a change in the chat, then swipe across to try it. See [Use Paige on your phone](/guides/mobile-app).
+</Note>

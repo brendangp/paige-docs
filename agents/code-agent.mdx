@@ -49,7 +49,7 @@ The agent has access to a set of built-in tools it uses behind the scenes to com
     Register [scheduled tasks](/guides/scheduled-tasks) that run on a repeating schedule — useful for daily reports or recurring notifications.
   </Card>
   <Card title="Connector tools" icon="plug">
-    Look up how [Airtable and Slack](/guides/connectors) really work before writing code against them — including your own tables and fields.
+    Look up how [Airtable and Slack](/integrations) really work before writing code against them — including your own tables and fields.
   </Card>
   <Card title="Media tools" icon="image">
     Send images and documents from your [Storage](/guides/storage), embed images into flow screens, and save media customers send in.
@@ -113,18 +113,10 @@ The agent will:
 3. Wire up the transitions between states
 4. Test the full flow in preview mode
 
-## Tips for effective prompting
+## Prompting the agent well
 
-**Be specific about the behavior you want.** Instead of "add a contact form", say "ask the user for their name and email address in two separate messages, then save both to a `leads` table and confirm with a text message."
+How you phrase a request has a real effect on the result — and the agent behaves differently in a brand-new project than in one that already has a bot. Both are covered on a dedicated page.
 
-**Reference behavior, not files.** Describe what should happen — "after the user picks an option from the main menu, ask them for their email" — and let the agent figure out which code to change.
-
-**Ask the agent to test after every significant change.** The agent can send test messages and simulate button clicks automatically. Add "then test it" to the end of your instruction.
-
-**Ask for logs when something is broken.** "Check the recent error logs and fix whatever is failing" gives the agent everything it needs to diagnose and fix issues without further input from you.
-
-**One thing at a time for complex changes.** Breaking a large feature into smaller steps (menu first, then each handler) produces more reliable results than asking for everything at once.
-
-<Tip>
-  If the agent makes a change that breaks something, just tell it what went wrong. It will read the logs, inspect the code, and fix the issue — you don't need to describe the underlying cause.
-</Tip>
+<Card title="Prompting tips" icon="lightbulb" href="/guides/prompting">
+  Describe outcomes not implementation, iterate in small steps, know when the agent edits code versus builds a Flow, and understand why a fresh project feels different. See [Prompting the Code Agent well](/guides/prompting).
+</Card>

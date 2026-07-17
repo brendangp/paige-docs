@@ -1,0 +1,61 @@
+---
+title: "The Conversations tab"
+sidebarTitle: "Conversations tab"
+description: "The Conversations tab is your WhatsApp inbox — every contact, their message history, and the state each conversation is in. Read what the green circle means, how to take a conversation over from your bot, and how the 24-hour window affects replying."
+---
+
+{/* TODO: video — Conversations tab walkthrough */}
+{/*
+<PageDemo
+  src="/assets/videos/conversations-tab.mp4"
+  poster="/assets/videos/conversations-tab.poster.jpg"
+  caption="A tour of the Conversations tab"
+/>
+*/}
+
+The **Conversations** tab is your inbox. On the left is the list of everyone who has messaged your bot; on the right is the selected conversation's full history. It's where you watch what your bot is doing, step in when a customer needs a person, and reply by hand.
+
+For the underlying model — contacts, conversation state, handover, and the 24-hour window in depth — see [Conversations](/concepts/conversations). This page is about the tab itself and what its indicators mean.
+
+## The contact list
+
+Every contact who has messaged your bot appears in the left-hand list, most recent at the top, with a preview of the last message.
+
+- **Search** the list by name or phone number with the box at the top.
+- **Filter by state** with the **All states** dropdown to show only conversations in a particular [state](/concepts/conversations#conversation-state) — for example everyone currently in handover.
+
+## What the green circle means
+
+A **green ring around a contact's avatar** means their **24-hour messaging window is open** — they've sent you a message within the last 24 hours, so you can reply freely.
+
+This matters because of a Meta rule, not a Paige one: a business can only send free-form messages to a customer for **24 hours** after that customer's last message. While the green ring is showing, you're inside that window. Once it's gone, the window has closed and you can only reach that contact with an approved [message template](/guides/templates).
+
+<Note>
+  Don't confuse the green ring with the other badges in the list. A small **green badge with an eye** marks a **preview/test contact** (one you created while testing), not the 24-hour window. A small **orange badge** marks a conversation you've **taken over** in handover.
+</Note>
+
+## Taking over from your bot
+
+When a customer needs a person — they're upset, the request is unusual, or they've asked for one — click **Handover** at the top of the conversation. Your bot stops responding to that contact entirely; their messages still arrive and are recorded, but they wait for you.
+
+<Warning>
+  **You can't type to a customer until handover is on.** The reply box is disabled otherwise and tells you why: *Enable handover mode to send messages*. Turn on handover first.
+</Warning>
+
+To hand back, click **Handover ON** and pick the [state](/concepts/conversations#conversation-state) to resume from — your bot needs to know where in the conversation to pick up. The full mechanics, including why there's no plain "give it back" button, are on the [Conversations](/concepts/conversations#taking-over-from-your-bot) page.
+
+### When the window has closed
+
+If the 24-hour window has expired, the handover button reads **24h expired** and the reply box shows *24-hour messaging window has expired*. Your only way to reach the contact after that is an approved [message template](/guides/templates).
+
+## Let the Conversations Agent help
+
+Open this tab and the chat sidebar switches to the **[Conversations Agent](/agents/conversations-agent)** — an assistant that knows your contacts and their history. Ask it to find contacts waiting in handover, summarise a conversation, or draft a reply for you to review and send.
+
+<Card title="Conversations Agent" icon="messages-square" href="/agents/conversations-agent">
+  Work through your inbox by chatting — find contacts, read history, and get draft replies. It drafts, but never sends on its own.
+</Card>
+
+<Note>
+  Conversations works well on a phone — it's one of the tabs you can swipe between the inbox and the assistant. See [Use Paige on your phone](/guides/mobile-app).
+</Note>

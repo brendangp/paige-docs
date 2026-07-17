@@ -104,6 +104,14 @@
             ]
           },
           {
+            "group": "The app, tab by tab",
+            "pages": [
+              "guides/settings-tab",
+              "guides/conversations-tab",
+              "guides/preview-tab"
+            ]
+          },
+          {
             "group": "Tools",
             "pages": [
               "guides/tools",
@@ -144,6 +152,7 @@
           {
             "group": "Operate your bot",
             "pages": [
+              "guides/prompting",
               "guides/testing",
               "guides/logs",
               "guides/version-history",

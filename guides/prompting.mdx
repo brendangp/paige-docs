@@ -1,0 +1,128 @@
+---
+title: "Prompting the Code Agent well"
+sidebarTitle: "Prompting tips"
+description: "Get better results from the Code Agent by describing outcomes, iterating in small steps, and knowing when it edits code directly versus building a WhatsApp Flow. Includes why a brand-new project behaves differently from an existing one."
+---
+
+The [Code Agent](/agents/code-agent) builds and edits your bot from plain-language instructions. How well it does that depends a lot on how you ask. This page collects the habits that get good results, and explains a couple of things about how the agent behaves that are worth understanding before you start.
+
+## Why a fresh project feels different
+
+The Code Agent is the one agent in Paige that changes what it can do depending on the project it's working in. In a brand-new project it behaves quite differently from one that already has a working bot — and that's deliberate.
+
+A project counts as **new** until it has a deployed webhook — in practice, until the agent has scaffolded your first bot. While it's new, the agent works in **scaffolding mode**:
+
+- It starts from a **starter template** rather than reading existing code, because there isn't any yet.
+- It picks the template that matches the kind of bot you asked for — a **simple menu bot** or an **AI bot** (see [How a new bot starts](/agents/code-agent#how-a-new-bot-starts)).
+- It pulls in a reference for how Paige's messaging and database APIs work, then writes the files.
+
+Once your bot exists, the same agent switches to **editing mode**:
+
+- It reads the relevant files first, then makes small, surgical edits rather than rewriting whole files.
+- It can search across your project to find where something lives.
+- It can read your [execution logs](/guides/logs) to debug a problem you describe.
+
+You don't switch these modes yourself — the agent does it based on whether the project already has a bot. The practical upshot: **in a fresh project, describe the bot you want from scratch; in an existing one, describe the change you want against what's already there.**
+
+<Note>
+  The agent also adapts to whether [Paige Dev testing](/guides/testing) is linked. When it is, "test it" runs a fuller automated test pass; when it isn't, the agent sends a single preview message instead. Either way you ask the same way — see [Ask it to test](#ask-it-to-test-after-a-change) below.
+</Note>
+
+## What the agent can reach for
+
+The Code Agent has close to forty built-in tools it uses behind the scenes. You never call these directly — you describe an outcome and the agent chooses the tools. It helps to know roughly what's in its reach, because it shapes what you can ask for in a single instruction.
+
+<CardGroup cols={2}>
+  <Card title="Files" icon="file-code">
+    Read, write, edit, and search your bot's code. In an existing project it prefers targeted edits over full rewrites.
+  </Card>
+  <Card title="Database" icon="database">
+    Create and change tables, and query, insert, update, or delete rows — so it can set up storage before writing the code that uses it.
+  </Card>
+  <Card title="Flows" icon="workflow">
+    Build, update, validate, publish, and upload [WhatsApp Flows](/guides/flows-builder), and embed images into flow screens.
+  </Card>
+  <Card title="Scheduled tasks" icon="clock">
+    Register, list, and remove [scheduled tasks](/guides/scheduled-tasks) that run on a repeating schedule.
+  </Card>
+  <Card title="Reference lookups" icon="book-open">
+    Look up how the Paige API, [Airtable, and Slack](/integrations) actually work — including your own Airtable tables and fields — before writing code against them.
+  </Card>
+  <Card title="Testing & logs" icon="play">
+    Send test messages through your bot, reset the preview, and read [execution logs](/guides/logs) to debug.
+  </Card>
+</CardGroup>
+
+Not every tool is available in every project — the file-reading and log-reading tools only appear once your bot exists, and the testing tools swap depending on whether Paige Dev is linked. You don't have to track any of this; ask for the outcome and the agent uses whatever it has.
+
+## When it edits code versus builds a Flow
+
+This is the distinction most worth understanding, because it changes how you phrase a request.
+
+For most changes — a new message, a menu option, a branch of logic, a database write — the agent **edits your bot code directly**.
+
+For collecting several fields of structured information in one go, it builds a **[WhatsApp Flow](/guides/flows-builder)** instead. A Flow is the native WhatsApp form UI: a screen with real inputs rather than a back-and-forth of questions. When the agent decides a Flow is the right tool, it hands the job to Paige's dedicated flow builder, which generates the Flow, validates it against Meta's rules, and drafts it — the agent then wires it into your bot.
+
+<Note>
+  The agent can't hand-edit a Flow's definition the way it edits ordinary code — Flows always go through the flow builder so they stay valid against Meta's requirements. This is invisible to you; it just means "change the booking form" and "change the welcome message" take slightly different routes under the hood.
+</Note>
+
+**So which should you ask for?**
+
+- **Ask for a message or a menu** when the interaction is a single question, a choice between a few options, or a short reply. These are quick, edited straight into your code, and easy to iterate on.
+- **Ask for a Flow** when you're collecting several details at once — a booking (name, date, time, party size), a lead form, a survey. A Flow is a better experience than asking for each field in a separate message, and Meta requires it for anything beyond a few fields.
+
+You don't have to use the word "Flow." Describe the outcome — *"collect the customer's name, email, and preferred date in one form"* — and the agent will reach for a Flow on its own. Naming it just makes your intent explicit.
+
+## Prompting habits that work
+
+**Describe the outcome, not the implementation.** Say what should happen from the customer's point of view — *"after they pick 'Book a demo', ask for their name and email, then save both and confirm"* — and let the agent decide which files and tools to touch. You don't need to know your bot's file structure.
+
+**Be specific about behavior.** "Add a contact form" leaves too much open. "Ask for name and email in one form, save them to a `leads` table, and reply with a thank-you message" tells the agent exactly what done looks like.
+
+**Iterate in small steps.** A large feature lands more reliably as a sequence of small requests — build the menu first, then each option's handler, then the edge cases — than as one long instruction. You also get to check each piece as it's built.
+
+**Reference behavior, not files.** Describe the moment in the conversation you want to change — *"when someone replies to the welcome message"* — rather than naming a file. The agent finds the right code.
+
+<Steps>
+  <Step title="Start with the shape">
+    Get the main path working first: the greeting, the menu, the one or two things most customers will do.
+  </Step>
+  <Step title="Fill in the branches">
+    Add the handlers for each option, one at a time, testing as you go.
+  </Step>
+  <Step title="Handle the edges">
+    Then cover the awkward inputs — empty messages, unexpected replies, someone changing their mind mid-flow.
+  </Step>
+</Steps>
+
+### Ask it to test after a change
+
+The agent can test its own work. Add *"then test it"* to an instruction and it sends a message through your bot in preview and shows you the result — no need to pick up your phone. This is the fastest way to catch a mistake before it reaches a customer.
+
+If you've linked [Paige Dev](/guides/testing), "test it" runs a fuller automated pass; if you haven't, it sends a single preview message. You ask the same way either way.
+
+### Let it read the logs when something breaks
+
+When a change misbehaves, you don't have to diagnose it yourself. Describe the symptom and point the agent at the [logs](/guides/logs):
+
+> "Customers say the booking confirmation never arrives. Check the logs and fix it."
+
+In an existing project the agent can read the same [execution logs](/guides/logs) you see in **Tools → Logs**, across both your preview and production bots, and change the code in the same conversation. That's the shortest path from "something's broken" to a fix.
+
+<Tip>
+  If the agent makes a change that breaks something, just tell it what went wrong in plain terms. It'll read the logs, inspect the code, and fix the cause — you don't need to work out the underlying reason yourself.
+</Tip>
+
+## A quick reference
+
+| You want to… | Ask for… |
+|---|---|
+| A greeting, reply, or menu option | A message — the agent edits your code directly |
+| A choice between a few options | Reply buttons or a list message |
+| Several fields collected at once | A form — the agent builds a WhatsApp Flow |
+| A recurring notification or report | A [scheduled task](/guides/scheduled-tasks) |
+| To store or look up data | A table — the agent creates it before wiring it up |
+| To find out why something failed | *"Check the logs and fix it"* |
+
+For the full reference on what the Code Agent is and how it fits together, see the [Code Agent page](/agents/code-agent).
