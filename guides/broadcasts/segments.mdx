@@ -1,0 +1,54 @@
+---
+title: "Save and reuse broadcast audiences with segments"
+sidebarTitle: "Segments"
+description: "A segment is a saved description of who you want to reach — VIP customers, everyone tagged newsletter, people who opted in. Build it once and reuse it on any broadcast."
+---
+
+Most businesses send to the same handful of groups over and over: your regulars, your newsletter list, everyone who came to last month's event. A **segment** saves that group once so you don't rebuild the filter every time.
+
+You'll find **Segments** as a sub-tab inside **Broadcasts**.
+
+## A segment is a description, not a list
+
+This is the important idea. A segment doesn't hold a frozen copy of your contacts — it holds the *rule*, and Paige works out who matches every time it's used.
+
+So a segment called "Opted-in VIPs" automatically picks up a new VIP you tagged this morning, and automatically drops someone who opted out last night. You never refresh it, and you never end up broadcasting to a stale list.
+
+## Building one
+
+Click **New Segment** and combine any of these. They narrow together — a contact has to match all of them.
+
+<AccordionGroup>
+  <Accordion title="Opted in only">
+    On by default. Leave it on unless you have a specific reason not to — and note that opted-out contacts are excluded from every broadcast regardless, so turning it off widens less than you'd think.
+  </Accordion>
+  <Accordion title="Tags">
+    Match anyone carrying **any** of the tags you list — `vip` or `newsletter`, not `vip` and `newsletter`. Leave it empty to match everyone.
+
+    Tags come from your bot (it can tag a contact as it learns things about them), from the tags column of a [CSV import](/guides/contacts-import), or from the "Tags for all" box when importing.
+  </Accordion>
+  <Accordion title="Search by name or number">
+    Match contacts whose name or number *contains* what you type. Useful for grouping by a shared pattern — everyone whose number starts with a particular dialling code, say.
+  </Accordion>
+  <Accordion title="Added contacts">
+    Search for specific people and add them by hand. They're included on top of whatever the filters match — handy when a segment is "everyone tagged vip, plus these three".
+  </Accordion>
+</AccordionGroup>
+
+A live count under the form tells you how many contacts match as you build.
+
+Click **Create** to save. Names are unique per project, and you can keep up to 100 segments.
+
+## Using one
+
+In the broadcast wizard's **Audience** step, choose **Saved segment** and pick it. That's the whole thing — the count you see is resolved fresh at that moment.
+
+## Editing and deleting
+
+The pencil icon edits a segment. Because segments resolve live, an edit changes every future broadcast that uses it — including any drafts or scheduled broadcasts pointing at it.
+
+Deleting tells you what it'll affect before you commit: it names how many draft or scheduled broadcasts reference the segment and would lose their audience. Broadcasts that have already gone out aren't affected.
+
+<Tip>
+  Segments you can't build in this form are still possible by asking the [Broadcasting assistant](/guides/broadcasts/broadcasting-assistant). It can target people by **a button they actually tapped** in one of your bot's messages — "everyone who tapped Book now in the last month" — which the form has no field for. It saves as a normal segment you can then pick in the wizard.
+</Tip>

@@ -1,0 +1,59 @@
+---
+title: "Plan broadcasts by chatting with the Broadcasting assistant"
+sidebarTitle: "Broadcasting assistant"
+description: "The Broadcasting assistant builds audiences, drafts templates, and assembles whole campaigns from a conversation — then hands them to you to approve. It can never send anything itself."
+---
+
+Open the **Broadcasts** tab and the chat sidebar switches to the **Broadcasting** assistant. It's a different agent from the one that writes your bot code, and it knows about your contacts, your segments, your templates, and your past broadcasts.
+
+It's most useful for the things the forms make tedious:
+
+> "How many opted-in contacts do we have tagged vip?"
+
+> "Make a segment of everyone who tapped Book now in the last 30 days."
+
+> "Draft a utility template telling people we're closed on the 24th."
+
+> "Put together a campaign for that segment using the closed_notice template, for Friday at 9am."
+
+## What it can do
+
+- **Answer questions** about your broadcasts, segments, templates, and audience sizes.
+- **Check an audience size** before you commit to anything — the number it gives is the same one the send would use.
+- **Create and edit segments**, including targeting by **buttons people tapped**, which the Segments form can't do.
+- **Draft, submit, and check templates.** It'll compose one, show it to you, and only submit to Meta once you say so. It can then tell you whether Meta has approved it yet.
+- **Assemble a campaign** — audience, template, variables, schedule — and hand it to you.
+
+## It never sends anything
+
+<Note>
+  The assistant cannot send, launch, approve, cancel, or retry a broadcast. There's no tool for it, and the system refuses to send a campaign in the state the assistant leaves it in. Asking it to "just send it" won't work — it'll explain that approving is yours to do.
+</Note>
+
+That's deliberate. An agent that could send a promotion to four thousand people because it misread a sentence is not a good agent.
+
+## The approval card
+
+When you ask it to assemble a campaign, a card appears in the chat with everything laid out: the name, how many recipients, the estimated cost, the schedule, a preview of the template as your customers will see it, and each variable with what it resolves to.
+
+Three buttons:
+
+- **Approve** — you're happy. The campaign is scheduled and sends at its time.
+- **Edit** — tell the assistant what to change and it reassembles.
+- **Reject** — discard it.
+
+<Warning>
+  **Approve means it will send.** If the campaign has no schedule, or a time that's already passed, approving sends it at the next opportunity — within minutes. The wizard's rule that nothing sends without a schedule doesn't save you here; your Approve click *is* the decision. Check the schedule line on the card before you click.
+</Warning>
+
+If the campaign uses a template Meta hasn't approved yet, approving is still fine — the campaign waits, and sends by itself once Meta approves and the scheduled time arrives. If Meta rejects the template instead, the campaign is cancelled and you'll get a **Campaign needs attention** notification.
+
+## Marketing templates and opt-in
+
+The assistant refuses to assemble a **marketing** campaign to an audience that isn't restricted to opted-in contacts, and tells you to fix the audience. Marketing messages to people who never opted in are exactly the thing that gets a WhatsApp number restricted.
+
+<Note>
+  The manual wizard doesn't enforce this — you can untick **Opted in only** and pick a marketing template there. The assistant is stricter than the form on purpose. Being stopped here is a reason to reconsider the audience, not to go and do it by hand.
+</Note>
+
+It also won't assemble a campaign with no audience at all, rather than quietly targeting every contact you have.

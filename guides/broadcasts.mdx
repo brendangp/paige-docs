@@ -1,0 +1,139 @@
+---
+title: "Send a WhatsApp template to many customers at once"
+sidebarTitle: "Broadcasts overview"
+description: "Broadcasts send an approved WhatsApp template to a group of your contacts — a promotion, a reminder, an announcement. Opt-outs and dead numbers are excluded for you."
+---
+
+Your bot answers people who message it. **Broadcasts** are the other direction: reaching out to many customers at once with an approved template — a seasonal promotion, a reminder that bookings open Monday, a notice that you're closed next week.
+
+You'll find **Broadcasts** as a tab at the top of your project, next to Conversations.
+
+<Note>
+  Broadcasts needs turning on for a project before the tab appears, from **Settings → Project**. It's also a paid feature, so it's locked once your trial ends.
+</Note>
+
+## Before you start
+
+You need two things:
+
+1. **An approved template.** WhatsApp doesn't let businesses send whatever they like to people who haven't messaged recently — every broadcast goes out as a [template](/guides/templates) that Meta has reviewed and approved. Approval takes minutes for a utility template and can take hours for a marketing one, so do this first.
+2. **Contacts to send to.** Either from people who've messaged your bot, or [imported in bulk](/guides/contacts-import).
+
+## Building a broadcast
+
+Click **New Broadcast** and you'll go through six steps.
+
+<Steps>
+  <Step title="Template">
+    Name the broadcast — for you, not your customers — and pick your template. Only **approved** templates appear here.
+  </Step>
+  <Step title="Variables">
+    If your template has `{{1}}`-style placeholders, fill each one. Two choices per placeholder:
+
+    - **Static text** — the same words for everyone.
+    - **Contact field** — each person's own **Full name**, **Phone number**, or **Username**.
+
+    A contact field is what turns one template into a personal message. The preview below shows how it'll read.
+  </Step>
+  <Step title="Audience">
+    Either pick a [saved segment](/guides/broadcasts/segments), or build a one-off filter here from tags. **Opted in only** is on by default — leave it that way.
+
+    A live count tells you how many people you're about to reach. If it says zero, you can't continue.
+  </Step>
+  <Step title="Schedule">
+    Pick a date and time, or save it as a draft to come back to. See below — this step matters more than it looks.
+  </Step>
+  <Step title="Test Send">
+    Send the real template to up to three numbers first. It doesn't touch your audience or your daily cap, and it's the only way to see the thing exactly as a customer will. Worth the thirty seconds.
+  </Step>
+  <Step title="Confirm">
+    Review it all, including the estimated WhatsApp cost, and save.
+  </Step>
+</Steps>
+
+## Scheduling is how a broadcast sends
+
+This catches people out, so it's worth being blunt:
+
+<Warning>
+  **There's no "send now" button.** A broadcast only ever goes out at a time you schedule. If you choose **Save as draft**, it sits there indefinitely — a draft will never send on its own, no matter how long you leave it.
+
+  If you want a broadcast to go out shortly, schedule it for a few minutes' time.
+</Warning>
+
+## What it costs
+
+Paige doesn't charge for broadcasts, and they don't use your credits. **Meta bills your connected number directly** for the messages, and the estimate on the Confirm step is a rough guide rather than a quote.
+
+The one limit is a **cap of 1,000 messages per project per day**, resetting at midnight UTC.
+
+<Note>
+  If a broadcast hits the cap mid-send it quietly pauses and picks up where it left off the next day. It'll sit showing **Sending** with a stuck Queued count, and nothing tells you why — so if a large broadcast seems frozen, the cap is the first thing to suspect.
+</Note>
+
+## Who actually receives it
+
+Two groups are always excluded, whatever your filter says:
+
+- **Anyone who opted out.** This is checked when the broadcast sends, not when you build it — so someone who sends STOP after you schedule is still excluded.
+- **Numbers confirmed not to be on WhatsApp.**
+
+That second one is worth understanding. Paige doesn't know whether an imported number is on WhatsApp until it tries. Your first broadcast to fresh imports is what finds out: the dead ones fail once with **Not on WhatsApp**, and they're quietly left out of every audience after that. A first broadcast with more failures than you expected usually means exactly this, and it's self-correcting.
+
+## Watching it go out
+
+Open a broadcast to see live counters — **Total, Queued, Sent, Delivered, Read, Failed, Canceled** — updating as it goes.
+
+<Note>
+  These are buckets, not totals. Each person sits in exactly one, and they move along: Sent → Delivered → Read. So a broadcast everyone has read shows **Sent: 0**. That's success, not failure.
+</Note>
+
+Below that, every recipient is listed with their status. Failures say why in plain language:
+
+| What you'll see | What it means |
+|---|---|
+| **Not on WhatsApp** | The number isn't reachable. Won't be tried again. |
+| **Rate limited — can retry** | WhatsApp throttled you. Worth retrying. |
+| **Blocked by quality limits** | Meta has restricted your number's sending, usually after too many blocks or reports. |
+| **Template rejected** | Meta withdrew approval for the template. |
+| **Account paused** | Meta has paused your WhatsApp account. |
+| **Delivery failed** | Something else. Copy the raw reason for the detail. |
+
+## Cancelling and retrying
+
+**Cancel** stops a scheduled or sending broadcast. Anything already sent has left and can't be recalled — cancelling only stops what's still queued. It can't be undone.
+
+**Retry failures** appears once a broadcast has finished with failures. It re-queues only the ones worth retrying — a rate-limited send, say — and skips the permanent ones like *Not on WhatsApp* or *Template rejected*, since retrying those would just fail again.
+
+## Opt-outs and STOP
+
+Your bot handles opt-outs on its own. If someone replies **STOP**, **UNSUBSCRIBE**, or **OPT OUT**, Paige marks them opted out immediately, before the message reaches your bot. They're excluded from every broadcast from then on.
+
+The word has to start the message, so "please don't stop messaging me" won't trigger it.
+
+<Warning>
+  **Opting out is one-way.** There's no button to opt someone back in, and re-importing them won't do it — imports skip contacts that already exist rather than updating them. Undoing an opt-out means editing that contact's row directly in [the database](/guides/database-tab), which you should only do if the person has genuinely asked to hear from you again.
+</Warning>
+
+Your customer gets no confirmation reply when they opt out — they send STOP and hear nothing back. That's worth knowing if someone asks whether it worked.
+
+<Note>
+  This applies to bots Paige hosts. If you run your own backend, opt-out handling is yours to implement.
+</Note>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Segments" icon="users" href="/guides/broadcasts/segments">
+    Save an audience once and reuse it across broadcasts.
+  </Card>
+  <Card title="Broadcasting assistant" icon="megaphone" href="/guides/broadcasts/broadcasting-assistant">
+    Build segments, draft templates, and assemble campaigns by chatting.
+  </Card>
+  <Card title="Import contacts" icon="upload" href="/guides/contacts-import">
+    Bring a list of numbers in from a CSV.
+  </Card>
+  <Card title="Message templates" icon="file-text" href="/guides/templates">
+    Write and submit the templates a broadcast needs.
+  </Card>
+</CardGroup>

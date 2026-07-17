@@ -1,0 +1,81 @@
+---
+title: "Import your contact list into Paige"
+sidebarTitle: "Import contacts"
+description: "Bring an existing customer list into your project from a CSV or by pasting numbers, so you can broadcast to people who haven't messaged your bot yet."
+---
+
+Your project builds up contacts on its own as people message your bot. But if you already have a customer list — in a spreadsheet, in your CRM, in an old system — you can bring it straight in and broadcast to those people without waiting for them to message first.
+
+You'll find the **Contacts** card in **Settings → Project**. Click **Import**.
+
+<Note>
+  It's in Settings rather than the Broadcasts tab, which is the first place most people look.
+</Note>
+
+## Two ways in
+
+**Upload CSV** takes a file. **Paste** takes numbers typed or pasted in, one per line:
+
+```
++27 82 123 4567
+Jane Doe, +27 71 555 0000
+```
+
+Either a bare number, or a name and number separated by a comma.
+
+Whichever you use, click **Validate** first. Nothing is imported until you've seen what Paige made of your list.
+
+## CSV format
+
+A header row with any of these columns, in any order:
+
+| Column | Required | What it does |
+|---|---|---|
+| `number` | Yes | Their phone number |
+| `name` | No | Their name |
+| `tags` | No | Labels for building [segments](/guides/broadcasts/segments) — separate several with semicolons |
+| `opted_in` | No | Defaults to yes. Set `false`, `no`, or `unsubscribed` to mark someone opted out |
+
+A file with nothing but a column of numbers works too — no header needed.
+
+```csv
+name,number,tags
+Jane Doe,+27821234567,vip;newsletter
+Sam Smith,+27715550000,newsletter
+```
+
+<Tip>
+  If you're putting several tags in one CSV cell, separate them with semicolons rather than commas — a comma inside an unquoted cell splits the column and your import comes out wrong.
+</Tip>
+
+## Numbers without a country code
+
+This is where imports usually go wrong.
+
+Paige needs to know which country a number belongs to. If your list has full international numbers (`+27 82 123 4567`), you're fine. If it has local ones (`082 123 4567`), you must type your country's two-letter code into **Default country** — `ZA` for South Africa, `GB` for the UK, `US` for the States.
+
+<Warning>
+  **Default country is empty by default.** Import a list of local-format numbers without filling it in and *every single row* is rejected as invalid. Nothing is imported and it isn't obvious why. If your validation summary says everything is invalid, this is almost always the reason.
+</Warning>
+
+## What validation tells you
+
+Three numbers:
+
+- **ready** — will be imported.
+- **duplicate** — already in your project. Skipped.
+- **invalid** — couldn't be read as a phone number. Skipped. You'll see the first few so you can spot the pattern.
+
+Then **Import** does it, and tells you what happened: *Imported 47 contacts, skipped 3 duplicates, 2 invalid*.
+
+<Note>
+  **Duplicates are skipped, never updated.** Re-importing someone with a corrected name or new tags does nothing — they're already there, so the row is ignored. To change an existing contact, edit them in [the database](/guides/database-tab). This also means you can't undo an opt-out by re-importing.
+</Note>
+
+You can import up to 50,000 rows at a time.
+
+## After importing
+
+Imported contacts are immediately available to [segments](/guides/broadcasts/segments) and [broadcasts](/guides/broadcasts) — segments resolve live, so counts update with no refresh.
+
+One thing to expect: Paige doesn't yet know whether these numbers are on WhatsApp, because nobody has tried to message them. Your first broadcast is what finds out. Expect some **Not on WhatsApp** failures on that first send — it's normal for an old list, and those numbers are excluded from every audience afterwards, so it only happens once.
