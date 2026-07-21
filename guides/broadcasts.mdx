@@ -45,7 +45,7 @@ Click **New Broadcast** and you'll go through six steps.
     A live count tells you how many people you're about to reach. If it says zero, you can't continue.
   </Step>
   <Step title="Schedule">
-    Pick a date and time, or save it as a draft to come back to. See below — this step matters more than it looks.
+    Pick a date and time, or save it as a draft to come back to. You can also switch on **Send in batches (waves)** here and set how many to **send now** — Paige holds the rest back for you to release later (see [Sending in batches](#sending-in-batches-waves)). See below — this step matters more than it looks.
   </Step>
   <Step title="Test Send">
     Send the real template to up to three numbers first. It doesn't touch your audience or your daily cap, and it's the only way to see the thing exactly as a customer will. Worth the thirty seconds.
@@ -55,15 +55,28 @@ Click **New Broadcast** and you'll go through six steps.
   </Step>
 </Steps>
 
-## Scheduling is how a broadcast sends
+## Launching and scheduling
 
-This catches people out, so it's worth being blunt:
+You send a broadcast one of two ways:
+
+- **Launch it now.** A finished draft has a **Launch** action in the broadcast list — click it, confirm, and the broadcast goes out straight away.
+- **Schedule it.** Give it a date and time on the Schedule step and Paige launches it for you when that time comes.
 
 <Warning>
-  **There's no "send now" button.** A broadcast only ever goes out at a time you schedule. If you choose **Save as draft**, it sits there indefinitely — a draft will never send on its own, no matter how long you leave it.
-
-  If you want a broadcast to go out shortly, schedule it for a few minutes' time.
+  **A draft never sends on its own.** If you only **Save as draft** and don't launch or schedule it, it sits there indefinitely — no matter how long you leave it. To send it, either click **Launch** on it in the list, or open it and set a schedule.
 </Warning>
+
+## Sending in batches (waves)
+
+If you have a large audience and want to test the waters first, switch on **Send in batches (waves)** on the wizard's Schedule step and choose how many to **send now**. When the broadcast launches, Paige **freezes the whole audience** and sends only that first batch — everyone else is put on hold. Your counters still cover the full audience on the one broadcast, so you never have to stitch several broadcasts together.
+
+The broadcast then shows as **Partially sent** rather than jumping to Completed. Open it and you'll see how many are **remaining**, with a **Send next wave** control: type a number and click **Send … more**, or click **Send all remaining** to release everyone left. Release as many waves as you like, whenever you like — each time, anyone who has **opted out** since you launched is skipped automatically. The broadcast only marks itself **Completed** once the last held recipient has been released and finished sending.
+
+<Note>
+  The audience is fixed at launch. Contacts who join it *after* you launch aren't added to later waves — to reach new people, create a fresh broadcast.
+</Note>
+
+Batched sending is available on standard Paige-hosted projects. Projects running their own self-hosted backend send everyone at once, and the toggle is hidden.
 
 ## What it costs
 
@@ -86,7 +99,7 @@ That second one is worth understanding. Paige doesn't know whether an imported n
 
 ## Watching it go out
 
-Open a broadcast to see live counters — **Total, Queued, Sent, Delivered, Read, Failed, Canceled** — updating as it goes.
+Open a broadcast to see live counters — **Total, Queued, Sent, Delivered, Read, Failed, Canceled**, plus **Held** when you've sent in batches — updating as it goes.
 
 <Note>
   These are buckets, not totals. Each person sits in exactly one, and they move along: Sent → Delivered → Read. So a broadcast everyone has read shows **Sent: 0**. That's success, not failure.
@@ -105,7 +118,7 @@ Below that, every recipient is listed with their status. Failures say why in pla
 
 ## Cancelling and retrying
 
-**Cancel** stops a scheduled or sending broadcast. Anything already sent has left and can't be recalled — cancelling only stops what's still queued. It can't be undone.
+**Cancel** stops a scheduled, sending, or partially-sent broadcast. Anything already sent has left and can't be recalled — cancelling only stops what's still queued, including anyone held back for a later wave. It can't be undone.
 
 **Retry failures** appears once a broadcast has finished with failures. It re-queues only the ones worth retrying — a rate-limited send, say — and skips the permanent ones like *Not on WhatsApp* or *Template rejected*, since retrying those would just fail again.
 
