@@ -45,7 +45,7 @@ If a customer reports a problem and you're staring at an empty log, this is almo
 Paige captures four log levels, matching the standard browser console methods:
 
 <AccordionGroup>
-  <Accordion title="log — General output">
+  <Accordion title="log — General output" icon="scroll-text">
     Use `console.log()` for general debugging information: variable values, which branch of logic ran, or any output that helps you trace execution flow.
 
     ```javascript
@@ -53,7 +53,7 @@ Paige captures four log levels, matching the standard browser console methods:
     console.log("User state:", userState);
     ```
   </Accordion>
-  <Accordion title="error — Errors and failures">
+  <Accordion title="error — Errors and failures" icon="circle-x">
     Use `console.error()` to record errors. These are shown prominently in the logs panel and are the first place to look when your bot stops responding correctly.
 
     ```javascript
@@ -64,7 +64,7 @@ Paige captures four log levels, matching the standard browser console methods:
     }
     ```
   </Accordion>
-  <Accordion title="warn — Warnings and unexpected conditions">
+  <Accordion title="warn — Warnings and unexpected conditions" icon="triangle-alert">
     Use `console.warn()` for situations that aren't failures but signal something unexpected — for example, a missing optional field or a fallback path being triggered.
 
     ```javascript
@@ -73,7 +73,7 @@ Paige captures four log levels, matching the standard browser console methods:
     }
     ```
   </Accordion>
-  <Accordion title="info — Informational milestones">
+  <Accordion title="info — Informational milestones" icon="info">
     Use `console.info()` for high-level events like a flow completing, a payment being confirmed, or a user reaching a specific step.
 
     ```javascript

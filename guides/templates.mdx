@@ -35,7 +35,7 @@ When you create a template, you assign it to one of three categories. The catego
 A template is made up of components. The only required component is a BODY. You can optionally add a HEADER (text or media), a FOOTER, and BUTTONS.
 
 <AccordionGroup>
-  <Accordion title="BODY (required)">
+  <Accordion title="BODY (required)" icon="pilcrow">
     The main text of the message. Supports variables using `{{1}}`, `{{2}}` notation. Variable values are provided at send time.
 
     ```json
@@ -45,7 +45,7 @@ A template is made up of components. The only required component is a BODY. You 
     }
     ```
   </Accordion>
-  <Accordion title="HEADER (optional)">
+  <Accordion title="HEADER (optional)" icon="panel-top">
     Displayed above the body. Can be plain text or a media type (image, video, document).
 
     ```json
@@ -56,7 +56,7 @@ A template is made up of components. The only required component is a BODY. You 
     }
     ```
   </Accordion>
-  <Accordion title="FOOTER (optional)">
+  <Accordion title="FOOTER (optional)" icon="panel-bottom">
     A short line of grey text displayed below the body. Does not support variables.
 
     ```json
@@ -66,7 +66,7 @@ A template is made up of components. The only required component is a BODY. You 
     }
     ```
   </Accordion>
-  <Accordion title="BUTTONS (optional)">
+  <Accordion title="BUTTONS (optional)" icon="mouse-pointer-click">
     Up to three buttons. Supported types are `QUICK_REPLY` (sends a reply back to your webhook), `URL` (opens a link), and `PHONE_NUMBER` (initiates a call).
 
     ```json

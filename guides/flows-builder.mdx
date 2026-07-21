@@ -102,21 +102,21 @@ The agent picks the right components for each screen based on your description.
 WhatsApp Flows support a specific set of UI components. The agent knows which components are valid and in what contexts they can be used.
 
 <AccordionGroup>
-  <Accordion title="TextHeading">
+  <Accordion title="TextHeading" icon="heading">
     A bold heading displayed at the top of a screen or section. Use it to label each screen clearly.
 
     ```json
     { "type": "TextHeading", "text": "Book your appointment" }
     ```
   </Accordion>
-  <Accordion title="TextBody">
+  <Accordion title="TextBody" icon="pilcrow">
     Regular body text for instructions or descriptions. Supports basic formatting.
 
     ```json
     { "type": "TextBody", "text": "Fill in your details below and we'll confirm your slot." }
     ```
   </Accordion>
-  <Accordion title="TextInput">
+  <Accordion title="TextInput" icon="text-cursor-input">
     A single-line or multi-line text field. Used for names, email addresses, notes, or any free-text input.
 
     ```json
@@ -128,7 +128,7 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
     }
     ```
   </Accordion>
-  <Accordion title="Dropdown">
+  <Accordion title="Dropdown" icon="chevron-down">
     A select menu with a list of options. Used for service selection, time slots, categories, and similar choices.
 
     ```json
@@ -144,7 +144,7 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
     }
     ```
   </Accordion>
-  <Accordion title="DatePicker">
+  <Accordion title="DatePicker" icon="calendar">
     A native date selector. Returns the selected date as a string in ISO format.
 
     ```json
@@ -156,7 +156,7 @@ WhatsApp Flows support a specific set of UI components. The agent knows which co
     }
     ```
   </Accordion>
-  <Accordion title="Footer">
+  <Accordion title="Footer" icon="panel-bottom">
     The primary action button at the bottom of a screen. Used to navigate to the next screen or submit the form. Each screen must have a Footer.
 
     ```json
