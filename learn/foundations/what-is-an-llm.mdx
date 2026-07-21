@@ -1,0 +1,90 @@
+---
+title: "What is an LLM?"
+sidebarTitle: "What is an LLM?"
+description: "A plain-language explanation of large language models — how they generate text by predicting tokens, why the same prompt can give different answers, and what turns a model into an agent like Paige's Code Agent."
+---
+
+You keep hearing the term. LLM. It sounds technical, and the explanations usually are. This page isn't. By the end you'll understand what an LLM actually does, why it sometimes surprises you, and what turns one into the Code Agent that builds your bot.
+
+## An LLM generates text — it doesn't look it up
+
+LLM stands for *large language model*. The simplest true thing you can say about it: an LLM generates text one piece at a time, by predicting what's likely to come next.
+
+That last part matters. A model is **not** a search engine and **not** a database. It doesn't store answers in a table and fetch the matching row. It was trained on an enormous amount of writing, and from that it learned the patterns of language — which words tend to follow which. When you give it some text, it continues that text with whatever is most likely to come next, over and over, until it's done.
+
+So when a model tells you something correct, it's not because it "looked up the fact." It's because the true continuation was also the *likely* one. Most of the time those line up. Sometimes they don't — which is why a model can state something wrong with total confidence. It's generating a plausible continuation, not consulting a record.
+
+Hold onto that idea. Almost everything else about LLMs follows from *pattern generation, not lookup*.
+
+## Tokens: the pieces it predicts
+
+The "next piece" a model predicts isn't quite a word. It's a **token** — a chunk of text, often a whole word, sometimes part of one.
+
+| Term | A concrete example |
+|---|---|
+| **Token** | `cat` is one token; `unbelievable` might split into `un`, `believ`, `able` |
+| **Prompt** | The text you send in: `Write a friendly welcome message for a dentist` |
+| **Model** | The trained system that reads your prompt and generates a reply |
+| **Generation** | Producing the reply one token at a time, each one predicted from everything so far |
+
+The model reads your prompt as tokens, then produces its answer as a stream of tokens — picking each one, adding it to the text, and using that longer text to pick the next. Word by word, roughly, until the reply is complete. That's the whole engine.
+
+## Why the same prompt gives different answers
+
+Here's the part that trips people up. Ask a model the exact same thing twice and you can get two different answers. Nothing is broken. This is how it's meant to work.
+
+At each step the model doesn't just pick the single most likely next token. It **samples** — it picks from the likely options, with a bit of controlled chance. That randomness is deliberate. It's what makes output feel natural and varied instead of stiff and repetitive.
+
+The upshot: an LLM is not **deterministic**. Deterministic means "same input, same output, every time" — like a calculator, where `2 + 2` is always `4`. A model isn't like that. Same prompt, slightly different answer. Usually that's fine, sometimes it's even the point. But it's why you can't treat a model like a machine that gives one guaranteed reply.
+
+## What makes the output better
+
+If the model is guessing likely continuations, then the quality of your input shapes the quality of what you get back. You have more control than it first appears. Three things reliably help.
+
+- **Clear input.** Vague prompts get vague, generic answers. Say what you actually want — the audience, the tone, the goal. The more specific your prompt, the narrower and more useful the likely continuations become.
+- **Examples.** Show the model one or two examples of what "good" looks like, and it will match the pattern. A sample message in the style you want beats a paragraph describing that style.
+- **Constraints.** Tell it the limits. "Under 20 words." "No emojis." "Only ask one question." Boundaries steer the generation toward what fits, instead of leaving it to wander.
+
+<Tip>
+  A weak answer is often a weak prompt, not a weak model. Before you conclude the model can't do something, try telling it more clearly what you want — with an example and a constraint or two.
+</Tip>
+
+## From model to agent
+
+A plain model only produces text. It can write you a message, but it can't *do* anything — it can't open a file, change a setting, or check a result. It just talks.
+
+An **agent** is a model plus **tools** it's allowed to use. Same generating engine underneath, but now it can take real actions in the world: read a file, make a change, run something and look at what came back. The model decides which tool to reach for and when; the tools let it act instead of only describe.
+
+| Term | A concrete example |
+|---|---|
+| **Model** | Generates text — writes you a welcome message when asked |
+| **Tool** | An action the model can trigger — "read this file," "save this change" |
+| **Agent** | Model **+** tools — reads your bot's setup, edits it, checks the result |
+
+That's exactly what Paige's **Code Agent** is. When you chat with it in plain English, a language model reads what you asked, decides what needs to change, and uses its tools to build and edit your WhatsApp bot for you. You never touch the code. You describe the outcome; the agent does the work of getting there.
+
+And here's the part worth remembering: **you lead, the agent executes.** It's fast and capable, but it doesn't know your business, your customers, or what "done" means to you. You set the direction, review what it produced, and decide what happens next. The agent is a very capable pair of hands. You're still the one steering.
+
+## Common misconceptions
+
+**"It knows facts like a database."** It doesn't. It generates likely text, and likely usually overlaps with true — but not always. When something needs to be exactly right, check it. Don't assume the model retrieved it from a store of facts, because there is no such store.
+
+**"The same prompt always gives the same answer."** No — it samples, so answers vary between runs. That's by design, not a bug. If you need consistency, get it from clear prompts and constraints, not from expecting identical output.
+
+**"A better model would read my mind."** No model fills in what you left out. It works from your prompt. Vague in, vague out — the fix is a clearer prompt, not a smarter model.
+
+**"An agent can do anything you ask."** An agent can only use the tools it has, and only as well as you've directed it. It's powerful, not limitless. It still needs your judgment about what to build and whether the result is right.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Context and prompting" icon="message-circle" href="/learn/foundations/context-and-prompting">
+    How what you tell the model — and what it already knows — shapes every answer you get.
+  </Card>
+  <Card title="Vibe coding 101" icon="sparkles" href="/learn/foundations/vibe-coding">
+    Building real things by describing them in plain language, and letting the agent handle the code.
+  </Card>
+  <Card title="Prompting tips" icon="wrench" href="/guides/prompting">
+    The Paige-specific craft of prompting the Code Agent well, with patterns that get better results.
+  </Card>
+</CardGroup>

@@ -62,6 +62,15 @@
         "icon": "graduation-cap",
         "groups": [
           {
+            "group": "Foundations",
+            "pages": [
+              "learn/foundations/what-is-an-llm",
+              "learn/foundations/context-and-prompting",
+              "learn/foundations/vibe-coding",
+              "learn/foundations/what-is-a-whatsapp-bot"
+            ]
+          },
+          {
             "group": "WhatsApp platform",
             "pages": [
               "learn/index",

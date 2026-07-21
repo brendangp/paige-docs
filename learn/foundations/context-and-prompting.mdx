@@ -1,0 +1,97 @@
+---
+title: "Context and prompting"
+sidebarTitle: "Context and prompting"
+description: "What a context window is, the kinds of context that make a request clear, and when a cluttered conversation is worth restarting."
+---
+
+When you build with Paige, you're not clicking through menus. You're describing what you want in plain language, and an AI [Code Agent](/agents/code-agent) does the building. That means one skill sits underneath everything else: knowing how to give the model what it needs to do the job.
+
+This page is the idea behind that skill. It's not a list of tricks — those live in **[Prompting tips](/guides/prompting)**. Here we cover how the model actually holds information, what kinds of detail make a request clear, and when to stop and start fresh.
+
+## What a context window is
+
+The model has a working memory. Everything it's paying attention to right now — your messages, its own replies, the parts of your project it has looked at — sits inside that memory while it works. That space is the **context window**.
+
+The important part: it has a size limit. The window is large, but it isn't endless. As a conversation grows, more and more piles into that space — every message, every file the agent read, every dead end you backed out of.
+
+<Info>
+  Think of it like a whiteboard. There's plenty of room, but it's not infinite. Everything written on it is in view at once — and once it fills up, old notes get crowded out to make space for new ones.
+</Info>
+
+Two things follow from this. First, what's *in* the window shapes the answer — the model reasons from what it can currently see, not from everything that has ever been said. Second, a long, meandering conversation isn't automatically a richer one. It can be a cluttered whiteboard, where the useful notes are buried under scribbles.
+
+## The kinds of context that matter
+
+When a request goes wrong, it's rarely because the model is weak. It's usually because the request was thin. You knew what you wanted; you just didn't say all of it.
+
+A clear request tends to carry five kinds of context. You don't need every one every time, but naming them is the fastest way to spot what's missing.
+
+| Kind of context | Something you could actually say |
+|---|---|
+| **Goal** — what you want to happen | "When someone messages the bot for the first time, I want it to greet them and show a menu of three options." |
+| **Constraints** — the rules it must stay inside | "Keep each message under two short sentences, and don't ask for an email until after they've picked an option." |
+| **Non-goals** — what to leave alone | "Don't touch the booking flow — only change the welcome message." |
+| **Examples** — a concrete case to copy | "For instance, if they tap 'Hours', reply: 'We're open 9-5, Monday to Friday.'" |
+| **Definition of done** — how you'll know it worked | "It's finished when a new contact gets the greeting, the three buttons appear, and tapping each one gives the right reply." |
+
+The table is the whole lesson. A request that names its goal, its limits, what to avoid, a concrete example, and what "done" looks like leaves almost nothing to guess. That's the difference between one clean result and three rounds of "no, not like that."
+
+### Weak versus strong, side by side
+
+The same idea, asked two ways:
+
+<Columns cols={2}>
+  <Card title="Weak prompt" icon="ban">
+    "Add a contact form to my bot."
+  </Card>
+  <Card title="Strong prompt" icon="check-check">
+    "Add a form that collects the customer's name and email. Save both to a `leads` table. Reply with a short thank-you. Don't change the existing menu. It's done when a test message gets through the form and the row shows up saved."
+  </Card>
+</Columns>
+
+The weak version isn't wrong — it's just underspecified. The model has to invent the fields, guess where to save them, and decide what "done" means. The strong version answers all of that up front. It's longer, but every extra word removes a guess.
+
+<Tip>
+  You don't have to write a perfect prompt in one shot. It's often faster to ask for the main thing, see what you get, and add the missing context in your next message. Clarity can arrive in steps.
+</Tip>
+
+## When to start fresh
+
+A conversation is a resource, and like any resource it can get used up. The signs are easy to recognise once you know them:
+
+- You've changed direction two or three times, and earlier ideas you've abandoned are still sitting in the thread.
+- The agent keeps referring back to something you no longer want.
+- You're spending more effort correcting old assumptions than describing the new goal.
+- The whole exchange just feels tangled, and you're not sure what state things are in.
+
+When that happens, don't fight it. Start a new conversation. A fresh thread is a clean whiteboard — nothing on it but the context you choose to write.
+
+Starting fresh isn't losing progress. Your bot and its code don't live in the conversation; they're saved in your project. A new chat throws away the *clutter*, not the work. Carry over a short, clean summary of where things stand — "The bot greets new contacts and shows a three-option menu. I now want to add a booking option." — and you've kept everything that mattered and dropped everything that didn't.
+
+<Note>
+  A good rule: if you find yourself explaining what to ignore more than what to do, it's time for a new conversation.
+</Note>
+
+## Common misconceptions
+
+A few beliefs quietly make prompting harder. Worth clearing up.
+
+**"More words always means a better prompt."** No. More *relevant* context helps; more words for their own sake just crowd the window. A tight request that names the goal, the constraints, and the definition of done beats a rambling one every time. Aim for complete, not long.
+
+**"It remembers everything I've ever told it."** It doesn't. The model works from what's in the context window now — this conversation. It has no memory of past chats, and in a very long thread even early messages can get crowded out. If something matters, and it was said a while ago, say it again.
+
+**"It can see my screen and the app around it."** It can't. The agent only knows what's in the conversation and what it can read from your project's files and logs. It doesn't see what you're looking at, where your cursor is, or which button you just clicked. Describe the situation in words — don't assume it's watching over your shoulder.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Vibe coding 101" icon="brain" href="/learn/foundations/vibe-coding">
+    Building by describing outcomes instead of writing code — the mindset the whole platform runs on.
+  </Card>
+  <Card title="Prompting tips" icon="message-square" href="/guides/prompting">
+    The hands-on techniques for prompting Paige's Code Agent well — the practical companion to this page.
+  </Card>
+  <Card title="Flows Builder" icon="route" href="/guides/flows-builder">
+    Put good prompts to work: generate, preview, and publish a WhatsApp Flow from a plain-language description.
+  </Card>
+</CardGroup>

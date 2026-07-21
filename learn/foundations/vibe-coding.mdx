@@ -1,0 +1,146 @@
+---
+title: "Vibe coding 101"
+sidebarTitle: "Vibe coding 101"
+description: "The mindset and method for building software by directing an AI agent — start with the goal, build in small slices, manage context, review each piece, and improve with specific feedback."
+---
+
+You are about to build software without writing any. That sounds like magic, but it's a skill — and like any skill, there's a right way to do it.
+
+The shift is this: you don't type the code, you *direct* it. You describe what you want, the Code Agent writes it, and you judge whether it's right. That makes you the **product lead**. The agent is your **implementer** — fast, tireless, and genuinely good at the mechanics. But it doesn't know your customers, your business, or what "done" looks like. You do.
+
+This page is about how to lead well. Get the method right and the agent feels like a superpower. Get it wrong and you'll go in circles. The good news: the method is simple, and it's the same whether you're building a booking bot or a support line.
+
+## Who does what
+
+Before the method, get clear on the roles. You each bring something the other can't.
+
+| | You (product lead) | Code Agent (implementer) |
+|---|---|---|
+| **Owns** | The goal, the priorities, what "good" means | The code, the syntax, the how |
+| **Best at** | Judging the result against real needs | Writing and changing code quickly |
+| **Decides** | What to build next, when it's done | Nothing — it proposes, you approve |
+| **Weak spot** | Can't write the code | Can't read your mind or your market |
+
+Keep this split in your head the whole way through. The agent is quick, but it is not the decision-maker. When something is wrong, it's your call to catch it. When there's a choice to make, it's yours to make.
+
+## The method
+
+Everything below is one loop, repeated. You'll run it dozens of times building a single bot. Learn it once and it carries every project you'll ever build.
+
+<Steps>
+  <Step title="Start with the goal, not the implementation" icon="target">
+    Say what you want to *happen*, not how to build it. "When someone messages, greet them and ask if they want to book or ask a question" is a goal. "Add a switch statement that routes on the message body" is you trying to do the agent's job — badly. Describe the outcome and let the implementer choose the how. It's better at the how than you are.
+  </Step>
+  <Step title="Build in small slices" icon="layers">
+    Never ask for the whole app at once. Ask for one working piece. A slice is small enough to describe in a sentence or two and to check in under a minute. Get it working, then add the next piece on top. Small slices are the single biggest thing separating people who succeed at this from people who get stuck.
+  </Step>
+  <Step title="Manage your context" icon="message-square">
+    The agent only knows what's in the current conversation. A focused chat produces focused work. When a conversation has wandered across five features and two dead ends, the agent starts losing the thread — and so do you. Start fresh when that happens. See [Context and prompting](/learn/foundations/context-and-prompting) for how to do this well.
+  </Step>
+  <Step title="Review and test every slice" icon="check-check">
+    Before you move on, check the slice actually works. Open the preview, send it a message, behave like a real customer would. A slice you didn't test isn't done — it's a guess. Catching a problem now, while the change is small and fresh, is ten times easier than finding it later buried under everything you built after it.
+  </Step>
+  <Step title="Improve with specific feedback" icon="repeat">
+    The first version is rarely the final one. That's fine — that's the loop working. When something's off, say exactly what's wrong and what you expected instead. Then run the loop again on the fix. Iteration isn't failure; it's the whole point.
+  </Step>
+</Steps>
+
+## Goals beat instructions
+
+The most common beginner mistake is asking for too much, too vaguely, all at once. Watch what happens when you scope a real first slice instead.
+
+<Columns cols={2}>
+  <Card title="Weak first prompt" icon="thumbs-down">
+    > Build me a booking bot for my salon.
+
+    This has no edges. What services? What does it ask? What happens after someone books? The agent has to guess all of it, and it'll guess wrong. You'll get a sprawling first draft that's hard to check and harder to fix.
+  </Card>
+  <Card title="Strong first prompt" icon="thumbs-up">
+    > When someone messages my salon for the first time, reply with a greeting and three buttons: Book an appointment, See our prices, Talk to a person. Don't build the booking yet — just the buttons and the greeting.
+
+    One slice. Clear outcome. Easy to test in seconds. You can build booking next, on top of something you know works.
+  </Card>
+</Columns>
+
+Notice the strong prompt isn't longer because it's more technical. It's longer because it's more *specific about the outcome*. You told the agent what the customer sees and where to stop. That's product leadership, not coding.
+
+<Tip>
+  When a request feels big, that's your cue to cut it into slices — not to write a bigger prompt. Ask yourself: what's the smallest piece I could see working right now? Build that. The rest becomes the next slices.
+</Tip>
+
+## Good feedback is specific feedback
+
+The same skill applies when something breaks. "It's not working" tells the agent nothing. It'll change something at random and you'll both be guessing. Describe the gap between what happened and what you wanted.
+
+<Columns cols={2}>
+  <Card title="Weak bug report" icon="thumbs-down">
+    > The booking is broken, fix it.
+
+    Broken how? At which step? What did you do, and what did you see? The agent can't reproduce a problem it can't picture. This kind of report almost always leads to a wrong fix and another round trip.
+  </Card>
+  <Card title="Strong bug report" icon="thumbs-up">
+    > When I pick a time slot, the bot confirms the booking but skips asking for my name. It should ask for my name after I pick the time, then confirm. Right now it jumps straight to confirmation.
+
+    Now the agent knows exactly where to look and what the right behaviour is. One clear report like this usually gets fixed in a single pass.
+  </Card>
+</Columns>
+
+The pattern for good feedback is always the same three parts: what I did, what happened, what I expected instead. If your report has all three, the agent can act. If it's missing one, you're asking it to guess.
+
+## Small slices, in practice
+
+Here's the loop laid out as stages, so you can see the rhythm you're aiming for. Each row is a beat you'll hit over and over.
+
+| Stage | What you do | What the agent does |
+|---|---|---|
+| **Aim** | Name the next small slice and its goal | Waits for a clear target |
+| **Ask** | Describe the outcome you want | Writes or changes the code |
+| **Check** | Test it in the preview like a customer | Shows you the result to judge |
+| **Refine** | Point out anything wrong, specifically | Fixes exactly what you named |
+| **Advance** | Confirm it works, pick the next slice | Carries the working piece forward |
+
+The whole loop should feel quick — minutes, not hours. If a single slice is taking many rounds and going nowhere, that's a signal. The slice is probably too big, or the conversation has drifted. Shrink the ask, or start a fresh chat and describe just the piece you're stuck on.
+
+<Note>
+  Building this way has a quiet benefit: at every moment, you have a bot that works. You're never staring at a half-finished mess hoping it all comes together at the end. Each slice leaves you somewhere solid to stand before you take the next step.
+</Note>
+
+## You stay in charge
+
+It's worth saying plainly, because the speed is seductive: the agent is fast, but you are still the one leading and judging. It will happily build the wrong thing quickly and confidently. It has no way to know the greeting sounds off-brand, or that your customers would never tap that button, or that this feature matters more than that one. Those are your calls.
+
+So slow down at the two moments that matter. Before you ask, be clear on what you actually want. After you get it, check it against reality — not against whether the code looks plausible, but whether it *does the right thing* for a real person messaging your business. The agent handles the middle. The judgment at both ends is yours.
+
+## Common misconceptions
+
+<AccordionGroup>
+  <Accordion title="I need to know how to code" icon="code">
+    You don't. You need to know what you want and whether you got it. The agent handles the code. Your job is describing outcomes and judging results — skills you already have from knowing your own business. If anything, knowing too much about code tempts you to micromanage the *how*, which is the agent's strength, not yours.
+  </Accordion>
+  <Accordion title="I should describe the whole app up front" icon="layers">
+    This is the most tempting mistake and the most reliable way to get stuck. A giant first prompt gives the agent too much to guess and gives you too much to check. Big requests produce big, tangled drafts. Slices produce working pieces. Always trade the whole app for the next small piece.
+  </Accordion>
+  <Accordion title="If a slice comes out wrong, I should start the whole project over" icon="rotate-ccw">
+    Almost never. A wrong slice is a normal part of the loop — you describe the gap, the agent fixes it, you move on. Starting over throws away every working piece to fix one broken one. Iterate on the slice in front of you. Starting fresh is for a *drifting conversation*, not a working project.
+  </Accordion>
+  <Accordion title="The agent knows what I want" icon="message-square">
+    It knows what you *said*, not what you meant. It can't see your customers, your brand, or the picture in your head. Every bit of that has to make it into words. When the result surprises you, it's usually because something obvious to you was never actually said. Say it, and try again.
+  </Accordion>
+</AccordionGroup>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Prompting tips" icon="pencil" href="/guides/prompting">
+    Turn the mindset into words. Concrete patterns for writing prompts the Code Agent acts on cleanly.
+  </Card>
+  <Card title="Testing" icon="check-check" href="/guides/testing">
+    The "review and test" step, in depth — how to check each slice before you build the next one.
+  </Card>
+  <Card title="Code Agent" icon="wrench" href="/agents/code-agent">
+    Meet your implementer. What the Code Agent can build and change, and how to work with it.
+  </Card>
+  <Card title="Quick start" icon="flag" href="/quickstart">
+    Ready to run the loop for real? Build your first working slice end to end.
+  </Card>
+</CardGroup>
