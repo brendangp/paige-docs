@@ -1,0 +1,43 @@
+---
+title: "Project settings"
+sidebarTitle: "Project"
+description: "The Project section of the Settings tab is where you rename a project, see its status and WhatsApp connection at a glance, share your bot, test on Paige Dev, manage device notifications, and reach the Danger Zone."
+---
+
+import { PageDemo } from "/snippets/page-demo.jsx"
+
+The **Settings** tab is where you manage the project as a whole — as opposed to the [Tools tab](/guides/tools), which holds the infrastructure your bot runs on. Its sections are split across the pages in this group; the **Project** section, covered here, is the tab's home base.
+
+<PageDemo src="/assets/videos/settings-tab.mp4" poster="/assets/videos/settings-tab.poster.jpg" />
+
+## Project
+
+From the **Project** section you can:
+
+- **Rename the project** — edit the name field; it saves when you click away.
+- See the project's **status** (`active`, `draft`) and the date it was **created**.
+- Check the **WhatsApp connection** at a glance — it reads *Connected to WhatsApp Business API* or *Not connected*. Manage the connection itself on the [WhatsApp](/guides/settings-whatsapp) page.
+- Use the **Share Your WhatsApp** card to hand out a wa.me link or QR code to start a chat with your bot.
+- Link a phone for testing on the **Paige Dev** card — see [Testing](/guides/testing).
+- Import contacts from the contacts card — see [Contacts import](/guides/contacts-import).
+- Activate **Broadcasts** for the project.
+
+<Warning>
+  The **Danger Zone** at the bottom has two irreversible actions. **Reset Project** removes all code, conversations, and messages (your contacts and WhatsApp connection are kept). **Delete Project** removes everything. Neither can be undone.
+</Warning>
+
+### Paige Dev — test on your phone
+
+The **Paige Dev** card lets you link your real phone number and message a shared test number to try your bot on actual WhatsApp, without a number of your own and without touching your live data. Linking, moving a number between projects, the **Try now** test template, and **Clear test data** are all covered in full on the [Testing](/guides/testing) page.
+
+## Notifications
+
+The **Notifications** section holds a single **Push notifications** switch for the device you're on. Turn it on to get a push when a customer needs you, a deploy finishes, or a broadcast changes state. It's per-device, so switch it on for each phone or computer you want alerts on. See [Notifications](/guides/mobile-app#notifications).
+
+## Where secrets live
+
+If you came here looking for API keys and secrets, they're not on the Settings tab — they moved to **Tools → Secrets**. Managing them is covered on the [Secrets](/guides/secrets) page.
+
+<Note>
+  On a phone, Settings sits behind the **☰** menu and each section is its own screen. See [Use Paige on your phone](/guides/mobile-app).
+</Note>
