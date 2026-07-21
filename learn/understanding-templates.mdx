@@ -1,0 +1,63 @@
+---
+title: "Understanding templates"
+sidebarTitle: "Understanding templates"
+description: "Why WhatsApp makes you get messages approved before you can send them, what the 24-hour window forces on you, and when a template is the right tool versus a free-form reply."
+---
+
+Most of what your bot says is a **free-form reply** — a normal message, written on the spot, in answer to something a customer just sent. Templates are the other kind: a fixed message you wrote and got **approved in advance**, so you can send it even when no conversation is open. Knowing when you're *forced* to use one, and when you'd *choose* to, saves a lot of confusion later.
+
+For how to actually write, submit, and send them in Paige, see the [Message Templates](/guides/templates) how-to. This page is about *why* they exist and *when* to reach for one.
+
+## The 24-hour window
+
+WhatsApp draws a hard line around a single idea: a business may message people freely only while a conversation is **live**. Every time a customer messages you, a **24-hour window** opens. Inside it, you can reply with anything — text, images, buttons, a flow — as many times as you like. When 24 hours pass with no new message from them, the window **closes**.
+
+Once it's closed, you can't just send a free-form message. The only way to reach that person again is an **approved template**. The window reopens the moment they reply.
+
+<Note>
+  This is a Meta rule, not a Paige one. In the [Conversations](/concepts/conversations) tab, the green ring around a contact tells you their window is open. No ring means a template is your only way in.
+</Note>
+
+## Why Meta requires approval
+
+Every template is reviewed by Meta before you can send it. That feels like friction, but it's the thing that keeps WhatsApp worth being on: it isn't a spam channel. Because businesses can't fire un-vetted messages at people outside a live conversation, people trust the messages they *do* get.
+
+Approval is a reviewer reading your message the way a customer would. That's why:
+
+- Templates have **categories** — utility, marketing, authentication — that set how they're reviewed and priced.
+- Every placeholder needs a realistic **example**, so the reviewer sees a real message rather than a form.
+- **Marketing** templates are scrutinised harder and approved slower than **utility** ones tied to something the customer did.
+
+The mechanics of all three are in the [how-to](/guides/templates#template-categories).
+
+## Template, or free-form reply?
+
+Inside the 24-hour window you often have a choice. The question is whether the message is **conversational** or a **fixed notification**.
+
+| Reach for a template | Write a free-form reply |
+|---|---|
+| The window is closed — you have no choice. | The window is open and the moment is conversational. |
+| A fixed, repeatable notification — order shipped, appointment reminder, "we're closed on the 24th". | A one-off answer to something they actually asked. |
+| You're sending to **many** people at once — a [broadcast](/guides/broadcasts) is always a template. | You're helping one person through a specific problem. |
+| The message must read the same every time and be on record with Meta. | Warmth and specificity matter more than repeatability. |
+
+<Tip>
+  A good bot leans on free-form replies while the window is open, and keeps a small set of well-chosen templates for the two jobs only templates can do: reaching people after the window closes, and broadcasting to a list.
+</Tip>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Message Templates" icon="file-text" href="/guides/templates">
+    The how-to: categories, components, placeholder rules, approval, and sending from bot code.
+  </Card>
+  <Card title="Conversations" icon="message-circle" href="/concepts/conversations">
+    The 24-hour window in depth, plus contacts, state, and handover.
+  </Card>
+  <Card title="Broadcasts" icon="megaphone" href="/guides/broadcasts">
+    Send an approved template to many contacts at once.
+  </Card>
+  <Card title="Thinking in flows" icon="route" href="/learn/thinking-in-flows">
+    The companion concept: structured conversations, and when to use them.
+  </Card>
+</CardGroup>
