@@ -13,10 +13,6 @@
     {
       "url": "https://api.paigeme.dev",
       "description": "Production"
-    },
-    {
-      "url": "https://green-pages-paige-builder-staging.onrender.com",
-      "description": "Staging"
     }
   ],
   "security": [
