@@ -4252,7 +4252,7 @@
           "Build"
         ],
         "summary": "Promote dev → production",
-        "description": "Copies the dev working copy to production and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
+        "description": "Copies the dev working copy to production and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4681,7 +4681,7 @@
           "Build"
         ],
         "summary": "Generate a new WhatsApp Flow via the flows sub-agent",
-        "description": "Builds a flow from a natural-language instruction — there is no hand-authored flow JSON path. Saves the JSON, records the flow, and drafts it on the connected WABA (never auto-publishes). Consumes credits.\n\n**Required scope:** `flows:write`",
+        "description": "Builds a flow from a natural-language instruction — there is no hand-authored flow JSON path. Saves the JSON, records the flow, and drafts it on the connected WABA (never auto-publishes). Consumes credits.\n\n**A `200` does not mean the flow was built.** The body is one of two shapes: the full result, or a bail-out `{ \"success\": false, \"error\": … }` with none of the flow fields (the agent produced no flow, or the run was cancelled). Only a provider-level failure becomes `502`. **Check `success` and the presence of `flow_name` before reading the rest.**\n\nNote that `success: false` on the FULL shape means something narrower — the flow was saved, but Meta raised validation errors or a WABA copy failed. `meta_validation_errors` / `user_waba_error` tell you which.\n\n**Required scope:** `flows:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4737,84 +4737,116 @@
                       ]
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
-                        },
-                        "flow_name": {
-                          "type": "string"
-                        },
-                        "flow_path": {
-                          "type": "string",
-                          "description": "Where the JSON was saved, e.g. `flows/booking.json`."
-                        },
-                        "summary": {
-                          "type": "string",
-                          "description": "The agent's description of what it built or changed."
-                        },
-                        "screens": {
-                          "type": "number",
-                          "description": "Screen count in the resulting flow."
-                        },
-                        "validation": {
+                      "anyOf": [
+                        {
                           "type": "object",
-                          "properties": {},
-                          "description": "Paige's own pre-publish validation result."
-                        },
-                        "meta_flow_id": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "Flow id on the user's WABA, or null when not connected."
-                        },
-                        "meta_status": {
-                          "type": "string",
-                          "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
-                        },
-                        "meta_validation_errors": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {}
+                          "properties": {
+                            "success": {
+                              "type": "boolean",
+                              "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
+                            },
+                            "flow_name": {
+                              "type": "string"
+                            },
+                            "flow_path": {
+                              "type": "string",
+                              "description": "Where the JSON was saved, e.g. `flows/booking.json`."
+                            },
+                            "summary": {
+                              "type": "string",
+                              "description": "The agent's description of what it built or changed."
+                            },
+                            "screens": {
+                              "type": "number",
+                              "description": "Screen count in the resulting flow."
+                            },
+                            "validation": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "Paige's own pre-publish validation result."
+                            },
+                            "meta_flow_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Flow id on the user's WABA, or null when not connected."
+                            },
+                            "meta_status": {
+                              "type": "string",
+                              "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
+                            },
+                            "meta_validation_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {}
+                              },
+                              "description": "Meta's validation errors, empty when it accepted the flow."
+                            },
+                            "user_waba_error": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
+                            },
+                            "paige_dev": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "properties": {},
+                              "description": "Result of the Paige Dev shared-number publish."
+                            },
+                            "is_dynamic": {
+                              "type": "boolean",
+                              "description": "True when the flow declares a data endpoint (dynamic flow)."
+                            }
                           },
-                          "description": "Meta's validation errors, empty when it accepted the flow."
+                          "required": [
+                            "success",
+                            "flow_name",
+                            "flow_path",
+                            "summary",
+                            "screens",
+                            "validation",
+                            "meta_flow_id",
+                            "meta_status",
+                            "meta_validation_errors",
+                            "user_waba_error",
+                            "paige_dev",
+                            "is_dynamic"
+                          ]
                         },
-                        "user_waba_error": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
-                        },
-                        "paige_dev": {
-                          "type": [
-                            "object",
-                            "null"
-                          ],
-                          "properties": {},
-                          "description": "Result of the Paige Dev shared-number publish."
-                        },
-                        "is_dynamic": {
-                          "type": "boolean",
-                          "description": "True when the flow declares a data endpoint (dynamic flow)."
+                        {
+                          "type": "object",
+                          "properties": {
+                            "success": {
+                              "type": "boolean",
+                              "enum": [
+                                false
+                              ]
+                            },
+                            "error": {
+                              "type": "string",
+                              "description": "Why the agent stopped. Nothing was written."
+                            },
+                            "aborted": {
+                              "type": "boolean",
+                              "description": "True when the run was cancelled rather than failing."
+                            },
+                            "usage": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "Token usage, when the agent ran before giving up."
+                            }
+                          },
+                          "required": [
+                            "success",
+                            "error"
+                          ]
                         }
-                      },
-                      "required": [
-                        "success",
-                        "flow_name",
-                        "flow_path",
-                        "summary",
-                        "screens",
-                        "validation",
-                        "meta_flow_id",
-                        "meta_status",
-                        "meta_validation_errors",
-                        "user_waba_error",
-                        "paige_dev",
-                        "is_dynamic"
                       ]
                     }
                   },
@@ -5161,7 +5193,7 @@
           "Build"
         ],
         "summary": "Update a flow via the flows sub-agent",
-        "description": "`{id}` is the flow NAME, not the row id. The change is applied by the flows sub-agent; flow JSON is never hand-edited. Consumes credits.\n\n**Required scope:** `flows:write`",
+        "description": "`{id}` is the flow NAME, not the row id. The change is applied by the flows sub-agent; flow JSON is never hand-edited. Consumes credits.\n\n**A `200` does not mean the update landed.** As with `POST /v1/flows`, the body is either the full result or a bail-out `{ \"success\": false, \"error\": … }` — an unknown flow name, unparseable stored JSON, or a cancelled run all return `200` in that shape. **Check `success` and the presence of `flow_name` before reading the rest.**\n\n**Required scope:** `flows:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -5225,84 +5257,116 @@
                       ]
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
-                        },
-                        "flow_name": {
-                          "type": "string"
-                        },
-                        "flow_path": {
-                          "type": "string",
-                          "description": "Where the JSON was saved, e.g. `flows/booking.json`."
-                        },
-                        "summary": {
-                          "type": "string",
-                          "description": "The agent's description of what it built or changed."
-                        },
-                        "screens": {
-                          "type": "number",
-                          "description": "Screen count in the resulting flow."
-                        },
-                        "validation": {
+                      "anyOf": [
+                        {
                           "type": "object",
-                          "properties": {},
-                          "description": "Paige's own pre-publish validation result."
-                        },
-                        "meta_flow_id": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "Flow id on the user's WABA, or null when not connected."
-                        },
-                        "meta_status": {
-                          "type": "string",
-                          "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
-                        },
-                        "meta_validation_errors": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {}
+                          "properties": {
+                            "success": {
+                              "type": "boolean",
+                              "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
+                            },
+                            "flow_name": {
+                              "type": "string"
+                            },
+                            "flow_path": {
+                              "type": "string",
+                              "description": "Where the JSON was saved, e.g. `flows/booking.json`."
+                            },
+                            "summary": {
+                              "type": "string",
+                              "description": "The agent's description of what it built or changed."
+                            },
+                            "screens": {
+                              "type": "number",
+                              "description": "Screen count in the resulting flow."
+                            },
+                            "validation": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "Paige's own pre-publish validation result."
+                            },
+                            "meta_flow_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Flow id on the user's WABA, or null when not connected."
+                            },
+                            "meta_status": {
+                              "type": "string",
+                              "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
+                            },
+                            "meta_validation_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {}
+                              },
+                              "description": "Meta's validation errors, empty when it accepted the flow."
+                            },
+                            "user_waba_error": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
+                            },
+                            "paige_dev": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "properties": {},
+                              "description": "Result of the Paige Dev shared-number publish."
+                            },
+                            "is_dynamic": {
+                              "type": "boolean",
+                              "description": "True when the flow declares a data endpoint (dynamic flow)."
+                            }
                           },
-                          "description": "Meta's validation errors, empty when it accepted the flow."
+                          "required": [
+                            "success",
+                            "flow_name",
+                            "flow_path",
+                            "summary",
+                            "screens",
+                            "validation",
+                            "meta_flow_id",
+                            "meta_status",
+                            "meta_validation_errors",
+                            "user_waba_error",
+                            "paige_dev",
+                            "is_dynamic"
+                          ]
                         },
-                        "user_waba_error": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
-                        },
-                        "paige_dev": {
-                          "type": [
-                            "object",
-                            "null"
-                          ],
-                          "properties": {},
-                          "description": "Result of the Paige Dev shared-number publish."
-                        },
-                        "is_dynamic": {
-                          "type": "boolean",
-                          "description": "True when the flow declares a data endpoint (dynamic flow)."
+                        {
+                          "type": "object",
+                          "properties": {
+                            "success": {
+                              "type": "boolean",
+                              "enum": [
+                                false
+                              ]
+                            },
+                            "error": {
+                              "type": "string",
+                              "description": "Why the agent stopped. Nothing was written."
+                            },
+                            "aborted": {
+                              "type": "boolean",
+                              "description": "True when the run was cancelled rather than failing."
+                            },
+                            "usage": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "Token usage, when the agent ran before giving up."
+                            }
+                          },
+                          "required": [
+                            "success",
+                            "error"
+                          ]
                         }
-                      },
-                      "required": [
-                        "success",
-                        "flow_name",
-                        "flow_path",
-                        "summary",
-                        "screens",
-                        "validation",
-                        "meta_flow_id",
-                        "meta_status",
-                        "meta_validation_errors",
-                        "user_waba_error",
-                        "paige_dev",
-                        "is_dynamic"
                       ]
                     }
                   },
@@ -7303,7 +7367,7 @@
           "Webhooks"
         ],
         "summary": "Partial update of a webhook (url / events / is_active)",
-        "description": "Partial update of a webhook (url / events / is_active)\n\n**Required scope:** `webhooks:manage`",
+        "description": "Send only the fields you want to change. **At least one of `url`, `events` or `is_active` is required** — an empty body is `400 invalid_request`, not a no-op (a cross-field rule the schema below cannot express). Unknown fields are rejected. Changing `events`, or flipping `is_active` to true, re-checks the `events:*` scopes for the resulting event set.\n\n**Required scope:** `webhooks:manage`",
         "security": [
           {
             "ApiKeyAuth": []

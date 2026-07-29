@@ -21,6 +21,7 @@ Two releases. The larger one reorganised where your bot's building blocks live, 
 - **Workspace management moved into Settings.** Create a workspace from the project-switcher dropdown, and manage it — members, permissions, invites, ownership — from **Settings → Workspace** inside any project that belongs to it. The project switcher now groups your projects by Personal and by workspace. See [Workspaces](/guides/workspaces).
 - **Send a broadcast in batches.** Release a big audience in waves instead of all at once: send a first batch now, watch how it lands, then release the rest yourself — all tracked as one broadcast. See [Sending in batches](/guides/broadcasts#sending-in-batches-waves).
 - **One AI agent connection, many projects.** Connect Claude, ChatGPT, or Codex once and let it work across several of your projects, each with its own permissions and its own default. You pick the projects on the consent screen, and you can **add or remove projects later without reconnecting the agent** from **Settings → API → Connected agents**. Workspace projects can now be connected too — by an owner or admin of that workspace. See [Connect an AI agent](/guides/connect-an-agent).
+- **Read your flows over the API.** `GET /v1/flows` lists a project's WhatsApp Flows and `GET /v1/flows/{name}` returns one with its full JSON definition, both under the **Read flows** permission. Until now that permission could be granted but did nothing — the API could create and update a flow, but never read one back. See [Scopes](/api-reference/scopes).
 
 ### Improvements
 
