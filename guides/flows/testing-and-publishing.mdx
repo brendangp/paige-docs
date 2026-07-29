@@ -1,0 +1,128 @@
+---
+title: "Test and publish a WhatsApp Flow"
+sidebarTitle: "Testing and publishing"
+description: "Preview a flow before it exists on your own number, test it on a real phone, publish it with Deploy, push changes to a live flow, and retire one when you're done with it."
+---
+
+Every flow Paige builds is testable immediately — before you've connected a WhatsApp number, and before anything is live. This page covers the whole path from first preview to retirement.
+
+## Preview a flow in Paige
+
+Open the **Flows** tab and pick a flow from the list. The right-hand panel renders it in a phone frame, and two buttons control what you're doing with it:
+
+- **Try it** runs the flow interactively. Step through every screen exactly as a customer would — fill in the fields, tap the buttons, reach the end.
+- **Inspect** is the other half of the same toggle. It goes back to looking at the flow rather than clicking through it.
+- **Debug** appears only while **Try it** is active. It shows the data each screen submits as you move through, which is how you check that a field is carrying the value you expect.
+
+<Note>
+  The interactive preview works whether or not you've connected your own WhatsApp number. If you haven't, Paige previews the Paige Dev copy and tells you so above the frame: *Previewing via Paige Dev — connect WhatsApp to preview from your own number.*
+</Note>
+
+### The live version versus your working version
+
+Once a flow is live on your own number, a **Paige Dev** / **Production** toggle appears above the preview. This is how you see both sides of an unpublished change at once:
+
+- **Paige Dev** renders your current version — the one with your latest edits in it.
+- **Production** renders what your customers are actually seeing right now.
+
+Selecting a flow defaults to **Production** when it's live on your number, and **Paige Dev** when it isn't. The toggle is hidden entirely until there's a live version to compare against, because until then there's only one version to look at.
+
+The preview refreshes itself whenever a flow is republished, so you don't need to reload the page after a deploy.
+
+## Paige Dev and your own number
+
+Two WhatsApp numbers are involved in every flow, and knowing which does what explains most of the buttons on this page.
+
+**Paige Dev** is a WhatsApp number Paige shares with everyone. Every flow you create or change is published to it automatically, which is what makes a flow testable on day one. It's also the validation gate: Meta checks the flow when it lands on Paige Dev, so an invalid flow is caught there and never reaches your own number.
+
+**Your own number** is where customers meet the flow. A flow only gets there when you deploy it, and only your number can send it to a real customer.
+
+You'll see this reflected in the detail pane:
+
+| What you see | What it means |
+|---|---|
+| **Live on Paige Dev** | The current version is published on the shared test number, so **Try it** and the Paige Dev preview are showing your latest edits. |
+| **Paige Dev publish failed** | The test copy couldn't be published. Hover it for Meta's reason. The flow is still in your project, but the preview may be stale until it's fixed. |
+| **Not yet deployed** | This flow has never gone live on your own number. |
+| **Changes pending deploy** | The flow is live on your number, but you've edited it since. Customers are still seeing the older version. |
+
+In the flow list the same thing shows as a small tag on the row — **New** (*Not yet deployed to your WhatsApp number*) or **Pending** (*Changes will go live on next deploy*).
+
+### Testing on a real handset
+
+Link your phone to the Paige Dev number and message it, and your bot answers — flows included. See [Testing with Paige Dev](/guides/testing).
+
+What you can check on each number differs:
+
+<Columns cols={2}>
+  <Card title="On Paige Dev" icon="smartphone">
+    Every screen, every input, the branching, and the data your bot receives on submit. This is enough to sign off the flow itself. Messages run against your **preview** copy, so nothing touches live data.
+  </Card>
+  <Card title="On your own number" icon="badge-check">
+    The real thing, end to end: the flow arriving from your own business number, in a real customer conversation, writing to your live data. Only available after you deploy.
+  </Card>
+</Columns>
+
+## Publish a flow
+
+**[Deploy](/guides/deploy) is how you publish.** Tick the flow in the deploy dialog and Paige registers it on your WhatsApp number and publishes it in one step — that's the path for a brand-new flow and for pushing changes to a live one. Deploy works out what needs doing from where the flow currently stands, so there's nothing else to choose.
+
+The **Publish** button in the Flows tab is narrower than it looks. It only appears for a flow that's already on your number and sitting in draft. A LOCAL flow has no **Publish** button, because there's nothing on your number to publish yet.
+
+<Note>
+  A flow with validation errors won't publish. The errors are listed in the flow's detail pane — ask Paige in the chat to fix them and it will re-run the flow through Meta's validation.
+</Note>
+
+### Edit a flow that's already live
+
+Editing a live flow is safe, and it's the normal way to work. You don't need to deprecate it or build a replacement.
+
+The moment you ask for a change, the **Paige Dev copy updates**, so you can test the new version straight away. Your customers keep seeing the version you last deployed. Nothing they experience changes until you deploy again and tick that flow.
+
+That gap is deliberate, and it's worth understanding rather than working around:
+
+<Note>
+  Pushing new content to a flow that's already published would knock it back to **draft** at Meta — and a draft flow can't be sent to anyone. Rather than take your live flow off the air the moment you edit it, Paige holds the change back and promotes it at deploy time. That's exactly why customers keep seeing the last version you deployed until you deploy again.
+</Note>
+
+While a flow is in that in-between state, Paige tells you in three places: the **Pending** tag on the list row, the **Changes pending deploy** badge in the detail pane, and a count on the **Deploy** button.
+
+<Warning>
+  Nothing is ticked by default in the deploy dialog, so a deploy never republishes a flow behind your back — but a flow you forget to tick stays pending. That's why the count sticks around.
+</Warning>
+
+## Sync
+
+**Sync** appears once a flow exists on your own number. It's a one-way pull from Meta, and it does four things:
+
+- **Pulls the current status.** This is how a flow shows up as **BLOCKED** or **THROTTLED** — Meta sets those, and you only see them after a sync.
+- **Refreshes validation errors**, including clearing ones that have since been fixed.
+- **Refreshes the live-data connection health.** For a [dynamic flow](/guides/flows/dynamic-flows), a sync is the only thing that fills in the endpoint health panel.
+- **Re-mints the preview**, so the phone frame is showing the current article.
+
+## View JSON
+
+**View JSON** jumps to the flow's file in the **Code** tab, where you can read exactly what was generated. Read it freely — just don't edit it by hand. Ask Paige for the change instead, so the result stays valid.
+
+## Deprecate a flow
+
+Deprecating takes a flow offline. Someone who receives a message containing a deprecated flow sees an error if they try to open it.
+
+Select the published flow in the **Flows** tab and click **Deprecate**.
+
+<Warning>
+  **Deprecating is a one-way door in Paige.** There's no un-deprecate button, and no path back to published. If you're changing a flow rather than retiring it, edit it and deploy instead — you don't need to deprecate anything.
+</Warning>
+
+## Delete a flow
+
+**Delete** is available on a DRAFT or LOCAL flow. The confirmation spells out what's about to happen: *This will permanently delete &lt;name&gt;.* — plus *The flow will also be removed from your Meta WhatsApp account.* when the flow is on your number — and *This action cannot be undone.*
+
+Two things to know:
+
+- **Deleting a LOCAL flow still tears down its Paige Dev copy.** If that cleanup fails, the delete is blocked entirely rather than left half-done: *Could not remove the flow's Paige Dev copy. The flow was not deleted — please try again.*
+- **A published flow can't be deleted — it gets deprecated instead.** Meta refuses to hard-delete a published flow, so if a delete is attempted on one (for example by asking Paige in the chat), Paige deprecates it and says so: *A published flow can't be hard-deleted, so it was deprecated instead.*
+
+<Note>
+  When a project has no flows at all, the list reads *No flows yet. Ask Paige to create one in the chat sidebar.*
+</Note>

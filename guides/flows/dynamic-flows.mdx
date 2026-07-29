@@ -1,0 +1,101 @@
+---
+title: "Dynamic flows that fetch live data"
+sidebarTitle: "Dynamic flows"
+description: "Most flows show fixed content. A dynamic flow asks your bot for fresh information while someone is filling it in — the slots free that day, their current order status, the products you stock right now."
+---
+
+A **static** flow carries everything it shows inside itself. Whatever's on the screen was decided when the flow was built, and it looks the same to everyone who opens it.
+
+A **dynamic** flow talks to your bot while someone is using it. When they open it, and again each time they make a choice, WhatsApp asks your bot what to show next — so the screen can carry the times that are genuinely free on the date they just picked, the status of the order they're asking about, or the products in your database this morning.
+
+## Paige builds static flows by default
+
+This is deliberate, and it's usually right. A form is still static when its values are typed in by the person filling it or chosen from a set list — a booking form, a signup form, a survey, a date picker, a dropdown of the five services you offer. None of those need to ask your bot anything.
+
+<Columns cols={2}>
+  <Card title="Still static" icon="square">
+    - A booking form with a fixed list of services.
+    - A signup form collecting a name and email.
+    - A survey with set answers.
+    - A dropdown of options that rarely change.
+  </Card>
+  <Card title="Genuinely dynamic" icon="zap">
+    - "Show only the times actually free that day."
+    - "Pull their current order status."
+    - "List the products currently in the database."
+    - Anything where a stale answer would be wrong.
+  </Card>
+</Columns>
+
+Paige only builds a dynamic flow when your request explicitly needs live data. When the wording could go either way it chooses static, and when it does choose dynamic it states the reason in one line so you can correct it if it read you wrong.
+
+<Tip>
+  If you wanted live data and got a static flow, say so directly: "the time slots must come from the bookings table at the time the customer opens the flow, not a fixed list."
+</Tip>
+
+## Telling them apart
+
+In the **Flows** tab, a dynamic flow's row carries a **Dynamic** pill. Static flows show nothing — the absence of the pill *is* the signal, which keeps the list uncluttered. The detail pane is explicit either way, badging the selected flow **Dynamic** or **Static**.
+
+<Note>
+  The **Dynamic** pill turns red when the flow's live-data connection looks unreachable, so a broken flow stands out in the list without you opening it.
+</Note>
+
+## Is the live-data connection working?
+
+A dynamic flow depends on your bot answering when WhatsApp calls. If that stops working, the flow breaks for customers quietly — they open it and see an error, and nothing tells you unless you look. So Paige surfaces the connection's health on the flow's detail pane, in one of three states.
+
+<AccordionGroup>
+  <Accordion title="Live-data connection healthy" icon="circle-check">
+    *This flow fetches live data from your app each time someone opens it, and that connection is working.*
+
+    Nothing to do.
+  </Accordion>
+  <Accordion title="Live-data connection unreachable" icon="triangle-alert">
+    *This flow pulls live data from your app, but WhatsApp can't reach it right now. People may see an error when they open it until the connection is fixed.*
+
+    Anything Meta reported about the failure is listed underneath. Work through these:
+
+    - **Is your bot deployed and running?** A dynamic flow is answered by your live bot, so a project that isn't deployed has nothing to answer with.
+    - **Is your bot's flow handler throwing?** Open [your logs](/guides/logs) and look for errors around the time someone last opened the flow.
+    - **Did the flow change without a deploy?** If you've edited the flow but haven't deployed, the live version and your bot's handler can be out of step. Deploy, then **Sync**.
+    - **Sync again once you've made a change.** The panel only updates on a sync — it won't clear itself.
+  </Accordion>
+  <Accordion title="Fetches live data" icon="circle-help">
+    *This flow fetches live data from your app while someone fills it in. Tap Sync to check that the connection is healthy.*
+
+    This is the default state, and it means nobody has checked yet — not that anything's wrong. Click **Sync** to find out. Checking connection health is one of the [four things Sync does](/guides/flows/testing-and-publishing#sync).
+  </Accordion>
+</AccordionGroup>
+
+## How your bot serves the data
+
+You don't wire any of this up. When Paige builds a dynamic flow, it also writes the part of your bot that answers — and the two are generated together so they agree about what each screen expects.
+
+At runtime it works like a short conversation between WhatsApp and your bot:
+
+<Steps>
+  <Step title="Someone opens the flow">
+    WhatsApp asks your bot which screen to show first and what to put on it. Your bot looks up whatever it needs — today's free slots, the customer's open orders — and hands back the screen with that content.
+  </Step>
+  <Step title="They make a choice">
+    Picking a date or submitting a screen asks your bot again, this time with what they entered. Your bot decides what comes next: a dropdown filled with the slots free on that specific date, a different screen, or a message that nothing's available.
+  </Step>
+  <Step title="They finish">
+    The last screen ends the flow. Your bot writes the booking, the order, or the ticket, and the completed data arrives in the conversation exactly as it does for a static flow.
+  </Step>
+</Steps>
+
+Because the flow and your bot are two halves of one thing, ask for changes to a dynamic flow in the chat rather than editing either half on its own. That's how they stay in step.
+
+## Going live
+
+<Warning>
+  **Take a dynamic flow live through [Deploy](/guides/deploy), or the Publish button in the Flows tab — never through Meta Business Manager.** Deploy wires up the live-data connection as part of publishing. Publishing the same flow by hand in Business Manager skips that step, so Meta's health check fails and the flow won't work.
+</Warning>
+
+Everything else about publishing a dynamic flow is the same as a static one: it's dual-published to Paige Dev for testing, deploy is what puts it on your own number, and edits sit as **Changes pending deploy** until you deploy again. See [Testing and publishing](/guides/flows/testing-and-publishing).
+
+<Note>
+  Preview a dynamic flow with **Try it** just like any other. Because it asks your bot for its content, what you see in the preview is whatever your bot returns at that moment — which makes the preview a genuine test of the live-data connection, not just of the layout.
+</Note>

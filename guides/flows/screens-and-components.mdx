@@ -1,0 +1,406 @@
+---
+title: "Flow screens and components"
+sidebarTitle: "Screens and components"
+description: "How a flow is put together — screens, the Footer that moves between them, conditional rendering, and the full set of 24 components a screen can contain."
+---
+
+You never write flow JSON yourself, but knowing what a screen can hold makes your requests to Paige far more precise. This page is the reference: how screens fit together, then every component that can go on one.
+
+## How a screen works
+
+A flow is an **ordered set of screens** — at most 10. Each screen has an ID, a title, and a single-column stack of components that render top to bottom.
+
+Screens don't advance on their own. The **Footer** — the button pinned to the bottom of the screen — is what moves things along:
+
+- A Footer with a **navigate** action opens another screen in the same flow, optionally handing it values from this one.
+- A Footer with a **complete** action ends the flow and submits everything to your bot. At least one screen in every flow must end this way.
+
+```json
+{
+  "type": "Footer",
+  "label": "Next",
+  "on-click-action": {
+    "name": "navigate",
+    "next": { "type": "screen", "name": "SCREEN_TWO" }
+  }
+}
+```
+
+Navigation is forward-only. There's no need for a back button — WhatsApp provides one.
+
+### Conditional rendering
+
+`If` and `Switch` let one screen show different things to different people. Both render **on the same screen surface** — the branches aren't separate screens, they're alternative contents of the one screen. That has two consequences worth remembering:
+
+- A field name used in one branch counts as a duplicate if it's reused in another branch on that screen. See [Every input on a screen needs its own name](/guides/flows/overview#every-input-on-a-screen-needs-its-own-name).
+- A Footer inside a branch is a real Footer for that render path.
+
+### The Footer rule
+
+**Exactly one Footer per render path.** Not one per screen — one per path a person can actually see.
+
+<AccordionGroup>
+  <Accordion title="A single Footer at the bottom of the screen" icon="check">
+    The ordinary case. One Footer, sitting alongside the other components.
+  </Accordion>
+  <Accordion title="One Footer inside each branch" icon="check">
+    Perfectly valid, and the right way to branch: put a `Switch` on the person's choice as the last thing on the screen, and give each case its own Footer. One case can navigate onward while another completes the flow.
+  </Accordion>
+  <Accordion title="A top-level Footer AND a Footer inside a branch" icon="x">
+    Rejected. That render path would show two buttons. Use one or the other, never both.
+  </Accordion>
+  <Accordion title="A Footer in one branch but not its sibling" icon="x">
+    Rejected. The branch without one is a dead end — the person reaches it and can't go anywhere. Every `If` `then` **and** `else`, every `Switch` case, and the `Switch` `default` if there is one, must each resolve to exactly one Footer.
+  </Accordion>
+  <Accordion title="A screen built around a NavigationList" icon="triangle-alert">
+    This screen has **no Footer at all**. The list rows do the navigating themselves, so a NavigationList must be the only thing on its screen — no Footer, no headings, no inputs. Move anything else to its own screen.
+  </Accordion>
+</AccordionGroup>
+
+## Text
+
+<AccordionGroup>
+  <Accordion title="TextHeading" icon="heading">
+    A bold heading displayed at the top of a screen or section. Use it to label each screen clearly. Max 80 characters.
+
+    ```json
+    { "type": "TextHeading", "text": "Book your appointment" }
+    ```
+  </Accordion>
+  <Accordion title="TextSubheading" icon="heading-2">
+    A smaller heading. Use it to break a longer screen into labelled sections. Max 80 characters.
+
+    ```json
+    { "type": "TextSubheading", "text": "Your details" }
+    ```
+  </Accordion>
+  <Accordion title="TextBody" icon="pilcrow">
+    Regular body text for instructions or descriptions. Set `markdown: true` for bold, italics, lists, and links. Max 4096 characters.
+
+    ```json
+    {
+      "type": "TextBody",
+      "text": "Fill in your details below and we'll confirm your slot.",
+      "markdown": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="TextCaption" icon="text-quote">
+    Small print — a disclaimer, a helper note, or a static label sitting above a value. Also supports `markdown: true`. Max 4096 characters.
+
+    ```json
+    { "type": "TextCaption", "text": "We'll only use this to confirm your booking." }
+    ```
+  </Accordion>
+  <Accordion title="RichText" icon="file-text">
+    Full markdown rendering, including tables. **Accepted, but not recommended** — it currently causes rendering errors in WhatsApp's flow runtime, so Paige is told to use `TextBody` with `markdown: true` instead. Reach for it only when you need something `TextBody` genuinely can't do, such as a markdown table, and expect trouble.
+
+    ```json
+    { "type": "RichText", "text": ["# Terms", "Please read before continuing."] }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Inputs
+
+Each of these registers a field name that appears in the submitted data.
+
+<AccordionGroup>
+  <Accordion title="TextInput" icon="text-cursor-input">
+    A **single-line** text field — names, email addresses, reference numbers. Needs a `name` and a `label` of 20 characters or fewer. Set `input-type` to one of `text`, `number`, `email`, `password`, `passcode`, or `phone` to get the right keyboard and validation. For anything longer than a line, use `TextArea`.
+
+    ```json
+    {
+      "type": "TextInput",
+      "name": "full_name",
+      "label": "Full name",
+      "input-type": "text",
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="TextArea" icon="text-cursor">
+    A multi-line text box for notes, descriptions, and free-form comments. Needs a `name` and a `label` of 20 characters or fewer.
+
+    ```json
+    {
+      "type": "TextArea",
+      "name": "description",
+      "label": "Describe the issue",
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="Dropdown" icon="chevron-down">
+    A select menu with a list of options. Used for service selection, time slots, categories, and similar choices. Label max 20 characters; up to 200 options, or 100 if any option carries an image.
+
+    ```json
+    {
+      "type": "Dropdown",
+      "name": "service",
+      "label": "Select a service",
+      "data-source": [
+        { "id": "web", "title": "Web design" },
+        { "id": "seo", "title": "SEO" }
+      ],
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="RadioButtonsGroup" icon="circle-dot">
+    Pick exactly one, with every option visible at once. Best for a short list where seeing all the choices matters. Max 20 options.
+
+    ```json
+    {
+      "type": "RadioButtonsGroup",
+      "name": "urgency",
+      "label": "How urgent is this?",
+      "data-source": [
+        { "id": "low", "title": "Low" },
+        { "id": "high", "title": "High" }
+      ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="CheckboxGroup" icon="square-check">
+    Pick several from a visible list. Max 20 options — for a longer list, split it across two screens.
+
+    ```json
+    {
+      "type": "CheckboxGroup",
+      "name": "toppings",
+      "label": "Choose your toppings",
+      "data-source": [
+        { "id": "cheese", "title": "Extra cheese" },
+        { "id": "olives", "title": "Olives" }
+      ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="ChipsSelector" icon="tags">
+    Multi-select shown as tappable tags rather than a list — good for interests and preferences. Between 2 and 20 options, and `max-selected-items` caps how many can be chosen.
+
+    ```json
+    {
+      "type": "ChipsSelector",
+      "name": "interests",
+      "label": "What are you interested in?",
+      "max-selected-items": 2,
+      "data-source": [
+        { "id": "lighting", "title": "Lighting" },
+        { "id": "layout", "title": "Room layouts" }
+      ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="OptIn" icon="badge-check">
+    A consent tick box — marketing permission, terms acceptance. Label max 120 characters, and at most 5 per screen.
+
+    ```json
+    {
+      "type": "OptIn",
+      "name": "marketing_consent",
+      "label": "I'd like to receive occasional offers",
+      "required": false
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Dates
+
+<AccordionGroup>
+  <Accordion title="DatePicker" icon="calendar">
+    A native date selector. The chosen date comes back as a `YYYY-MM-DD` string. Label max 40 characters. `min-date`, `max-date`, and `unavailable-dates` let you fence off dates that can't be picked.
+
+    ```json
+    {
+      "type": "DatePicker",
+      "name": "appointment_date",
+      "label": "Preferred date",
+      "required": true
+    }
+    ```
+  </Accordion>
+  <Accordion title="CalendarPicker" icon="calendar-days">
+    A full calendar view. `mode: "single"` picks one date; `mode: "range"` picks a start and an end, and the label becomes a pair. Use it for stays and multi-day bookings where seeing the month matters. Label max 40 characters.
+
+    ```json
+    {
+      "type": "CalendarPicker",
+      "name": "stay_dates",
+      "mode": "range",
+      "label": { "start-date": "Check in", "end-date": "Check out" }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Media and links
+
+<AccordionGroup>
+  <Accordion title="Image" icon="image">
+    A single image on the screen — a product shot, a map, a logo. `src` is either an `https` URL or raw base64 with no `data:image/...;base64,` prefix. Max 3 per screen, and keep each under about 300 KB.
+
+    ```json
+    { "type": "Image", "src": "https://example.com/room.jpg", "alt-text": "Deluxe room" }
+    ```
+  </Accordion>
+  <Accordion title="ImageCarousel" icon="images">
+    Between 1 and 3 swipeable images in one block. Use it to show variants of the same thing without spending three separate screens.
+
+    ```json
+    {
+      "type": "ImageCarousel",
+      "scale-type": "cover",
+      "images": [
+        { "alt-text": "Front view", "src": "https://example.com/front.jpg" },
+        { "alt-text": "Side view", "src": "https://example.com/side.jpg" }
+      ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="EmbeddedLink" icon="link">
+    A tappable line of text that acts like a link. Text max 25 characters, at most 2 per screen, and it needs an action saying what tapping it does.
+
+    ```json
+    {
+      "type": "EmbeddedLink",
+      "text": "Read our terms",
+      "on-click-action": {
+        "name": "navigate",
+        "next": { "type": "screen", "name": "TERMS" }
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="PhotoPicker" icon="camera">
+    Lets someone attach photos from their camera or gallery — proof of damage, a meter reading, a receipt. Needs a `name` and a `label`. Only one per screen, and it can't share a screen with a DocumentPicker.
+
+    ```json
+    {
+      "type": "PhotoPicker",
+      "name": "photos",
+      "label": "Upload photos",
+      "photo-source": "camera_gallery",
+      "min-uploaded-photos": 1,
+      "max-uploaded-photos": 5
+    }
+    ```
+  </Accordion>
+  <Accordion title="DocumentPicker" icon="file-up">
+    The same idea for files — a signed contract, a PDF quote. `allowed-mime-types` restricts what can be attached. Needs a `name` and a `label`, one per screen, and no PhotoPicker alongside it.
+
+    ```json
+    {
+      "type": "DocumentPicker",
+      "name": "contract",
+      "label": "Signed contract",
+      "max-uploaded-documents": 1,
+      "allowed-mime-types": ["application/pdf"]
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Structure and logic
+
+<AccordionGroup>
+  <Accordion title="Form" icon="square-menu">
+    A container that groups a screen's inputs together with the Footer that submits them. It's plumbing rather than something people see — Paige adds it where it's needed.
+
+    ```json
+    {
+      "type": "Form",
+      "name": "booking_form",
+      "children": [ /* inputs and the Footer */ ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="Footer" icon="panel-bottom">
+    The action button at the bottom of a screen. Label max 35 characters; optional captions sit beneath it (`left-caption` and `right-caption` must be used together, or use `center-caption` on its own — never all three, and each caps at 15 characters). The action is `navigate` to move on, `complete` to submit and end the flow, or `data_exchange` in a [dynamic flow](/guides/flows/dynamic-flows).
+
+    ```json
+    {
+      "type": "Footer",
+      "label": "Submit",
+      "on-click-action": {
+        "name": "complete",
+        "payload": { "service": "${form.service}" }
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="NavigationList" icon="list">
+    A list of rich, tappable rows that each open a different screen — a menu of services, a set of plans, a category picker. It must be the **only** thing on its screen, and that screen has no Footer. Between 1 and 20 items, and the per-item limits are tight: title 30 characters, description **20**, metadata 80.
+
+    ```json
+    {
+      "type": "NavigationList",
+      "name": "products",
+      "list-items": [
+        {
+          "id": "home",
+          "main-content": { "title": "Home insurance", "metadata": "Cover for your house" },
+          "on-click-action": {
+            "name": "navigate",
+            "next": { "type": "screen", "name": "HOME_DETAILS" }
+          }
+        }
+      ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="If" icon="git-branch">
+    Shows one set of components when a condition is true and another when it isn't — for example, only asking for a company name if someone said they're a business. The condition has to resolve to a true/false answer.
+
+    ```json
+    {
+      "type": "If",
+      "condition": "${form.customer_type} == 'business'",
+      "then": [ { "type": "TextInput", "name": "company", "label": "Company name" } ],
+      "else": [ { "type": "TextBody", "text": "No company details needed." } ]
+    }
+    ```
+  </Accordion>
+  <Accordion title="Switch" icon="git-fork">
+    The same idea for more than two outcomes: one case per value, plus an optional `default`. This is how a single screen replaces several near-identical ones, and how a screen sends different people to different next screens — each case carries its own Footer.
+
+    ```json
+    {
+      "type": "Switch",
+      "value": "${form.plan}",
+      "cases": {
+        "basic": [ { "type": "TextHeading", "text": "Basic plan" } ],
+        "pro": [ { "type": "TextHeading", "text": "Pro plan" } ],
+        "default": [ { "type": "TextHeading", "text": "Pick a plan" } ]
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Limits at a glance
+
+Paige checks all of these before a flow ever reaches Meta, so hitting one shows up as a clear message rather than a rejection.
+
+| What | Limit |
+|---|---|
+| Screens per flow | 10 |
+| Components per screen | 50 |
+| Whole flow size | 256 KB |
+| Screen title | 80 characters |
+| Heading text (`TextHeading`, `TextSubheading`) | 80 characters |
+| Body text (`TextBody`, `TextCaption`) | 4096 characters |
+| `TextInput` / `TextArea` / `Dropdown` label | 20 characters |
+| `DatePicker` / `CalendarPicker` label | 40 characters |
+| `OptIn` label | 120 characters |
+| `EmbeddedLink` text | 25 characters |
+| Footer label | 35 characters |
+| Footer captions | 15 characters each |
+| Dropdown options | 200, or 100 if any option has an image |
+| RadioButtonsGroup / CheckboxGroup options | 20 |
+| ChipsSelector options | 2–20 |
+| NavigationList item | Title 30, description 20, metadata 80 characters |
+| Per screen | 2 EmbeddedLink, 5 OptIn, 3 Image |
+| Image size | About 300 KB each |

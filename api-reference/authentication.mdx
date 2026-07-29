@@ -32,6 +32,8 @@ Keys live under **Settings → API → API Keys**.
   </Step>
   <Step title="Tick only the scopes it needs">
     Grant the minimum. A key that only sends messages should hold `messages:send` and nothing else. See [Scopes](/api-reference/scopes).
+
+    A **Select all** control sits at the top of the scope list, with a running `3/17 selected` count beside it. Once everything is ticked it flips to **Deselect all**, so one click clears the lot. It's there for the rare full-access key and for starting over — not as the default.
   </Step>
   <Step title="Copy the key immediately">
     The secret is shown **once**, in a dialog, with a copy button. Paige stores only a hash of it — nobody, including Paige support, can show it to you again.
@@ -39,17 +41,28 @@ Keys live under **Settings → API → API Keys**.
 </Steps>
 
 <Warning>
+  Reach for **Select all** and you've made a key that can send WhatsApp messages, rewrite your bot's code, deploy it, and assemble broadcasts. Tick what the integration needs instead.
+</Warning>
+
+### Seeing what a key can do
+
+Each key in the list shows its name, its short prefix, and when it was last used — plus a compact **"3 scopes"** chip rather than a wall of badges, so the rows stay the same height however many permissions a key carries.
+
+Click the chip and it expands into a popover listing every scope on that key, with an **Edit** button that opens the scope picker directly.
+
+<Warning>
   **Never put a key in front-end code, a mobile app, or a public repository.** Anyone holding it can do everything its scopes allow to your project — including sending WhatsApp messages to your customers. Store it as a server-side secret, for example in an environment variable like `PAIGE_API_KEY`.
 </Warning>
 
 ### Rotate and revoke
 
-Each key row has **Rotate** and **Revoke**, plus an option to edit its scopes.
+Each key row has **Rotate** and **Revoke**, plus the scope editor behind the scopes chip.
 
 - **Rotate** issues a fresh secret for the same key and shows it once. Update your integration promptly — the old secret stops working.
 - **Revoke** deletes it. Anything still using it starts getting `401 invalid_api_key` immediately.
+- **Edit scopes** changes what the key may do while leaving the secret alone. The same **Select all** / **Deselect all** control is there. A key must keep at least one scope.
 
-Rotate when a key may have leaked, when someone with access leaves, or just periodically. Editing scopes takes effect straight away — no new key needed.
+Rotate when a key may have leaked, when someone with access leaves, or just periodically. Editing scopes takes effect straight away — no new key needed, and nothing using the key breaks.
 
 ## The key is also the project
 

@@ -12,12 +12,14 @@ description: "Settings → API is the developer corner of a project — API keys
 
 ## What's on the page
 
+The cards appear in this order, top to bottom:
+
 <CardGroup cols={2}>
   <Card title="API Keys" icon="key">
     Create a key, tick the permissions it carries, and rotate, revoke, or edit its scopes later. The secret is shown once — copy it there and then.
   </Card>
   <Card title="Connect an AI agent (MCP)" icon="terminal">
-    The Paige MCP server address, plus copy-ready install snippets for Claude, Claude Desktop, ChatGPT, Codex, and Cursor.
+    The Paige MCP server address, plus per-client install snippets. Copy-ready for **Claude Code**, **Claude Desktop**, and **Cursor**; the **ChatGPT** and **Codex CLI** tabs show the server URL to configure in the client itself.
   </Card>
   <Card title="Connected agents" icon="plug">
     Every agent connected by sign-in, the projects each one covers, and per-project permissions. Add a project, change permissions, or disconnect.
@@ -25,17 +27,37 @@ description: "Settings → API is the developer corner of a project — API keys
   <Card title="Webhooks" icon="webhook">
     Register an HTTPS endpoint and pick the events to deliver to it. The signing secret is shown once when you create it.
   </Card>
-  <Card title="Integration skill" icon="sparkles">
+  <Card title="Build an integration with your agent" icon="sparkles">
     A ready-made brief you hand to a coding agent so it builds against the live spec instead of guessing. Copy it, download it, or copy the OpenAPI URL.
   </Card>
 </CardGroup>
+
+<Note>
+  Only three of the five MCP tabs are copy-paste. ChatGPT's custom-connector form accepts OAuth, No Authentication, or Mixed Authentication only — there's no field for a pasted key — and Codex is configured through its own `mcp_servers` block. Both tabs give you the server URL and a note instead of a snippet. See [Connect an AI agent](/guides/connect-an-agent).
+</Note>
+
+## Build an integration with your agent
+
+The last card is the fastest way to get an integration written for you. It holds a **skill** — a ready-made instruction file that tells an AI coding agent how to build against Paige without guessing endpoint shapes.
+
+Three buttons:
+
+- **Copy skill** — puts the whole skill on your clipboard. Paste it into Claude Code, Codex, Cursor, or whatever you're building with, and ask for the integration you want.
+- **Download .md** — saves it as `build-a-paige-integration.SKILL.md`, so you can commit it alongside your code or drop it into an agent's skills folder.
+- **Copy OpenAPI URL** — copies the link to Paige's live API description.
+
+The skill is served from `GET /v1/skill.md`, so what you copy is always current. It points the agent at the live OpenAPI document — `https://api.paigeme.dev/v1/openapi.json`, public and unauthenticated — as its source of truth, and gives it working recipes for sends, templates, broadcasts, contacts, and webhooks. **Expand** the preview on the card if you want to read it first.
+
+<Tip>
+  The skill doesn't include a key, and it can't make one. Create an API key on the card above first, with only the scopes the integration needs, and give the agent that.
+</Tip>
 
 ## Where to go from here
 
 Each card has a page that explains it properly:
 
-- **Building an integration in your own code?** Start at [The Paige API](/api-reference/introduction), then [Authentication](/api-reference/authentication) and [Scopes](/api-reference/scopes).
-- **Connecting Claude, ChatGPT, Codex, or Cursor?** [Connect an AI agent](/guides/connect-an-agent) covers both the sign-in and paste-a-key routes, and how one connection can cover several projects.
+- **Building an integration in your own code?** Start at [The Paige API](/api-reference/introduction), then [Authentication](/api-reference/authentication), [Scopes](/api-reference/scopes) and [API conventions](/api-reference/conventions).
+- **Connecting Claude, ChatGPT, Codex, or Cursor?** [Connect an AI agent](/guides/connect-an-agent) covers both the sign-in and paste-a-key routes, and how one connection can cover several projects. [What a connected agent can do](/guides/agent-tools) lists every tool it gets.
 - **Want events pushed to you?** [Webhooks](/api-reference/webhooks) covers the payload, signature verification, and retries.
 
 <Warning>

@@ -1,0 +1,164 @@
+---
+title: "Build interactive multi-screen WhatsApp Flows with Paige"
+sidebarTitle: "Overview"
+description: "A WhatsApp Flow is a multi-screen form that opens inside the chat. Learn when to reach for one, how to ask Paige to build it, and how the submitted data reaches your bot."
+---
+
+import { PageDemo } from "/snippets/page-demo.jsx"
+
+A **flow** collects structured information from someone inside WhatsApp — without sending them to a website or asking them to reply to a string of questions. It opens as a sequence of screens with inputs, dropdowns, date pickers, and selection controls. When the person submits the last screen, everything they entered arrives back at your bot as a single message.
+
+Flows suit appointment booking, lead capture, surveys, sign-ups, support intake, and anything else where the same set of details gets collected every time.
+
+<PageDemo src="/assets/videos/flows-builder.mp4" poster="/assets/videos/flows-builder.poster.jpg" />
+
+## When to use a flow instead of plain messages
+
+A flow buys you structure and costs you flexibility. That trade is worth making when the answers need to be specific.
+
+<Columns cols={2}>
+  <Card title="Use a flow" icon="list-checks">
+    - You need several related details in one go — a name, a date, and a choice.
+    - The answer must be a valid email, a real date, or one of a fixed set of options.
+    - Asking the same thing as five separate messages would feel like an interrogation.
+    - You want the result clean enough to write straight into a table.
+  </Card>
+  <Card title="Use plain messages" icon="message-square">
+    - You need one answer, not five.
+    - The question is open-ended and you can't predict the reply.
+    - Two or three tappable buttons already cover the choice.
+    - The conversation is support or advice rather than data collection.
+  </Card>
+</Columns>
+
+<Info>
+  For the thinking behind *when* structure helps and how to order the questions, see [Thinking in flows](/learn/thinking-in-flows). For what a flow is at a platform level, see [WhatsApp Flows](/concepts/flows).
+</Info>
+
+## Static and dynamic flows
+
+Most flows are **static**: every screen, every option, and every piece of copy is fixed when the flow is built. A booking form, a signup form, a survey, and a dropdown of set options are all static — the values change, but what's on screen doesn't.
+
+A **dynamic** flow is different: it asks your bot for fresh information while someone is filling it in — the slots actually free on the day they picked, the current status of their order, the products in your database right now. Paige builds a static flow unless your request genuinely needs live data, and when it does choose dynamic it tells you why in one line. See [Dynamic flows](/guides/flows/dynamic-flows).
+
+## Flow statuses and what each one allows
+
+Every flow carries a status, shown as a coloured tag in the **Flows** tab and again in the detail pane.
+
+| Status | What it means | What you can do |
+|---|---|---|
+| **LOCAL** | The flow exists in your project and on the shared Paige Dev number, but isn't on your own WhatsApp number yet. Every flow starts here. | **Try it**, **Delete**, **View JSON**. No **Publish** and no **Sync** — there's nothing on your number to publish or sync with. |
+| **DRAFT** | The flow is on your WhatsApp number but can't be sent to customers yet. | **Publish**, **Delete**, **Sync**, **Try it**, **View JSON**. |
+| **PUBLISHED** | The flow is live and your bot can send it. | **Deprecate**, **Sync**, **Try it**, **View JSON**. No **Delete** — see [Delete a flow](/guides/flows/testing-and-publishing#delete-a-flow). |
+| **DEPRECATED** | The flow has been retired and can no longer be sent. | **Sync**, **Try it**, **View JSON**. |
+| **BLOCKED** / **THROTTLED** | Set by Meta, not by you, when it sees a problem with the flow's health or usage — for example repeated errors when customers open it. These appear after a **Sync** pulls the current status. | Depends on what Meta has restricted. Fix the underlying problem, then **Sync** again. |
+
+<Note>
+  Going from LOCAL to live is the job of **Deploy**, not the **Publish** button. See [Testing and publishing](/guides/flows/testing-and-publishing).
+</Note>
+
+## Build a flow by asking for one
+
+You don't build flows by hand. Describe what you want in the chat sidebar and Paige generates the flow, checks it against Meta's rules, and saves it to your project as `flows/{name}.json`.
+
+Be specific about the screens, the kind of input on each one, and any branching. The more precisely you describe the shape, the less you'll go back and forth.
+
+Good prompts look like this:
+
+> "Create a 3-screen appointment booking flow. The first screen asks the user to select a service from a dropdown. The second screen has a date picker and a time slot dropdown. The third screen shows a summary and a confirm button."
+
+> "Build a lead capture flow with two screens. The first screen collects the user's name and email. The second screen asks how they heard about us using radio buttons, then has a submit button."
+
+> "Create a customer support intake flow that collects a subject, a description (text input), and an urgency level (dropdown: Low, Medium, High)."
+
+Paige picks the right component for each thing you describe. If you're not sure what to ask for, [Screens and components](/guides/flows/screens-and-components) lists everything a flow screen can contain.
+
+### Update a flow you already have
+
+Ask for the change in the same way — name the flow and say what should be different.
+
+> "Update the booking flow: replace the time slot dropdown with a list of radio buttons."
+
+> "Fix the appointment flow — add a confirmation screen at the end that shows the selected date and service before submitting."
+
+Paige reads the current flow, applies just that change, keeps your screen IDs and field names stable, and re-checks the result. Editing a flow that's already live is safe and normal — you don't need to deprecate it or make a copy first. See [Edit a flow that's already live](/guides/flows/testing-and-publishing#edit-a-flow-thats-already-live).
+
+<Warning>
+  Never edit a flow's JSON file by hand. Paige's flow builder enforces Meta's schema and a long list of validation rules; a hand-edited file will usually fail to upload.
+</Warning>
+
+## Design rules that shape how you prompt
+
+Paige enforces these for you. They're worth knowing because they change what you should ask for.
+
+### Every input on a screen needs its own name
+
+Each field on a screen — a text input, a dropdown, a date picker, a checkbox group, a file picker — is stored under a `name`, and no two fields on the same screen may share one. Meta rejects a flow that reuses a name, often with an unhelpful error.
+
+The catch is branching. `If` and `Switch` branches all render on the **same screen surface**, so a name used in one branch counts as a duplicate if it's reused in another branch on that screen. Paige catches this before the flow is uploaded and says so plainly:
+
+```
+Screen "PIZZA_BASE": duplicate field name "size" — two input components share this "name" on one
+screen (If/Switch then/else/cases branches count as the same screen). Meta rejects this; give each
+field a unique name or split into separate screens.
+```
+
+When two branches need the "same" logical field with different options — a `size` dropdown that offers different sizes depending on the base — you have three ways out:
+
+- Keep **one** input on the screen and vary its options outside the branch.
+- Give each branch's input a distinct name (`size_small_base`, `size_large_base`) and read both in your bot.
+- Split the choices into separate screens so each name lives on its own screen.
+
+### Keep flows small enough to generate in one pass
+
+Paige writes the whole flow in one go, so a very large flow can run past the model's output limit. When that happens it stops with a specific message rather than quietly handing you a half-finished flow:
+
+> Flow generation exceeded the model output-token limit (response truncated at maxTokens) — the flow is too large to emit in one pass. Simplify or split the screens, or raise modelConfig flows.maxTokens.
+
+If you see it:
+
+- **Reduce screen count.** Combine screens that collect related fields, or drop optional steps.
+- **Use `Switch` instead of duplicating screens.** When several screens share the same shape with different copy, one `Switch`-driven screen replaces all of them.
+- **Split into multiple flows.** Long onboarding journeys are usually clearer as two or three smaller flows your bot sends in sequence.
+
+<Note>
+  A flow can have at most **10 screens**, so a journey longer than that is two flows regardless.
+</Note>
+
+## Receive flow submissions in your bot
+
+When someone completes and submits a flow, your bot receives an `interactive` message carrying `nfm_reply`. The submitted values sit inside it, keyed by the field names from the flow.
+
+```javascript
+if (incoming.type === "interactive" && incoming.interactive?.nfm_reply) {
+  const flowData = JSON.parse(incoming.interactive.nfm_reply.response_json);
+
+  // Access submitted fields by the name you defined in the flow
+  const fullName = flowData.full_name;
+  const service = flowData.service;
+  const appointmentDate = flowData.appointment_date;
+
+  // Save to your database and send a confirmation
+  await db.insertRow("bookings", { name: fullName, service, date: appointmentDate, phone: from });
+  await sendText(conversationId, from, `Thanks ${fullName}, your ${service} appointment on ${appointmentDate} is confirmed.`);
+}
+```
+
+You rarely write this yourself — when Paige builds a flow it also wires up the handler that receives it. It's here so you can recognise the shape when you read your bot's code.
+
+## Where to next
+
+<CardGroup cols={2}>
+  <Card title="Screens and components" icon="layout-list" href="/guides/flows/screens-and-components">
+    The screen model, the Footer rule, and every component a flow screen can contain.
+  </Card>
+  <Card title="Testing and publishing" icon="rocket" href="/guides/flows/testing-and-publishing">
+    Preview it, test it on a real phone, publish it, and push changes to a live flow.
+  </Card>
+  <Card title="Dynamic flows" icon="zap" href="/guides/flows/dynamic-flows">
+    Flows that fetch live data from your bot while someone is filling them in.
+  </Card>
+  <Card title="Thinking in flows" icon="lightbulb" href="/learn/thinking-in-flows">
+    How to decide what the conversation should look like before you build it.
+  </Card>
+</CardGroup>

@@ -8,7 +8,7 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ## July 2026
 
-Two releases. The larger one reorganised where your bot's building blocks live, added Slack, and rebuilt onboarding.
+Three releases. The middle one reorganised where your bot's building blocks live, added Slack, and rebuilt onboarding. The last opened Paige up to the outside world with a public API.
 
 ### New features
 
@@ -22,6 +22,11 @@ Two releases. The larger one reorganised where your bot's building blocks live, 
 - **Send a broadcast in batches.** Release a big audience in waves instead of all at once: send a first batch now, watch how it lands, then release the rest yourself — all tracked as one broadcast. See [Sending in batches](/guides/broadcasts#sending-in-batches-waves).
 - **One AI agent connection, many projects.** Connect Claude, ChatGPT, or Codex once and let it work across several of your projects, each with its own permissions and its own default. You pick the projects on the consent screen, and you can **add or remove projects later without reconnecting the agent** from **Settings → API → Connected agents**. Workspace projects can now be connected too — by an owner or admin of that workspace. See [Connect an AI agent](/guides/connect-an-agent).
 - **Read your flows over the API.** `GET /v1/flows` lists a project's WhatsApp Flows and `GET /v1/flows/{name}` returns one with its full JSON definition, both under the **Read flows** permission. Until now that permission could be granted but did nothing — the API could create and update a flow, but never read one back. See [Scopes](/api-reference/scopes).
+- **A public API.** Paige now has a documented REST API at `/v1` — send messages, read conversations, edit files, deploy, manage flows and assemble broadcasts from your own systems. Create a key under **Settings → API**, choose exactly which permissions it carries, and browse every endpoint in the new [API reference](/api-reference/introduction).
+- **Webhooks, managed from the dashboard.** Have Paige call your system when something happens — no code required to set it up. Create, edit, and delete webhooks under **Settings → API**, pick the events you care about (or name your own), and copy the signing secret, which is shown once and never again. See [Webhooks](/api-reference/webhooks).
+- **Dynamic flows.** A flow can now fetch live data while a customer is filling it in — the times that are genuinely free that day, their current order status, the products actually in stock. Paige stays static-first and only builds a dynamic flow when your request truly needs live data. A **Dynamic** badge and a live-data connection panel tell you which is which and whether the connection is healthy. See [Dynamic flows](/guides/flows/dynamic-flows).
+- **Schedule a broadcast wave for later.** When a broadcast is holding recipients back, you can now set the next wave to release at a time you choose instead of only sending it by hand. Pick how many and when, and Paige releases them within about 15 minutes of that time. See [Sending in batches](/guides/broadcasts).
+- **Auto-retarget quality-limit failures.** Switch this on when you create a broadcast and Paige automatically tries again, about a day later, for the recipients WhatsApp blocked on quality or per-user messaging limits — the failures most likely to succeed on a second attempt. Off by default, once only, and cancellable. See [Auto-retargeting quality-limit failures](/guides/broadcasts).
 
 ### Improvements
 
@@ -30,6 +35,8 @@ Two releases. The larger one reorganised where your bot's building blocks live, 
 - **Interactive messages can carry a media header and a footer.** Buttons and list menus can now open with an image and close with a line of small print.
 - **"Cron Jobs" is now "Scheduled Tasks"** everywhere — the same feature, named for what it does. See [Scheduled Tasks](/guides/scheduled-tasks).
 - **Edit a database cell by double-clicking it** — or tapping, on a phone. See [the Database tab](/guides/database-tab).
+- **Pick from the tags you already use** when you build a segment, with a contact count beside each one, and a warning when a tag you type matches nobody. See [Segments](/guides/broadcasts/segments).
+- **A clearer rule about editing database rows.** A table needs a primary key before its rows can be edited or deleted; older tables without one now offer an **Add primary key** button instead of failing quietly. See [the Database tab](/guides/database-tab).
 - **The flow preview refreshes itself** after a flow is republished, so you're never looking at a stale copy.
 - **Broadcasts appear in your per-agent credit breakdown** in Settings → Usage.
 - **A clearer payment-failure warning**, with the 7-day deadline stated plainly and one email per failure rather than one per retry.
@@ -75,7 +82,7 @@ A staging-to-production release focused on smoother onboarding, trial-aware feat
 - **Open paid features during the trial.** The 14-day free trial now opens the full product — Conversations, Broadcasts, Deploy, and bot runtime on your connected WhatsApp number. Gating only kicks in after the trial expires. Connecting WhatsApp through embedded signup is never gated. See [Free trial](/guides/billing#free-trial).
 - **Help Agent from the header.** A new **?** button next to Feedback in the header opens the chat sidebar straight to the free [Help Agent](/agents/help-agent), making in-app guidance a first-class entry point.
 - **See Docs in the user menu.** The account dropdown now links to the full documentation site so you can pop open the docs without leaving your current view.
-- **URL buttons render in the in-app preview.** Tap a `cta_url` button in the phone preview to open the destination inside the phone frame, with **Close** and **Open in new tab** controls. If a site blocks iframing, the preview shows an error state and keeps **Open in new tab** available. See [URL buttons in the in-app preview](/guides/flows-builder#url-buttons-in-the-in-app-preview).
+- **URL buttons render in the in-app preview.** Tap a `cta_url` button in the phone preview to open the destination inside the phone frame, with **Close** and **Open in new tab** controls. If a site blocks iframing, the preview shows an error state and keeps **Open in new tab** available. See [Tap a URL button](/guides/preview-tab#tap-a-url-button).
 - **Try-it preview before you connect WhatsApp.** The **Try it**, **Inspect**, and **Debug** controls in the Flows tab now work for projects that haven't connected their own WhatsApp number yet. Paige falls back to the Paige Dev copy of the flow so you can preview straight away.
 - **Try a test template on your Paige Dev tester.** The Paige Dev card has a new **Try now** button that delivers a pre-built Meta template — with an embedded flow-trigger button — to your linked phone in one click. Rate-limited to 5 successful sends per linked number per rolling 24 hours. See [Try a test template](/guides/testing#try-a-test-template-on-your-linked-phone).
 - **Faster signup with a warm Supabase project pool.** Paige now keeps a small pool of pre-provisioned project backends ready, so new signups land in a fully working project instantly instead of waiting for provisioning.

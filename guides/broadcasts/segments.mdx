@@ -25,6 +25,18 @@ Click **New Segment** and combine any of these. They narrow together — a conta
   <Accordion title="Tags" icon="tag">
     Match anyone carrying **any** of the tags you list — `vip` or `newsletter`, not `vip` and `newsletter`. Leave it empty to match everyone.
 
+    You don't have to remember your tags. Below the box is a list of **every tag your contacts already have**, each with how many people carry it — `vip`, *42 contacts*. Type to filter it, click a tag to add it. That count is the point of the list: you can see a tag is worth targeting before you build the segment around it.
+
+    You can still type a tag by hand and click **Add**, which matters because your bot can create tags that don't exist yet when you're building the segment.
+
+    <Warning>
+      **Tags are case-sensitive.** `VIP` and `vip` are two different tags, and matching is exact — so a segment built on `VIP` will not pick up contacts tagged `vip`.
+    </Warning>
+
+    If you type something no contact has, Paige tells you rather than letting you build a segment that silently reaches nobody — type `VIPs` and you get: *No contact has "VIPs" — it will match **0 contacts** and won't tag anyone*. If the only difference is capitalisation, it adds a **Did you mean "vip"?** link that swaps in the tag that actually exists.
+
+    A tag you've selected that nobody currently carries stays in the list as an **amber chip** with a warning icon, so an unmatched tag is visible at a glance instead of quietly costing you an audience.
+
     Tags come from your bot (it can tag a contact as it learns things about them), from the tags column of a [CSV import](/guides/contacts-import), or from the "Tags for all" box when importing.
   </Accordion>
   <Accordion title="Search by name or number" icon="search">

@@ -40,12 +40,17 @@ Click **New Broadcast** and you'll go through six steps.
     A contact field is what turns one template into a personal message. The preview below shows how it'll read.
   </Step>
   <Step title="Audience">
-    Either pick a [saved segment](/guides/broadcasts/segments), or build a one-off filter here from tags. **Opted in only** is on by default — leave it that way.
+    Either pick a [saved segment](/guides/broadcasts/segments), or build a one-off filter here from tags. The tag box lists the tags your contacts already carry with a count beside each, so you can see what you're about to reach before you pick — see [Tags](/guides/broadcasts/segments#building-one). **Opted in only** is on by default — leave it that way.
 
     A live count tells you how many people you're about to reach. If it says zero, you can't continue.
   </Step>
   <Step title="Schedule">
-    Pick a date and time, or save it as a draft to come back to. You can also switch on **Send in batches (waves)** here and set how many to **send now** — Paige holds the rest back for you to release later (see [Sending in batches](#sending-in-batches-waves)). See below — this step matters more than it looks.
+    Pick a date and time, or save it as a draft to come back to. Two switches also live here:
+
+    - **Send in batches (waves)** — set how many to **send now** and Paige holds the rest back for you to release later (see [Sending in batches](#sending-in-batches-waves)).
+    - **Auto-retarget quality-limit failures** — off by default. Turn it on and Paige automatically tries the recipients WhatsApp quality-blocked again about 24 hours later (see [Auto-retargeting quality-limit failures](#auto-retargeting-quality-limit-failures)).
+
+    See below — this step matters more than it looks.
   </Step>
   <Step title="Test Send">
     Send the real template to up to three numbers first. It doesn't touch your audience or your daily cap, and it's the only way to see the thing exactly as a customer will. Worth the thirty seconds.
@@ -70,7 +75,35 @@ You send a broadcast one of two ways:
 
 If you have a large audience and want to test the waters first, switch on **Send in batches (waves)** on the wizard's Schedule step and choose how many to **send now**. When the broadcast launches, Paige **freezes the whole audience** and sends only that first batch — everyone else is put on hold. Your counters still cover the full audience on the one broadcast, so you never have to stitch several broadcasts together.
 
-The broadcast then shows as **Partially sent** rather than jumping to Completed. Open it and you'll see how many are **remaining**, with a **Send next wave** control: type a number and click **Send … more**, or click **Send all remaining** to release everyone left. Release as many waves as you like, whenever you like — each time, anyone who has **opted out** since you launched is skipped automatically. The broadcast only marks itself **Completed** once the last held recipient has been released and finished sending.
+The broadcast then shows as **Partially sent** rather than jumping to Completed. Open it and a panel tells you how many are still held — **200 recipients remaining**, say — with a **Send now** / **Schedule** toggle for releasing them.
+
+Release as many waves as you like, whenever you like. Each time, anyone who has **opted out** since you launched is skipped automatically. The broadcast only marks itself **Completed** once the last held recipient has been released and finished sending.
+
+### Releasing a wave now
+
+Leave the toggle on **Send now**, then either:
+
+- Type how many to release and click the send button, which counts back what you typed — **Send 50 more**.
+- Or click **Send all remaining** to release everyone left.
+
+### Scheduling a wave for later
+
+Switch the toggle to **Schedule** and you get two fields instead:
+
+- **How many** — leave it blank to schedule everyone remaining (the placeholder reads `All`), or type a number.
+- **Send at (your local time)** — the date and time to release it. It has to be in the future.
+
+The submit button counts back what you typed — **Schedule 50** — or reads **Schedule all remaining** when you left the count blank. Paige notes underneath that it *fires within ~15 minutes of the chosen time*: the release runs on a fifteen-minute cycle, so treat the time you pick as "no earlier than", not to the second.
+
+Once scheduled, the controls are replaced by a banner — **50 scheduled for 14 Aug 2026, 09:00**, or **All remaining scheduled for** that time — with the note that it *releases automatically around this time (within ~15 minutes)* and that opted-out contacts are skipped at release.
+
+To change a pending schedule, just schedule again: setting a new count or time overwrites the previous one. There's no separate edit control.
+
+<Warning>
+  **Cancel schedule** is not **Cancel**. **Cancel schedule** only clears the timer — the held recipients stay held, and you can still release them by hand or schedule them again. **Cancel** stops the whole broadcast and can't be undone. See [Cancelling and retrying](#cancelling-and-retrying).
+</Warning>
+
+Scheduling a wave is only offered while a broadcast is **Sending** or **Partially sent** and still has recipients held back. It isn't available on self-hosted projects.
 
 <Note>
   The audience is fixed at launch. Contacts who join it *after* you launch aren't added to later waves — to reach new people, create a fresh broadcast.
@@ -82,7 +115,7 @@ Batched sending is available on standard Paige-hosted projects. Projects running
 
 Paige doesn't charge for broadcasts, and they don't use your credits. **Meta bills your connected number directly** for the messages, and the estimate on the Confirm step is a rough guide rather than a quote.
 
-The one limit is a **cap of 1,000 messages per project per day**, resetting at midnight UTC.
+The one limit is a **daily message cap on each project**, which starts at **1,000 messages a day** and resets at midnight UTC. It's a per-project setting rather than a fixed platform ceiling, so a project can be raised above the default. There's no self-service control for it — ask the [Help Agent](/agents/help-agent) if 1,000 a day isn't enough for you.
 
 <Note>
   If a broadcast hits the cap mid-send it quietly pauses and picks up where it left off the next day. It'll sit showing **Sending** with a stuck Queued count, and nothing tells you why — so if a large broadcast seems frozen, the cap is the first thing to suspect.
@@ -99,11 +132,13 @@ That second one is worth understanding. Paige doesn't know whether an imported n
 
 ## Watching it go out
 
-Open a broadcast to see live counters — **Total, Queued, Sent, Delivered, Read, Failed, Canceled**, plus **Held** when you've sent in batches — updating as it goes.
+Open a broadcast to see live counters updating as it goes. **Total** is the size of the whole audience, and next to it sit six status tiles: **Queued**, **Sent**, **Delivered**, **Read**, **Failed**, and **Canceled**.
 
 <Note>
-  These are buckets, not totals. Each person sits in exactly one, and they move along: Sent → Delivered → Read. So a broadcast everyone has read shows **Sent: 0**. That's success, not failure.
+  Those six are buckets, not totals. Each person sits in exactly one, and they move along: Sent → Delivered → Read. So a broadcast everyone has read shows **Sent: 0**. That's success, not failure.
 </Note>
+
+There's no "Held" tile. If you [sent in batches](#sending-in-batches-waves), the recipients still waiting are shown in the wave panel below the tiles — **200 recipients remaining** — and that's the number to look for, not one of the six.
 
 Below that, every recipient is listed with their status. Failures say why in plain language:
 
@@ -111,16 +146,46 @@ Below that, every recipient is listed with their status. Failures say why in pla
 |---|---|
 | **Not on WhatsApp** | The number isn't reachable. Won't be tried again. |
 | **Rate limited — can retry** | WhatsApp throttled you. Worth retrying. |
-| **Blocked by quality limits** | Meta has restricted your number's sending, usually after too many blocks or reports. |
+| **Blocked by quality limits** | Meta has restricted your number's sending, usually after too many blocks or reports, or you've hit a per-user messaging limit. This is the one bucket [auto-retargeting](#auto-retargeting-quality-limit-failures) can retry for you. |
 | **Template rejected** | Meta withdrew approval for the template. |
 | **Account paused** | Meta has paused your WhatsApp account. |
 | **Delivery failed** | Something else. Copy the raw reason for the detail. |
 
 ## Cancelling and retrying
 
-**Cancel** stops a scheduled, sending, or partially-sent broadcast. Anything already sent has left and can't be recalled — cancelling only stops what's still queued, including anyone held back for a later wave. It can't be undone.
+**Cancel** appears on a broadcast that is **Scheduled** or **Sending**, and stops it. Anything already sent has left and can't be recalled — cancelling only stops what's still queued, including anyone held back for a later wave. It can't be undone.
+
+<Note>
+  Don't confuse this with **Cancel schedule** in the wave panel, which only clears a pending wave release and leaves the broadcast alone. See [Scheduling a wave for later](#scheduling-a-wave-for-later).
+</Note>
 
 **Retry failures** appears once a broadcast has finished with failures. It re-queues only the ones worth retrying — a rate-limited send, say — and skips the permanent ones like *Not on WhatsApp* or *Template rejected*, since retrying those would just fail again.
+
+## Auto-retargeting quality-limit failures
+
+WhatsApp sometimes blocks part of a broadcast because of your number's quality rating, or because a particular person has already received too many messages from you. Those recipients show as **Blocked by quality limits**, and they're usually reachable again once a day has passed.
+
+**Auto-retarget quality-limit failures** on the wizard's Schedule step does that for you. It's **off by default**. The switch explains itself in-product:
+
+> If WhatsApp blocks some recipients for quality or per-user messaging limits, automatically try them again about 24 hours later. You can cancel the retry any time before it sends.
+
+Here's what actually happens when it's on:
+
+- About **24 hours** after the original broadcast finishes, Paige creates a follow-up broadcast aimed at exactly the recipients WhatsApp quality-blocked.
+- It uses the same template and the same variable settings as the original.
+- The follow-up appears in your broadcast list under the original's name with **(auto-retarget)** on the end — *Winter sale (auto-retarget)* — in **Scheduled** status. You can open it, check it, and **Cancel** it like any other scheduled broadcast before it sends.
+
+<Note>
+  It retries **only** the quality-limit bucket. Numbers that aren't on WhatsApp, a rejected template, or any other failure are never retargeted — retrying those would just fail the same way. For rate-limited sends, use **Retry failures** instead.
+</Note>
+
+Three limits worth knowing:
+
+- **It happens once.** A retarget is never itself retargeted, so you can't end up in a retry loop.
+- **It's capped at 500 contacts.** If more than 500 recipients were quality-blocked, the follow-up covers the first 500.
+- **Paige waits before it looks.** WhatsApp reports quality failures asynchronously — a message that looked sent can flip to failed minutes later — so Paige leaves about **2 hours** after the original completes before working out who to retarget. The follow-up still sends around 24 hours after the original finished.
+
+The switch is hidden on self-hosted projects, which manage their own recipient list and so can't be retargeted from Paige.
 
 ## Opt-outs and STOP
 

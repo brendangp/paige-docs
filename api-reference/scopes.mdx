@@ -15,9 +15,9 @@ Every endpoint states the scope it needs, both in its description and in the `x-
     | --- | --- |
     | `messages:send` | Send WhatsApp session and template messages. |
     | `conversations:read` | List conversations and read their messages and delivery status. |
-    | `conversations:write` | Change a conversation's state (for example handover, open, closed). |
+    | `conversations:write` | Change a conversation's state — `handover`, `unstructured`, `awaiting_form`, `done`, or any state your own bot uses. |
     | `contacts:read` | Read contact records. |
-    | `contacts:write` | Create or update a contact name and tags. |
+    | `contacts:write` | Update a contact's name, tags, and custom attributes. |
   </Tab>
   <Tab title="Templates & broadcasts">
     | Scope | Lets a key |
@@ -25,7 +25,7 @@ Every endpoint states the scope it needs, both in its description and in the `x-
     | `templates:read` | List message templates and their approval status. |
     | `templates:manage` | Create and delete WhatsApp message templates. |
     | `broadcasts:read` | View broadcast campaigns and their status. |
-    | `broadcasts:manage` | Create, schedule, and send broadcast campaigns. |
+    | `broadcasts:manage` | Create and assemble broadcast campaigns, and define the segments they target. **It never sends one** — every campaign is held for human approval. |
   </Tab>
   <Tab title="Code & flows">
     | Scope | Lets a key |
@@ -46,6 +46,10 @@ Every endpoint states the scope it needs, both in its description and in the `x-
 </Tabs>
 
 That's 17 scopes in total.
+
+<Warning>
+  **`broadcasts:manage` is not a licence to send.** `POST /v1/broadcasts` always lands the campaign in `pending_approval`, whatever scopes the credential holds. There is no send, launch, approve, or retry endpoint — a human releases the campaign from the **Broadcasts** tab in the dashboard. Don't design a flow that expects the API to send; it never will. See [Broadcasts](/guides/broadcasts).
+</Warning>
 
 ## When a scope is missing
 
@@ -80,6 +84,6 @@ with HTTP **403**. Fix it by editing the key's scopes in **Settings → API** �
 | --- | --- |
 | Order notifications out of your own system | `messages:send`, plus `templates:read` if you look templates up |
 | A shared inbox or CRM sync | `conversations:read`, `contacts:read`, `contacts:write` |
-| A marketing campaign tool | `broadcasts:manage`, `broadcasts:read`, `templates:read` |
+| A marketing campaign tool (a human still approves each send) | `broadcasts:manage`, `broadcasts:read`, `templates:read` |
 | An AI agent that edits your bot | `code:read`, `code:write`, `flows:read`, `flows:write` |
 | An event consumer | `webhooks:manage` plus each `events:*` you subscribe to |

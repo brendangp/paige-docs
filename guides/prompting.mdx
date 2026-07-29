@@ -40,7 +40,7 @@ The Code Agent has close to forty built-in tools it uses behind the scenes. You 
     Create and change tables, and query, insert, update, or delete rows — so it can set up storage before writing the code that uses it.
   </Card>
   <Card title="Flows" icon="workflow">
-    Build, update, validate, publish, and upload [WhatsApp Flows](/guides/flows-builder), and embed images into flow screens.
+    Build, update, validate, publish, and upload [WhatsApp Flows](/guides/flows/overview), and embed images into flow screens.
   </Card>
   <Card title="Scheduled tasks" icon="clock">
     Register, list, and remove [scheduled tasks](/guides/scheduled-tasks) that run on a repeating schedule.
@@ -61,7 +61,7 @@ This is the distinction most worth understanding, because it changes how you phr
 
 For most changes — a new message, a menu option, a branch of logic, a database write — the agent **edits your bot code directly**.
 
-For collecting several fields of structured information in one go, it builds a **[WhatsApp Flow](/guides/flows-builder)** instead. A Flow is the native WhatsApp form UI: a screen with real inputs rather than a back-and-forth of questions. When the agent decides a Flow is the right tool, it hands the job to Paige's dedicated flow builder, which generates the Flow, validates it against Meta's rules, and drafts it — the agent then wires it into your bot.
+For collecting several fields of structured information in one go, it builds a **[WhatsApp Flow](/guides/flows/overview)** instead. A Flow is the native WhatsApp form UI: a screen with real inputs rather than a back-and-forth of questions. When the agent decides a Flow is the right tool, it hands the job to Paige's dedicated flow builder, which generates the Flow, validates it against Meta's rules, and drafts it — the agent then wires it into your bot.
 
 <Note>
   The agent can't hand-edit a Flow's definition the way it edits ordinary code — Flows always go through the flow builder so they stay valid against Meta's requirements. This is invisible to you; it just means "change the booking form" and "change the welcome message" take slightly different routes under the hood.

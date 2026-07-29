@@ -1,0 +1,145 @@
+---
+title: "What a connected agent can do"
+sidebarTitle: "Agent tools"
+description: "The sixteen tools Paige's MCP server gives a connected AI agent — what each one does, the permission it needs, and the one thing it can never do: send a broadcast."
+---
+
+Once you've [connected an AI agent](/guides/connect-an-agent), it gets a fixed set of **tools** — the specific actions it's allowed to take in Paige. This page lists all sixteen.
+
+Two things shape what an agent can actually do with them:
+
+- **Permissions.** Every tool except one needs a scope. If the credential doesn't carry that scope for the project it's working on, the tool fails with `insufficient_scope`. See [Scopes](/api-reference/scopes).
+- **The project.** One connection can cover several projects, so the agent names the project on every tool that changes something. Read-only tools fall back to your default project.
+
+<Note>
+  These tools are a thin wrapper over the [Paige API](/api-reference/introduction). Anything an agent can do here, you can do yourself with an HTTP call — and every limit, permission check, rate limit and guardrail is enforced in the same place for both.
+</Note>
+
+## Projects
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `list_projects` | Lists every project this connection may act on, with each one's name, its permissions **in that project**, and which is the default. | none |
+
+It's the first thing a well-behaved agent calls, and the only tool that needs no permission at all. It keeps working even when the default project is paused, so an agent can always find its way back to a project that works.
+
+<Tip>
+  If an agent says it can't reach a project you've just added, ask it to look up your projects again. Adding a project takes effect immediately and never requires reconnecting.
+</Tip>
+
+## Conversations and messaging
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `list_conversations` | Lists the project's WhatsApp conversations, so the agent can answer questions about who's been in touch and about what. | `conversations:read` |
+| `send_message` | Sends a free-form WhatsApp message from the project's number. Only works inside WhatsApp's 24-hour window — outside it, the send fails with `outside_24h_window`. | `messages:send` |
+
+<Warning>
+  `send_message` sends a real WhatsApp message to a real person the moment the agent calls it. There is no draft step and no undo. Grant `messages:send` only to agents you want messaging your customers, and say who you mean rather than leaving it to guess.
+</Warning>
+
+## Code and deploying
+
+This is the group that lets an agent change your bot.
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `list_files` | Lists the files that make up the bot's code. | `code:read` |
+| `read_file` | Reads one file's contents. | `code:read` |
+| `edit_file` | Makes an exact, known edit to one file — replacing its contents, or swapping one specific string for another. | `code:write` |
+| `build_code` | Takes a plain-English description of a change and hands it to **Paige's own Code Agent**, which works out the edit and writes it. Costs credits. | `code:write` |
+| `deploy` | Promotes the current code to production, so the changes go live on your WhatsApp number. | `code:write` |
+
+### `build_code` versus `edit_file`
+
+Both write code. They're for different situations:
+
+<CardGroup cols={2}>
+  <Card title="build_code" icon="sparkles">
+    **When you want Paige to work out the change.** "Add an opening-hours reply", "make the booking flow ask for a phone number". It runs Paige's [Code Agent](/agents/code-agent) — the same one in your chat sidebar, with its knowledge of the project scaffold, your connectors, and the platform's rules.
+  </Card>
+  <Card title="edit_file" icon="pencil">
+    **When you already know the exact edit.** A one-line fix, a copy change, a value you want swapped. It's deterministic, fast, and doesn't cost credits.
+  </Card>
+</CardGroup>
+
+<Warning>
+  **`build_code` uses credits.** It runs a real AI build, so it draws down the project's balance like any other Code Agent build. When the project is out of credits it fails with `insufficient_credits` rather than half-building something. `edit_file` doesn't cost credits.
+</Warning>
+
+The reason `build_code` exists is quality. Without it, an outside agent writes Paige code from the outside, guessing at conventions it's never seen. With it, the outside agent describes the outcome and Paige's own agent writes the code — the same house standard you'd get from the chat sidebar.
+
+<Note>
+  Some files are off-limits to `edit_file` — the platform wiring that keeps a bot running. A write to one of those fails with `protected_file`. See [API conventions](/api-reference/conventions#protected-files). Flow JSON is off-limits too, for a different reason: it has its own tools.
+</Note>
+
+## Flows
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `create_flow` | Builds a new WhatsApp Flow from a description — the form-like screens your customers fill in inside WhatsApp. | `flows:write` |
+| `update_flow` | Changes an existing flow. | `flows:write` |
+
+<Note>
+  Every flow change goes through Paige's flows sub-agent. There's no hand-edit path — an agent that tries to edit a flow's JSON as a file is refused. Flow definitions are strict, and a malformed one is rejected by Meta rather than degrading gracefully. See [Flows](/concepts/flows).
+</Note>
+
+## Contacts and audiences
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `tag_contact` | Adds or removes tags on a contact — the labels that segments and broadcasts target. | `contacts:write` |
+| `create_segment` | Saves a reusable audience from a filter: opted-in status, tags, or a button people tapped. | `broadcasts:manage` |
+| `preview_segment` | Counts how many contacts a filter reaches **right now**, without saving anything. | `broadcasts:manage` |
+
+<Tip>
+  `preview_segment` saves nothing, but the agent still has to name the project when it calls it. That's deliberate — Paige requires the target to be named on anything that isn't a plain read, so a count is never quietly taken against the wrong project.
+</Tip>
+
+## Broadcasts
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `assemble_broadcast` | Puts a campaign together — audience, template, variables, schedule — and holds it for approval. | `broadcasts:manage` |
+| `get_broadcast_status` | Reads a campaign's status and its delivery counts. | `broadcasts:read` |
+| `list_broadcast_recipients` | Lists a campaign's recipients one by one, with each person's delivery outcome. | `broadcasts:read` |
+
+### An agent can never send a broadcast
+
+<Warning>
+  **`assemble_broadcast` never sends.** It always leaves the campaign in **pending approval**, and there is no tool to send, launch, approve, cancel, or retry one. A campaign only goes out when a human approves it in the **Broadcasts** tab of the dashboard.
+
+  This isn't the agent being polite about it. The rule lives in Paige's own platform layer, so it holds for a connected agent, for a raw API call, and for anything else that ever talks to Paige. Asking an agent to "just send it" cannot work.
+</Warning>
+
+An agent that could send a promotion to four thousand people because it misread a sentence is not a good agent. So the agent does the tedious part — the audience, the template, the variables, the schedule — and the decision stays yours.
+
+<Note>
+  **This is a different surface from the Broadcasting Agent.** Paige's own [Broadcasting Agent](/agents/broadcasting-agent), in the chat sidebar of the Broadcasts tab, has its own set of tools including `assemble_campaign` — and it can also draft and submit templates, list button taps, and update segments, which a connected agent can't. The two are separate: `assemble_broadcast` is what an **outside** agent gets over MCP; `assemble_campaign` is what Paige's **built-in** agent uses. Both are held for your approval, and neither can send.
+</Note>
+
+## Permissions are per project
+
+<Note>
+  One connection can cover several projects, and **each project carries its own permissions**. A project can't borrow a scope from a sibling on the same connection — being allowed to edit code in one project never implies it in another.
+
+  So when an agent tells you it doesn't have permission, the fix is usually specific: open **Settings → API → Connected agents**, find the agent, and grant that permission **for that project**. See [Connect an AI agent](/guides/connect-an-agent).
+</Note>
+
+## Choosing what to grant
+
+| If you want the agent to… | Grant |
+| --- | --- |
+| Answer questions about your conversations | `conversations:read` |
+| Reply to customers | `messages:send` |
+| Read your bot's code without changing it | `code:read` |
+| Build and ship changes to your bot | `code:read`, `code:write` |
+| Build WhatsApp Flows | `flows:write` |
+| Keep contact tags in sync with another system | `contacts:write` |
+| Prepare campaigns for you to approve | `broadcasts:manage`, `broadcasts:read` |
+
+Grant the least that gets the job done. You can change it later without reconnecting anything.
+
+<Tip>
+  Some scopes have no MCP tool behind them — there's no tool for templates, no tool for setting a conversation's state, and no tool for webhooks. Granting `templates:manage` or `webhooks:manage` to a connected agent gives it nothing it can use. Those live in the [API](/api-reference/introduction), for code you write yourself.
+</Tip>

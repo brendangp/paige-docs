@@ -31,13 +31,24 @@ Select a table to see its rows, 50 at a time. From there:
 - **Add or delete a row** — **Add Row**, or the bin icon on a row.
 - **Clear a table** — **Clear** empties every row but keeps the table itself.
 - **Filter** — narrow rows by a column using *equals*, *not equals*, *contains*, *greater than*, or *less than*.
-- **Change the shape** — **New Table**, **Add Column**, and **Drop Table**, in Preview only.
+- **Change the shape** — **New Table**, **Add Column**, and **Drop Table**, in Preview only. On **New Table** you have to tick **PK** on one of the columns; the form won't let you create the table until you do, and says why: *Tick **PK** on a column — a table needs a primary key to be editable.*
+
+### A table needs a primary key to be editable
+
+Paige identifies a row by its primary key, so a table without one can be read but not changed. Open a table like that and instead of the edit controls you'll see:
+
+> This table has no primary key, so its rows can't be edited or deleted. Add one to enable editing.
+
+Click **Add primary key** next to it and Paige adds one for you, then reloads the table with editing switched on. This normally only comes up on a table created outside Paige — anything you make with **New Table** has a primary key from the start.
 
 ### System tables
 
 Three tables come with every project and are managed by Paige: your **contacts**, **conversations**, and **messages**. They carry a **System** badge, and selecting one shows a warning — for good reason.
 
-Your bot's execution logs live in the database too, but they're deliberately kept out of this tab — read them in [Logs](/guides/logs) instead, which is built for them.
+Two more tables live in the database but are deliberately kept out of this tab, because there's a better place to read each one:
+
+- **Execution logs** — read them in [Logs](/guides/logs) instead, which is built for them.
+- **`broadcast_recipients`** — the per-recipient send ledger a [broadcast](/guides/broadcasts) writes as it goes. Paige's sender is updating it live, so hand-editing it would corrupt a broadcast's counts. Per-recipient delivery status is shown in the **Broadcasts** tab: open a broadcast and every recipient is listed there with its status and, for failures, the reason.
 
 <Warning>
   Editing system tables by hand can break your bot in ways that are hard to trace. Your bot uses these rows to know who it's talking to and where it got to in a conversation; changing them out from under it is like moving someone's furniture in the dark. Read them freely — but leave the editing to your bot unless you know exactly why you're there.

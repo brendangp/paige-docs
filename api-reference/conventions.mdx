@@ -1,0 +1,145 @@
+---
+title: "API conventions"
+sidebarTitle: "Conventions"
+description: "The /v1 behaviours that aren't obvious from a schema — which conversation field to read, what a send gives you back, why a file write can be refused, and how contact attributes merge."
+---
+
+The [OpenAPI document](https://api.paigeme.dev/v1/openapi.json) tells you the shape of every request and response. It can't tell you which of two fields to prefer, what an id actually is, or why a write you're allowed to make gets refused. This page covers the `/v1` behaviours you'd otherwise find out the hard way.
+
+## Read `state`, not `status`
+
+Conversation reads return the lifecycle field **twice**:
+
+```json
+{
+  "id": 4821,
+  "state": "handover",
+  "status": "handover"
+}
+```
+
+They always carry the same value. **`state` is canonical. `status` is a deprecated alias**, kept so integrations built before the rename keep working.
+
+<Warning>
+  New integrations should read `state`. Treat `status` as legacy — it exists for compatibility, not as a second field with its own meaning, and nothing new should be written against it.
+</Warning>
+
+The write side has already moved on. `PATCH /v1/conversations/{id}` accepts **`state` only** — sending `status` in the body does nothing and the request is rejected for having no state. Its response returns `state` and `previous_state`, with no `status` alias at all.
+
+The values Paige itself uses are `unstructured`, `handover`, `awaiting_form` and `done`. A project's own bot code can introduce others, and those are accepted too; a value the project has never used is rejected with `INVALID_STATE` and a message listing the ones that are known.
+
+## Message ids and `wamid`
+
+A successful `POST /v1/messages` returns:
+
+```json
+{
+  "success": true,
+  "data": { "id": "wamid.HBgLMjc4MjEyMz…", "status": "sent" }
+}
+```
+
+That `id` is the **real WhatsApp message id** — the `wamid` Meta assigned — not a Paige placeholder and not a locally generated stub. It's the same identifier WhatsApp uses in its own delivery callbacks, so you can store it and track the message from the moment the call returns.
+
+`GET /v1/messages/{id}` accepts **either form**:
+
+- the `wamid` you got back from the send, or
+- the numeric message id from a conversation's message list.
+
+Paige works out which you've passed. Anything that isn't purely digits is treated as a `wamid`.
+
+<Note>
+  The lookup echoes back the **numeric** message id in its `id` field, whichever form you queried with. Don't compare the `id` you sent with the `id` you got back and conclude you've been given the wrong message — key your own records on the `wamid` from the send.
+</Note>
+
+## Sends land in the conversation
+
+Both kinds of send become part of the thread.
+
+### Template sends
+
+A template sent through the API is written into the conversation like any other message, and the conversation moves to the top of the list as recently active. Your team sees the same history in the **Conversations** tab whether the message came from the dashboard, from your bot, or from your own code calling `/v1`.
+
+### Session sends
+
+Free-form (session) sends are **platform-native**. Paige delivers them itself rather than routing them through your bot, which has three consequences worth knowing:
+
+<CardGroup cols={2}>
+  <Card title="No redeploy" icon="rocket">
+    Sending through the API doesn't depend on your bot's code and doesn't need a deploy. It works on a project you haven't touched in months.
+  </Card>
+  <Card title="They persist" icon="message-square">
+    The message is stored on the conversation with its `wamid`, so it appears in the thread and in `GET /v1/conversations/{id}/messages`.
+  </Card>
+  <Card title="They're trackable" icon="activity">
+    Because the row is keyed on the real `wamid`, WhatsApp's delivery and read callbacks attach to it. `GET /v1/messages/{id}` reflects the current status.
+  </Card>
+  <Card title="No surprise handover" icon="user-x">
+    Sending no longer flips the conversation into human handover as a side effect. A send is just a send — if you want the bot to stop replying, change the state deliberately.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Session sends are still gated by WhatsApp's 24-hour customer-service window. Outside it you get `409 outside_24h_window` and an approved template is the only thing that goes through. See [Templates](/guides/templates).
+</Warning>
+
+<Note>
+  These behaviours describe standard Paige-hosted projects. A project running its own self-hosted backend handles delivery and storage on its own side, so what comes back from a send is whatever that backend reports.
+</Note>
+
+## Protected files
+
+`PUT /v1/files/{path}` will refuse to write to some files and return `protected_file` with HTTP `403`. The rejection happens before anything is touched, so the file is guaranteed unchanged.
+
+The protected set is the platform's own wiring rather than your bot's logic:
+
+- the app's entry point and dependency manifest
+- the WhatsApp webhook and send endpoints
+- the runtime helpers Paige injects into every project — messaging, media, identifiers, logging, connector clients
+- auto-generated manifests, which are rewritten from your project's real state and would be silently overwritten anyway
+- Paige's own internal project directory
+
+Overwrite any of those and the bot stops working — often in a way that looks like a Paige outage rather than a bad write. The guard exists so an integration bug can't brick a live WhatsApp number.
+
+Everything that makes your bot *yours* stays writable: your routes, your handlers, your config.
+
+<Tip>
+  **Reads are not restricted.** `GET /v1/files` and `GET /v1/files/{path}` return every file, protected ones included. Reading can't break anything, and you often need to read the webhook or the entry point to understand how a project is wired.
+</Tip>
+
+Flow definitions are refused too, but that's a separate rule with a separate error — flows are edited through the flow endpoints, never as raw files. Both codes are listed in [Errors](/api-reference/errors).
+
+## Contact custom attributes
+
+`PATCH /v1/contacts/:id` accepts an `attributes` object — custom CRM fields you define, stored per contact.
+
+```json
+{
+  "name": "Sam Lee",
+  "tags": { "add": ["vip"] },
+  "attributes": {
+    "plan": "gold",
+    "seats": 12,
+    "trial": false,
+    "legacy_ref": null
+  }
+}
+```
+
+**Value types.** A value may be a string (up to 1,000 characters), a number, a boolean, or `null`. Nested objects and arrays are rejected — keep values flat.
+
+**Attributes merge.** You send only the keys you're changing. Keys you don't mention are left alone, so a partial update is safe and there's no read-modify-write dance.
+
+<Warning>
+  **Setting a key to `null` deletes it.** `null` is not stored as an empty value — it removes the attribute entirely. That's how you clear one, and it's also how you delete one by accident if your serializer emits `null` for unset fields. Strip nulls before sending unless you mean them.
+</Warning>
+
+**At least one field is required.** The request must contain at least one of `name`, `tags` or `attributes`. An empty body is rejected rather than treated as a no-op.
+
+<Note>
+  **Custom attributes are API-only today.** There is no dashboard UI for them — you can't view, add, or edit a contact's attributes anywhere in Paige's interface, and the contacts CSV import doesn't carry them either (it accepts `number`, `name`, `tags` and `opted_in` only). The `PATCH` response returns the contact's full attributes after the merge, so that's where you read them back; treat your own system as the place a human looks at them. Tags, by contrast, are visible and usable throughout the dashboard.
+</Note>
+
+<Tip>
+  If a value needs to drive an audience — who gets a broadcast, who's in a segment — use a **tag**, not an attribute. Segments filter on tags, and tags show up in the UI. Attributes are for the data you carry alongside a contact.
+</Tip>

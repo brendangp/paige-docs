@@ -11,6 +11,10 @@ It works with any MCP-compatible agent, because MCP is an open standard they all
 Everything here lives under **Settings → API**.
 
 <Note>
+  For the full list of what a connected agent can actually do — all sixteen tools, the permission each one needs, and the guardrail that stops it sending a broadcast — see [What a connected agent can do](/guides/agent-tools).
+</Note>
+
+<Note>
   The **API** section is for owners and admins. If you're a workspace member without admin access, it won't appear in your Settings sidebar at all.
 </Note>
 
@@ -25,13 +29,31 @@ Everything here lives under **Settings → API**.
     For agents that support it, like Claude and ChatGPT. You click **Connect** in the agent, sign in to Paige, tick the projects and permissions, and approve. Nothing to copy or paste.
   </Card>
   <Card title="Paste an API key" icon="key">
-    For any client. Create a key under **API Keys**, then copy the ready-made install snippet from the **Connect an AI agent (MCP)** card — a one-line `claude mcp add …` command, or a config block for Claude Desktop, ChatGPT, or Cursor.
+    For any client. Create a key under **API Keys**, then open the **Connect an AI agent (MCP)** card and pick your client. Three of the five tabs give you a snippet to copy; the other two give you the server address to paste into the client's own connector settings.
   </Card>
 </CardGroup>
 
+### What each client tab gives you
+
+The **Connect an AI agent (MCP)** card has five tabs. They don't all work the same way, because the clients themselves don't:
+
+| Tab | What you get |
+| --- | --- |
+| **Claude Code** | A one-line `claude mcp add --transport http paige …` command. Copy it, run it in your terminal, and the Paige tools appear on next launch. |
+| **Claude Desktop** | A JSON config block for your `claude_desktop_config.json`. Paste it in and restart Claude Desktop. |
+| **Cursor** | The same JSON config block, for `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project). Paste it in and reload Cursor. |
+| **ChatGPT** | **No config block.** ChatGPT's custom-connector form only offers OAuth, No Authentication, or Mixed Authentication — there's nowhere to paste a bearer key. The tab shows a read-only **Server URL** and a note explaining why. Connect ChatGPT by signing in instead. |
+| **Codex CLI** | **No config block.** The tab shows a read-only **Server URL** plus a note. Add the Paige server to Codex's own MCP config (its `mcp_servers` block) pointing at that URL — Codex can then connect by signing in, or with a Paige API key sent as an `Authorization: Bearer` header. |
+
+So **Claude Code**, **Claude Desktop** and **Cursor** are copy-paste. **ChatGPT** and **Codex CLI** are server-URL-only: you copy the address and configure the client yourself.
+
 <Tip>
-  The install snippet comes prefilled with your new key **while the key is still on screen** — copy the whole thing then. The secret is never shown again, so afterwards the snippet falls back to a `YOUR_PAIGE_API_KEY` placeholder you fill in yourself.
+  On the three copy-paste tabs, the snippet comes prefilled with your new key **while the key is still on screen** — copy the whole thing then. The secret is never shown again, so afterwards the snippet falls back to a `YOUR_PAIGE_API_KEY` placeholder you fill in yourself.
 </Tip>
+
+<Note>
+  If Paige's MCP server hasn't been switched on for your environment yet, the card says so and the snippets show a `<your Paige MCP server URL>` placeholder rather than a real address.
+</Note>
 
 ## Approving the connection
 
@@ -131,17 +153,20 @@ There's nothing to configure for this. The agent can ask Paige which projects yo
 ## Connecting specific agents
 
 <AccordionGroup>
-  <Accordion title="Claude" icon="message-circle">
-    Claude can connect either way. The no-key route is the easy one: add the Paige server, sign in, pick your projects and permissions, approve. For Claude Code and Claude Desktop the card also gives you a ready install snippet that uses an API key.
+  <Accordion title="Claude Code" icon="terminal">
+    Copy the one-line `claude mcp add …` command from the **Claude Code** tab and run it in your terminal. The Paige tools appear the next time you launch Claude Code.
   </Accordion>
-  <Accordion title="ChatGPT" icon="message-square">
-    Add a **custom connector** in ChatGPT and give it Paige's MCP server address, shown on the ChatGPT tab of the card. ChatGPT connectors always sign in — there's no box to paste an API key — so it sends you to Paige to choose your projects and approve.
-  </Accordion>
-  <Accordion title="OpenAI Codex" icon="terminal">
-    Point Codex at the same Paige MCP server address in its connector settings. Codex can either sign in to Paige and approve, or use a Paige API key you paste in — whichever you prefer.
+  <Accordion title="Claude Desktop" icon="message-circle">
+    Either route works. Signing in is the easy one: add the Paige server, sign in, pick your projects and permissions, approve. Or copy the config block from the **Claude Desktop** tab into your `claude_desktop_config.json` and restart the app.
   </Accordion>
   <Accordion title="Cursor" icon="code">
-    Use the API key route. Create a key with the scopes you need, then copy the Cursor config block from the card.
+    Use the API key route. Create a key with the scopes you need, then copy the config block from the **Cursor** tab into `~/.cursor/mcp.json` (or `.cursor/mcp.json` in your project) and reload Cursor.
+  </Accordion>
+  <Accordion title="ChatGPT" icon="message-square">
+    Add a **custom connector** in ChatGPT and give it Paige's MCP server address, shown on the **ChatGPT** tab of the card. ChatGPT connectors always sign in — its form only offers OAuth, No Authentication, or Mixed Authentication, so there's no box to paste an API key — and it sends you to Paige to choose your projects and approve.
+  </Accordion>
+  <Accordion title="OpenAI Codex CLI" icon="square-terminal">
+    Copy the server address from the **Codex CLI** tab and add the Paige server to Codex's own MCP config (its `mcp_servers` block). Codex can then either sign in to Paige and approve, or use a Paige API key you paste in — whichever you prefer.
   </Accordion>
 </AccordionGroup>
 

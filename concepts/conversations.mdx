@@ -4,7 +4,7 @@ sidebarTitle: "Conversations"
 description: "Paige tracks every WhatsApp conversation by phone number. View message history, monitor conversation state, and send messages from the dashboard."
 ---
 
-Every time someone messages your bot, Paige records the conversation and links it to their phone number. The **Conversations** section of your project dashboard gives you a live view of who is talking to your bot, what state each conversation is in, and the full message history. You can also intervene manually — changing a conversation's state or sending a message directly — without touching your bot code.
+Every time someone messages your bot, Paige records the conversation and links it to their phone number. The **Conversations** section of your project dashboard gives you a live view of who is talking to your bot, what state each conversation is in, and the full message history. You can also intervene manually — taking a conversation over from your bot and replying yourself — without touching your bot code.
 
 ## Contacts
 
@@ -15,6 +15,10 @@ Each contact can have multiple conversations over time. From the contacts list y
 - Browse all contacts that have messaged your bot
 - View all conversations for a specific contact
 - See the full message history across a contact's conversations
+
+<Note>
+  A contact can also carry **custom attributes** — your own key/value data, like a customer number or a plan name. These are **API-only today**: your bot or an integration reads and writes them through the [Paige API](/api-reference/introduction), and there's no dashboard screen for them.
+</Note>
 
 ### Phone numbers and usernames
 
@@ -49,23 +53,15 @@ The state field reflects where the contact is in your bot's conversation flow. I
 
 ### Changing state from the dashboard
 
-If a contact gets stuck in an unexpected state, or you need to manually reset a conversation, you can update the state directly from the dashboard without modifying your bot code or waiting for the contact to message again.
+There's no general-purpose "set this conversation's state" control. State is your bot's to manage, and the dashboard only lets you set it at one specific moment: **when you hand a conversation back after taking it over**.
 
-<Steps>
-  <Step title="Open the conversation">
-    Navigate to the **Conversations** tab in your project and click the conversation you want to update.
-  </Step>
-  <Step title="Change the state">
-    Use the state control to select a new state. Only states that exist in your bot code are meaningful — setting an unrecognised state will leave the contact in a state your bot does not handle.
-  </Step>
-  <Step title="Confirm the change">
-    The change takes effect immediately. The next message from the contact will be processed by the handler for the new state.
-  </Step>
-</Steps>
+Click **Handover ON** on a conversation that's in handover and you're asked to pick the state to resume from. That picker is the only place the dashboard writes a state, and it deliberately leaves out `handover`, `end`, and `finish` — you can't hand a conversation back into handover, or into a terminal state. See [Taking over from your bot](#taking-over-from-your-bot) below and [the Conversations tab](/guides/conversations-tab#taking-over-from-your-bot).
+
+To move a conversation that isn't in handover, take it over first, then hand it back to the state you want.
 
 ### Filtering by state
 
-The conversations list can be filtered by state. Use the **States** filter to view only conversations in a particular state — for example, all contacts currently in `collect_info` or all contacts in a custom `awaiting_payment` state.
+The conversations list can be filtered by state. Use the **All states** dropdown to view only conversations in a particular state — for example, all contacts currently in `collect_info` or all contacts in a custom `awaiting_payment` state.
 
 You can also fetch the list of unique states currently active across all conversations. This is useful for getting a quick overview of where your contacts are in the conversation flow.
 

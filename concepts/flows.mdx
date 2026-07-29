@@ -23,6 +23,12 @@ WhatsApp Flows let you embed rich, multi-screen interactive experiences directly
   </Card>
 </CardGroup>
 
+## Static and dynamic Flows
+
+Most Flows are **static**: every screen, option, and line of copy is fixed when the Flow is built. A booking form, a signup form, or a survey is static even though the answers differ each time.
+
+A **dynamic** Flow asks your bot for fresh information while someone is filling it in — the slots actually free on the day they chose, the current status of their order. Paige builds a static Flow unless the request genuinely needs live data. See [Dynamic flows](/guides/flows/dynamic-flows).
+
 ## Flow statuses
 
 Each Flow carries a status, shown as a coloured tag in the **Flows** tab:
@@ -32,8 +38,10 @@ Each Flow carries a status, shown as a coloured tag in the **Flows** tab:
 | **LOCAL** | The Flow exists in your project and on Paige Dev, but hasn't been registered on your own WhatsApp number yet. This is where every Flow starts if you haven't connected WhatsApp. You can preview and test it; [Deploy](/guides/deploy) is what puts it on your number. |
 | **DRAFT** | The Flow is on your WhatsApp number but isn't sendable to customers yet. |
 | **PUBLISHED** | The Flow is live and your bot can send it to customers. |
-| **DEPRECATED** | The Flow has been retired and can no longer be sent. Conversations already inside the Flow aren't interrupted. |
+| **DEPRECATED** | The Flow has been retired and can no longer be sent. |
 | **BLOCKED** / **THROTTLED** | Set by Meta, not by you. Meta applies these when it detects a problem with the Flow's health or usage — for example, repeated errors when customers open it. |
+
+For what each status lets you do, see [Flow statuses and what each one allows](/guides/flows/overview#flow-statuses-and-what-each-one-allows).
 
 ### Editing a published Flow
 
@@ -41,8 +49,10 @@ Each Flow carries a status, shown as a coloured tag in the **Flows** tab:
 
 When you change a live Flow, the Paige Dev copy updates immediately so you can test the new version, while your customers carry on seeing the version that's currently live. Your change reaches them when you [Deploy](/guides/deploy) and tick that Flow. Until then the Flow shows a **Pending** tag, and the Deploy button carries a count of how many Flows are waiting.
 
+That delay is deliberate: pushing new content to an already-published Flow would knock it back to draft at Meta, and a draft Flow can't be sent to anyone. Paige holds the change back and promotes it at deploy time instead. See [Edit a flow that's already live](/guides/flows/testing-and-publishing#edit-a-flow-thats-already-live).
+
 <Note>
-  Deprecating is a one-way door. There's no un-deprecate — a deprecated Flow has no way back to published, so reach for it only when you're genuinely retiring a Flow.
+  Deprecating is a one-way door in Paige. There's no un-deprecate button and no path back to published, so reach for it only when you're genuinely retiring a Flow.
 </Note>
 
 ## How Flows are validated and synced to Meta
@@ -56,51 +66,25 @@ This is why a Flow can be previewed and tested before you've connected WhatsApp 
 
 Each Flow that reaches your own number gets a Meta Flow ID, stored in your project. Your bot code uses this ID when sending a Flow to a contact.
 
-<Steps>
-  <Step title="Generate a Flow">
-    Describe the Flow you want to the Code Agent in the bot code chat. For example: "Create a 3-screen appointment booking flow with a service dropdown, date picker, and confirmation screen." The agent generates the Flow definition and runs it through the Paige Dev validation gate.
-  </Step>
-  <Step title="Preview and validate">
-    Open the **Flows** tab, select the Flow, and click **Try it** for an interactive simulation you can click through — this works even before you've connected your own WhatsApp number. If Meta flagged anything, the errors are listed right there in the detail pane.
-  </Step>
-  <Step title="Deploy the Flow">
-    Click [**Deploy**](/guides/deploy) and tick the Flow. Paige creates it on your WhatsApp number if it isn't there yet, publishes it, and from that point your bot can send it to customers.
-  </Step>
-  <Step title="Embed in your bot code">
-    Reference the Flow by its ID in your bot code to send it to a contact at the right moment in the conversation. The submission payload arrives as a structured message that your webhook handler processes.
-  </Step>
-</Steps>
-
 ## Flow JSON format
 
-Flows are defined in JSON format (version `6.0`). Each Flow contains one or more screens, and each screen contains a layout of components. Paige's Code Agent generates and edits this JSON for you — you rarely need to edit it by hand.
+Flows are defined in JSON. Paige generates version `7.3`, and versions from `5.0` upwards are accepted. Each Flow contains one or more screens, and each screen contains a layout of components. Paige generates and edits this JSON for you — you should never edit it by hand.
 
-Common Flow components include:
-
-| Component | Description |
-|---|---|
-| `TextHeading` | A heading displayed at the top of a screen |
-| `TextBody` | Body copy or instructions on a screen |
-| `TextInput` | A free-text input field |
-| `Dropdown` | A single-select dropdown |
-| `DatePicker` | A date selection widget |
-| `Footer` | A button at the bottom of a screen that advances to the next screen or submits the form |
+There are 24 components a screen can hold, from headings and text inputs to date pickers, file uploads, and conditional blocks. For the complete list with examples and limits, see [Screens and components](/guides/flows/screens-and-components).
 
 <Tip>
-  Ask the Code Agent to generate new Flows or update existing ones in plain language. When updating, the agent preserves the existing Meta Flow ID so your bot code references remain valid.
+  Ask Paige to generate new Flows or update existing ones in plain language. When updating, it preserves the existing Meta Flow ID so your bot code references remain valid.
 </Tip>
 
-## Managing Flows from the dashboard
+## Building and managing Flows
 
-The **Flows** tab lists every Flow in your project with its status. Select one and you can:
+The **Flows** tab lists every Flow in your project with its status, and lets you preview, publish, sync, deprecate, and delete each one.
 
-- **Try it** — step through an interactive preview, and switch between the **Paige Dev** and **Production** copies once the Flow is live on your number
-- **Sync** — pull the latest status and any validation errors from Meta
-- **View JSON** — jump to the Flow's file in the Code tab
-- **Publish** — available for a draft Flow that's already on your number. A LOCAL Flow doesn't have this button; use [Deploy](/guides/deploy) instead
-- **Deprecate** — retire a published Flow
-- **Delete** — available for LOCAL and draft Flows
-
-<Warning>
-  A published Flow has no Delete button, and deprecating it doesn't give it one — deprecating and deleting are separate things. If you want a published Flow gone from your number, deprecate it to stop it being sent.
-</Warning>
+<CardGroup cols={2}>
+  <Card title="Flows overview" icon="workflow" href="/guides/flows/overview">
+    How to ask Paige for a Flow, the design rules that shape your request, and how submissions reach your bot.
+  </Card>
+  <Card title="Testing and publishing" icon="rocket" href="/guides/flows/testing-and-publishing">
+    Preview, test on a real phone, publish with Deploy, and push changes to a live Flow.
+  </Card>
+</CardGroup>

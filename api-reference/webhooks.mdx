@@ -7,6 +7,36 @@ Polling the API to find out what changed is slow and wastes your rate limit. **W
 
 Register one under **Settings → API → Webhooks**, or with `POST /v1/webhooks` (scope `webhooks:manage`).
 
+## Set one up in the dashboard
+
+You don't need to call the API to manage webhooks. The **Webhooks** card under **Settings → API** does the whole lifecycle — create, list, edit, delete.
+
+<Steps>
+  <Step title="Click New webhook">
+    Opens the create dialog.
+  </Step>
+  <Step title="Enter the delivery URL">
+    The address Paige POSTs to, like `https://example.com/webhooks/paige`. It must be **https** — an `http://` address is rejected, as is anything that resolves to a private or local network. Maximum 512 characters.
+  </Step>
+  <Step title="Pick the events">
+    Platform events are a checkbox list. Below it, a free-form field lets you add a **custom event name** — type the name your bot emits and click **Add**. Names may use letters, numbers, dots, underscores and hyphens; anything else is refused. Pick at least one event.
+  </Step>
+  <Step title="Choose whether it starts active">
+    An **Active — start delivering immediately** toggle. Leave it off if your endpoint isn't ready yet, and switch it on later.
+  </Step>
+  <Step title="Copy the signing secret">
+    Creating the webhook reveals its secret — `whsec_…` — with a copy button. **This is the only time you will ever see it.**
+  </Step>
+</Steps>
+
+<Warning>
+  The signing secret is shown **once, on create**. It never appears in the list, never comes back from the API, and there is no rotate. Editing a webhook doesn't reissue it. If you lose it, delete the webhook and register a new one.
+</Warning>
+
+Each webhook in the list shows its URL, an **Active** or **Inactive** badge, and a badge per subscribed event. **Edit** changes the URL, the events, or the active state. **Delete** removes it and stops deliveries — you'll be asked to confirm.
+
+{/* TODO: screenshot of the Webhooks card with one registered webhook */}
+
 ## What a delivery looks like
 
 Every delivery is a `POST` with a JSON body in this shape:
@@ -154,7 +184,7 @@ The name you pass is delivered verbatim as `event`, and the payload becomes `dat
   Don't give a custom event the same name as a platform event. Subscriptions are matched by name, so a custom `message.received` would be gated behind the platform event's scope.
 </Warning>
 
-## Registering one
+## Registering one over the API
 
 <CodeGroup>
 
