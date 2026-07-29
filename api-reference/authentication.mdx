@@ -11,6 +11,10 @@ Authorization: Bearer pk_live_…
 
 There's no separate login step and no session. Send the header on every call.
 
+<Note>
+  Keys minted against production start with **`pk_live_`**; keys minted in a non-production environment start with **`pk_test_`**. They behave identically — the prefix just tells you at a glance which environment a key came from, which is worth checking first when a key 401s.
+</Note>
+
 ## Create a key
 
 Keys live under **Settings → API → API Keys**.

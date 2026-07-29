@@ -30,7 +30,7 @@
       "display": "simple"
     },
     "params": {
-      "expanded": "closed"
+      "expanded": "all"
     },
     "examples": {
       "languages": ["curl", "javascript", "python"]

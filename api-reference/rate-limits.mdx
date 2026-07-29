@@ -16,7 +16,9 @@ Two different limits can return a `429`, and confusing them wastes a lot of debu
 
 ## The API rate limit
 
-**60 requests per minute**, counted in a rolling one-minute window. The limit is flat — it doesn't vary by plan or by endpoint.
+**60 requests per minute**, counted in a fixed one-minute window. The limit is flat — it doesn't vary by plan or by endpoint.
+
+Because the window is fixed rather than sliding, the counter resets outright at the boundary — `RateLimit-Reset` tells you exactly when. Bursting right before a reset and again right after is the one way to briefly exceed 60 in any given 60 seconds.
 
 It's counted **per credential**, not per project or per IP. Each API key gets its own 60, and each connected AI agent gets its own. Two integrations on the same project don't eat each other's budget; two copies of the same integration sharing one key do.
 
@@ -29,7 +31,6 @@ Every rate-limited response carries these, not just the ones that fail:
 | `RateLimit-Limit` | Requests permitted in the current window. |
 | `RateLimit-Remaining` | Requests left in it. |
 | `RateLimit-Reset` | Seconds until the window resets. |
-| `RateLimit-Policy` | The policy in force, as `60;w=60`. |
 
 On a `429` you also get:
 

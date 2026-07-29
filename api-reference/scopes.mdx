@@ -32,7 +32,7 @@ Every endpoint states the scope it needs, both in its description and in the `x-
     | --- | --- |
     | `code:read` | List and read the project bot code files. |
     | `code:write` | Edit project code files and deploy dev → production. |
-    | `flows:read` | View WhatsApp Flows. |
+    | `flows:read` | List WhatsApp Flows and read a flow's JSON definition. |
     | `flows:write` | Generate and update WhatsApp Flows (routed through the flows agent). |
   </Tab>
   <Tab title="Webhooks & events">
@@ -81,5 +81,5 @@ with HTTP **403**. Fix it by editing the key's scopes in **Settings → API** �
 | Order notifications out of your own system | `messages:send`, plus `templates:read` if you look templates up |
 | A shared inbox or CRM sync | `conversations:read`, `contacts:read`, `contacts:write` |
 | A marketing campaign tool | `broadcasts:manage`, `broadcasts:read`, `templates:read` |
-| An AI agent that edits your bot | `code:read`, `code:write`, `flows:write` |
+| An AI agent that edits your bot | `code:read`, `code:write`, `flows:read`, `flows:write` |
 | An event consumer | `webhooks:manage` plus each `events:*` you subscribe to |

@@ -106,6 +106,8 @@ Both carry `Retry-After`. They're genuinely different problems — see [Rate lim
 | --- | --- | --- |
 | `meta_auth_error` | 502 | Meta rejected the project's WhatsApp credentials. Reconnect WhatsApp under **Settings → WhatsApp**. |
 | `build_failed` | 502 | The code agent couldn't complete the build. |
+| `flow_generation_failed` | 502 | The flows agent couldn't build the flow. Try a more specific instruction. |
+| `flow_update_failed` | 502 | The flows agent couldn't apply the change to an existing flow. |
 | `server_error` | 500 | An unexpected error on Paige's side. |
 
 You'll also see some codes in `SCREAMING_SNAKE_CASE` — `PROJECT_NOT_FOUND`, `SEGMENT_NOT_FOUND`, `MEDIA_EXPIRED`, `BROADCAST_NOT_FOUND` and similar. They come from the shared capability layer that the AI agent tools use too, and they behave exactly like any other code. Match on them the same way.

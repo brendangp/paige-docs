@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Paige API",
-    "version": "0.1.0",
-    "description": "The Paige public REST API (`/v1`). Build WhatsApp automations against your Paige project: send messages, manage templates, read conversations, tag contacts, assemble broadcasts, edit bot code + flows, and register signed webhooks.\n\n## Authentication\nEvery `/v1` request authenticates with a project API key: `Authorization: Bearer pk_live_…`. Mint and scope keys in **Settings → API keys**. A key carries its own project context, so `/v1` paths never include a project id.\n\n## Scopes\nEach endpoint requires one or more scopes (see each operation, and the `x-required-scopes` extension). Grant a key only the scopes it needs. A key missing a required scope gets `403 insufficient_scope`.\n\n## Response envelope\nSuccess: `{ \"success\": true, \"data\": … }`. Error: `{ \"success\": false, \"error\": { \"code\", \"message\" }, \"request_id\" }`. The `request_id` is also returned as the `X-Request-Id` header on every response.\n\n## Rate limits & quota\nRequests are throttled per key (`RateLimit-*` headers; exceed → `429 rate_limited`). WhatsApp sends also draw down a daily quota (exceed → `429 quota_exceeded`). Both carry `Retry-After`.\n\n## Idempotency\nSend an `Idempotency-Key` header on `POST /v1/messages` to make retries safe — a completed key replays the stored response and never re-sends.\n\n## Webhook signatures\nOutbound webhook deliveries carry `X-Paige-Signature: t=<unix>,v1=<hmac_sha256>`. Verify with the reference `verifyPaigeSignature` helper (constant-time HMAC over `\"<t>.<rawBody>\"`, 300s tolerance).",
+    "version": "1.0.0",
+    "description": "The Paige public REST API (`/v1`). Build WhatsApp automations against your Paige project: send messages, manage templates, read conversations, tag contacts, assemble broadcasts, edit bot code + flows, and register signed webhooks.\n\n## Authentication\nEvery `/v1` request authenticates with a project API key: `Authorization: Bearer pk_live_…`. Mint and scope keys in **Settings → API keys**. A key carries its own project context, so `/v1` paths never include a project id.\n\n## Scopes\nEach endpoint requires one or more scopes (see each operation, and the `x-required-scopes` extension). Grant a key only the scopes it needs. A key missing a required scope gets `403 insufficient_scope`.\n\n## Response envelope\nSuccess: `{ \"success\": true, \"data\": … }`. Error: `{ \"success\": false, \"error\": { \"code\", \"message\" }, \"request_id\" }`. Some errors add `error.details` with structured extras (e.g. `quota_exceeded` carries `limit` + `resetAt`) — read it defensively, its keys depend on the code. The `request_id` is also returned as the `X-Request-Id` header on every response.\n\n## Rate limits & quota\nRequests are throttled per key (`RateLimit-*` headers; exceed → `429 rate_limited`). WhatsApp sends also draw down a daily quota (exceed → `429 quota_exceeded`). Both carry `Retry-After`.\n\n## Idempotency\nSend an `Idempotency-Key` header on `POST /v1/messages` to make retries safe — a completed key replays the stored response and never re-sends.\n\n## Webhook signatures\nOutbound webhook deliveries carry `X-Paige-Signature: t=<unix>,v1=<hmac_sha256>`. Verify with the reference `verifyPaigeSignature` helper (constant-time HMAC over `\"<t>.<rawBody>\"`, 300s tolerance).",
     "contact": {
       "name": "Paige",
       "url": "https://paigeme.dev"
@@ -47,7 +47,7 @@
     },
     {
       "name": "Build",
-      "description": "Read/edit bot code, deploy, generate + update flows."
+      "description": "Read/edit bot code, deploy, read/generate/update flows."
     },
     {
       "name": "Webhooks",
@@ -76,6 +76,11 @@
             "type": "string",
             "description": "Human-readable message (safe to surface).",
             "example": "Invalid request body"
+          },
+          "details": {
+            "type": "object",
+            "properties": {},
+            "description": "Structured extras for codes that carry them — the keys depend on `code`. `quota_exceeded` carries `limit` + `resetAt`; most errors omit this field entirely."
           }
         },
         "required": [
@@ -143,6 +148,41 @@
                     "success",
                     "data"
                   ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/skill.md": {
+      "get": {
+        "operationId": "getIntegrationSkill",
+        "tags": [
+          "Meta"
+        ],
+        "summary": "The pasteable \"build a Paige integration\" agent skill (no auth)",
+        "description": "Serves the integration skill as markdown — hand it to a coding agent (Claude, Codex, Cursor) instead of pasting docs at it. Public, like `/v1/openapi.json`; the same file is downloadable in the app under **Settings → API → Integration skill**. Responds `text/markdown`, NOT the JSON envelope.",
+        "security": [],
+        "x-required-scopes": [],
+        "responses": {
+          "200": {
+            "description": "Success (raw response body — not the JSON envelope).",
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string",
+                  "description": "The skill markdown."
                 }
               }
             }
@@ -432,7 +472,7 @@
           "Messages"
         ],
         "summary": "Send a message (session, template, or interactive)",
-        "description": "Dispatch by `type`. Session types (`text|image|video|audio|document|location`) and `interactive` (button/list/carousel) are gated by the 24h customer-service window (closed → `409 outside_24h_window`); `template` is exempt. Supports the optional `Idempotency-Key` header (safe retries — a completed key replays the stored response). Reserves 1 unit of the daily send quota.\n\n**Required scope:** `messages:send`",
+        "description": "Dispatch by `type`. Session types (`text|image|video|audio|document|location`) and `interactive` (button/list/carousel) are gated by the 24h customer-service window (closed → `409 outside_24h_window`); `template` is exempt. Supports the optional `Idempotency-Key` header (safe retries — a completed key replays the stored response). Reserves 1 unit of the daily send quota.\n\n**What you must send.** Beyond `type`, the required fields are conditional, so they cannot all be marked required in the schema below:\n\n- **Session and `interactive` types** need exactly one recipient — `conversationId` **or** `phone` (E.164, e.g. `+27821234567`) **or** `bsuid` — plus `content`. For `text`, `content` is the message body; for media types it is the URL or media id; for `interactive` it is the button/list/carousel payload. Omit the recipient → `400 missing_recipient`.\n- **`template`** needs a recipient spelled `to` **or** `phone` (an E.164 number — `conversationId`/`bsuid` are not accepted on this branch), plus a template name and a language.\n- **Template name and language each accept two spellings** — `name` or `templateName`, and `language` or `languageCode` — because the endpoint takes both the friendly and the strict form. Send one of each; if both are present the friendly spelling (`name` / `language`) wins. Missing → `400 missing_template_name` / `400 missing_language`.\n- **Template variables** go in either raw Meta `components` **or** the structured `header`/`body`/`footer`/`buttons` form. If you send both, raw `components` takes precedence and the structured form is ignored. A variable count that disagrees with the approved template is `400 template_variable_mismatch`.\n\n**Required scope:** `messages:send`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -1544,7 +1584,7 @@
           "Templates"
         ],
         "summary": "List message templates + approval status",
-        "description": "List message templates + approval status\n\n**Required scope:** `templates:read`",
+        "description": "Every template on the project WABA, one entry per localization — the same `name` appears once per language.\n\n**Required scope:** `templates:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -1585,7 +1625,41 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string",
+                                "description": "BCP-47 code, e.g. `en_US`. Pass it as `language`/`languageCode` when sending."
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "Lowercased Meta status — `approved`, `pending`, `rejected`, `paused`. Only `approved` can be sent."
+                              },
+                              "category": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "MARKETING | UTILITY | AUTHENTICATION."
+                              },
+                              "components": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {}
+                                },
+                                "description": "Meta's component array — header/body/footer/buttons, including variable placeholders."
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "language",
+                              "status",
+                              "category",
+                              "components"
+                            ]
                           }
                         }
                       },
@@ -1688,7 +1762,7 @@
           "Templates"
         ],
         "summary": "Delete a template (all localizations, or a single language)",
-        "description": "Delete a template (all localizations, or a single language)\n\n**Required scope:** `templates:manage`",
+        "description": "Deletes every localization of `{name}` by default. Pass `?language=<code>` to remove just that one localization and leave the rest in place.\n\n**Required scope:** `templates:manage`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -2877,7 +2951,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success (raw bytes).",
+            "description": "Success (raw response body — not the JSON envelope).",
             "content": {
               "application/octet-stream": {
                 "schema": {
@@ -2984,7 +3058,7 @@
           "Conversations"
         ],
         "summary": "Set a conversation's state (validated against known states)",
-        "description": "Set a conversation's state (validated against known states)\n\n**Required scope:** `conversations:write`",
+        "description": "Sets the conversation's state. **`state` is required** — it is enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`, not a no-op. The value is validated against the states this project actually uses.\n\n**Required scope:** `conversations:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -3186,7 +3260,7 @@
           "Contacts"
         ],
         "summary": "Update a contact name / tags / custom attributes",
-        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**Required scope:** `contacts:write`",
+        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Required scope:** `contacts:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -3795,7 +3869,7 @@
           "Build"
         ],
         "summary": "Edit/create a file via the code agent",
-        "description": "Whole-file write (`content`) OR one exact replacement (`old_string`/`new_string`). Flow JSON is rejected — use the flow endpoints. Platform-critical / injected / auto-generated files (e.g. `routes/whatsapp_webhook.js`, `app.js`, `config/db.js`, `services/messages.js`, `config/mediaAssets.js`, matched across both flat and `src/` layouts) are rejected with `403 protected_file`; the file is left unchanged. Reads (`GET /v1/files`, `GET /v1/files/{path}`) are NOT restricted.\n\n**Required scope:** `code:write`",
+        "description": "**Send exactly one of two forms** — a whole-file write (`content`) **or** one exact replacement (`old_string` **and** `new_string`, both required together). The choice is enforced by a cross-field rule the schema below cannot express: sending neither, or both, is `400 invalid_request`. An `old_string` that matches zero or more than one location in the file is also rejected, so make it long enough to be unique. Flow JSON is rejected — use the flow endpoints. Platform-critical / injected / auto-generated files (e.g. `routes/whatsapp_webhook.js`, `app.js`, `config/db.js`, `services/messages.js`, `config/mediaAssets.js`, matched across both flat and `src/` layouts) are rejected with `403 protected_file`; the file is left unchanged. Reads (`GET /v1/files`, `GET /v1/files/{path}`) are NOT restricted.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -3863,7 +3937,23 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "path": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "saved",
+                            "edited"
+                          ],
+                          "description": "`saved` for a whole-file write, `edited` for a targeted replacement."
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "status"
+                      ]
                     }
                   },
                   "required": [
@@ -4162,7 +4252,7 @@
           "Build"
         ],
         "summary": "Promote dev → production",
-        "description": "Promote dev → production\n\n**Required scope:** `code:write`",
+        "description": "Copies the dev working copy to production and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4222,7 +4312,74 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "deployed_sha": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Commit sha of the deployed snapshot, or null when no commit was recorded."
+                        },
+                        "files_count": {
+                          "type": "number",
+                          "description": "Number of dev files promoted."
+                        },
+                        "tables_created": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Custom tables created in production during this deploy."
+                        },
+                        "tables_synced": {
+                          "type": "number",
+                          "description": "Count of tables whose structure was synced."
+                        },
+                        "rows_copied": {
+                          "type": "number",
+                          "description": "Rows copied for the tables named in `tables`. 0 when data copy was not requested."
+                        },
+                        "table_errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Per-table failures. Non-empty means the deploy partially succeeded."
+                        },
+                        "table_sync_failed": {
+                          "type": "boolean",
+                          "description": "True when `table_errors` is non-empty."
+                        },
+                        "flows_published": {
+                          "type": "number",
+                          "description": "Count of flows published on the connected number."
+                        },
+                        "flow_errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Per-flow publish failures."
+                        },
+                        "flows_failed": {
+                          "type": "boolean",
+                          "description": "True when `flow_errors` is non-empty."
+                        }
+                      },
+                      "required": [
+                        "deployed_sha",
+                        "files_count",
+                        "tables_created",
+                        "tables_synced",
+                        "rows_copied",
+                        "table_errors",
+                        "table_sync_failed",
+                        "flows_published",
+                        "flow_errors",
+                        "flows_failed"
+                      ]
                     }
                   },
                   "required": [
@@ -4313,13 +4470,218 @@
       }
     },
     "/v1/flows": {
+      "get": {
+        "operationId": "listFlows",
+        "tags": [
+          "Build"
+        ],
+        "summary": "List the project's WhatsApp Flows",
+        "description": "Newest first. Returns metadata only — call `GET /v1/flows/{id}` for a flow's JSON definition.\n\n**Required scope:** `flows:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "flows:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "flows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The flow identity — this is the `{id}` other flow endpoints take."
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "DRAFT | PUBLISHED | DEPRECATED | BLOCKED | THROTTLED | LOCAL."
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "file_path": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Where the JSON lives in project files, e.g. `flows/booking.json`."
+                              },
+                              "first_screen": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "is_dynamic": {
+                                "type": "boolean",
+                                "description": "True when the flow declares a data endpoint."
+                              },
+                              "validation_errors": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              },
+                              "meta_flow_id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Flow id on the user's own WABA, or null when not connected."
+                              },
+                              "paige_status": {
+                                "type": "string",
+                                "description": "State of the Paige Dev shared-number copy: NONE | PUBLISHED | DEPRECATED."
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "status",
+                              "categories",
+                              "file_path",
+                              "first_screen",
+                              "is_dynamic",
+                              "validation_errors",
+                              "meta_flow_id",
+                              "paige_status",
+                              "created_at",
+                              "updated_at"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "flows"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "operationId": "createFlow",
         "tags": [
           "Build"
         ],
         "summary": "Generate a new WhatsApp Flow via the flows sub-agent",
-        "description": "Generate a new WhatsApp Flow via the flows sub-agent\n\n**Required scope:** `flows:write`",
+        "description": "Builds a flow from a natural-language instruction — there is no hand-authored flow JSON path. Saves the JSON, records the flow, and drafts it on the connected WABA (never auto-publishes). Consumes credits.\n\n**Required scope:** `flows:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4376,7 +4738,84 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
+                        },
+                        "flow_name": {
+                          "type": "string"
+                        },
+                        "flow_path": {
+                          "type": "string",
+                          "description": "Where the JSON was saved, e.g. `flows/booking.json`."
+                        },
+                        "summary": {
+                          "type": "string",
+                          "description": "The agent's description of what it built or changed."
+                        },
+                        "screens": {
+                          "type": "number",
+                          "description": "Screen count in the resulting flow."
+                        },
+                        "validation": {
+                          "type": "object",
+                          "properties": {},
+                          "description": "Paige's own pre-publish validation result."
+                        },
+                        "meta_flow_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Flow id on the user's WABA, or null when not connected."
+                        },
+                        "meta_status": {
+                          "type": "string",
+                          "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
+                        },
+                        "meta_validation_errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Meta's validation errors, empty when it accepted the flow."
+                        },
+                        "user_waba_error": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
+                        },
+                        "paige_dev": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {},
+                          "description": "Result of the Paige Dev shared-number publish."
+                        },
+                        "is_dynamic": {
+                          "type": "boolean",
+                          "description": "True when the flow declares a data endpoint (dynamic flow)."
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "flow_name",
+                        "flow_path",
+                        "summary",
+                        "screens",
+                        "validation",
+                        "meta_flow_id",
+                        "meta_status",
+                        "meta_validation_errors",
+                        "user_waba_error",
+                        "paige_dev",
+                        "is_dynamic"
+                      ]
                     }
                   },
                   "required": [
@@ -4472,18 +4911,257 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v1/flows/{id}": {
+      "get": {
+        "operationId": "getFlow",
+        "tags": [
+          "Build"
+        ],
+        "summary": "Read one flow, including its JSON definition",
+        "description": "`{id}` is the flow NAME (the same identity `PATCH /v1/flows/{id}` takes), not the row id. Adds `definition` — the flow JSON itself — to the summary shape. `definition` is null if the stored JSON is unreadable; the metadata is still returned.\n\n**Required scope:** `flows:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "flows:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "flow": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "The flow identity — this is the `{id}` other flow endpoints take."
+                            },
+                            "status": {
+                              "type": "string",
+                              "description": "DRAFT | PUBLISHED | DEPRECATED | BLOCKED | THROTTLED | LOCAL."
+                            },
+                            "categories": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "file_path": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Where the JSON lives in project files, e.g. `flows/booking.json`."
+                            },
+                            "first_screen": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "is_dynamic": {
+                              "type": "boolean",
+                              "description": "True when the flow declares a data endpoint."
+                            },
+                            "validation_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            },
+                            "meta_flow_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Flow id on the user's own WABA, or null when not connected."
+                            },
+                            "paige_status": {
+                              "type": "string",
+                              "description": "State of the Paige Dev shared-number copy: NONE | PUBLISHED | DEPRECATED."
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "definition": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "properties": {},
+                              "description": "The flow JSON (screens, routing, data model), or null when unparseable."
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "status",
+                            "categories",
+                            "file_path",
+                            "first_screen",
+                            "is_dynamic",
+                            "validation_errors",
+                            "meta_flow_id",
+                            "paige_status",
+                            "created_at",
+                            "updated_at",
+                            "definition"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "flow"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "operationId": "updateFlow",
         "tags": [
           "Build"
         ],
-        "summary": "Update a flow via the flows sub-agent (id = flow name)",
-        "description": "Update a flow via the flows sub-agent (id = flow name)\n\n**Required scope:** `flows:write`",
+        "summary": "Update a flow via the flows sub-agent",
+        "description": "`{id}` is the flow NAME, not the row id. The change is applied by the flows sub-agent; flow JSON is never hand-edited. Consumes credits.\n\n**Required scope:** `flows:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4548,7 +5226,84 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "description": "True only when Meta raised no validation errors AND both WABA copies were written. Check the error fields below on false — the flow JSON is still saved locally."
+                        },
+                        "flow_name": {
+                          "type": "string"
+                        },
+                        "flow_path": {
+                          "type": "string",
+                          "description": "Where the JSON was saved, e.g. `flows/booking.json`."
+                        },
+                        "summary": {
+                          "type": "string",
+                          "description": "The agent's description of what it built or changed."
+                        },
+                        "screens": {
+                          "type": "number",
+                          "description": "Screen count in the resulting flow."
+                        },
+                        "validation": {
+                          "type": "object",
+                          "properties": {},
+                          "description": "Paige's own pre-publish validation result."
+                        },
+                        "meta_flow_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Flow id on the user's WABA, or null when not connected."
+                        },
+                        "meta_status": {
+                          "type": "string",
+                          "description": "DRAFT | PUBLISHED | LOCAL — LOCAL means saved in Paige only."
+                        },
+                        "meta_validation_errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Meta's validation errors, empty when it accepted the flow."
+                        },
+                        "user_waba_error": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Why the user's own WABA copy failed, if it did. Paige Dev is unaffected."
+                        },
+                        "paige_dev": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {},
+                          "description": "Result of the Paige Dev shared-number publish."
+                        },
+                        "is_dynamic": {
+                          "type": "boolean",
+                          "description": "True when the flow declares a data endpoint (dynamic flow)."
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "flow_name",
+                        "flow_path",
+                        "summary",
+                        "screens",
+                        "validation",
+                        "meta_flow_id",
+                        "meta_status",
+                        "meta_validation_errors",
+                        "user_waba_error",
+                        "paige_dev",
+                        "is_dynamic"
+                      ]
                     }
                   },
                   "required": [
@@ -4644,6 +5399,16 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -4655,7 +5420,7 @@
           "Broadcasts"
         ],
         "summary": "Create + save a reusable audience segment",
-        "description": "Create + save a reusable audience segment\n\n**Required scope:** `broadcasts:manage`",
+        "description": "Saves the filter under a name you can reuse as `segment_id` when assembling a broadcast. A project is capped at 100 segments, and names must be unique (`409`).\n\n**Required scope:** `broadcasts:manage`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4755,7 +5520,53 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "segment": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "Pass this as `segment_id` when assembling a broadcast."
+                            },
+                            "project_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "filter": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "The normalized filter, as stored."
+                            },
+                            "contact_count": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Live count when the segment was written. NULL means the count could not be resolved — the segment is still saved and re-counts on read."
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "project_id",
+                            "name",
+                            "filter",
+                            "contact_count",
+                            "created_at",
+                            "updated_at"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "segment"
+                      ]
                     }
                   },
                   "required": [
@@ -5066,7 +5877,7 @@
           "Broadcasts"
         ],
         "summary": "Assemble a broadcast — ALWAYS lands in pending_approval (never sends)",
-        "description": "Guardrail: an assembled broadcast is held in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Required scope:** `broadcasts:manage`",
+        "description": "Guardrail: an assembled broadcast is held in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Beyond `name`, a valid call needs two things the schema below cannot mark required** (they are checked by the assembler, which reports failures as `400`):\n\n- **A template** — `template_name` (with `template_language`) or `template_id`. It must already be APPROVED by Meta.\n- **An audience** — either a saved `segment_id`, or an inline filter built from `opted_in` / `tags` / `clicked`. An audience that resolves to zero contacts is rejected.\n\nAlso supply `variable_mapping` whenever the template has variables; a mapping that does not match the template is rejected. `schedule` is genuinely optional — omit it to assemble for immediate approval.\n\n**Required scope:** `broadcasts:manage`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -5161,7 +5972,46 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "broadcast_id": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "Always `pending_approval` — assembly never sends."
+                        },
+                        "template_approved": {
+                          "type": "boolean",
+                          "description": "Whether Meta has approved the chosen template. False blocks launch."
+                        },
+                        "launch_blocked_reason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Why this broadcast cannot be approved yet, or null when it is ready."
+                        },
+                        "summary": {
+                          "type": "object",
+                          "properties": {},
+                          "description": "Audience count, cost estimate, template preview and resolved variable mapping."
+                        },
+                        "note": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Advisory note from the assembler, e.g. an opt-in caveat."
+                        }
+                      },
+                      "required": [
+                        "broadcast_id",
+                        "status",
+                        "template_approved",
+                        "launch_blocked_reason",
+                        "summary",
+                        "note"
+                      ]
                     }
                   },
                   "required": [
@@ -5268,7 +6118,7 @@
           "Broadcasts"
         ],
         "summary": "Broadcast status + rollup counts",
-        "description": "Broadcast status + rollup counts\n\n**Required scope:** `broadcasts:read`",
+        "description": "`{id}` is the broadcast UUID. Returns the campaign with its delivery rollup (`counts`) and a live `recipient_count` resolved at read time.\n\n**Required scope:** `broadcasts:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -5312,7 +6162,223 @@
                     },
                     "data": {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "broadcast": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "project_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "template_name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "template_language": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "category": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Template category — MARKETING campaigns require an opted-in audience."
+                            },
+                            "audience": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "The resolved audience definition (segment or inline filter)."
+                            },
+                            "template_variables": {
+                              "type": "object",
+                              "properties": {}
+                            },
+                            "status": {
+                              "type": "string",
+                              "description": "pending_approval | scheduled | sending | completed | canceled | failed. Assembly always lands in pending_approval."
+                            },
+                            "scheduled_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "started_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "completed_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "created_by": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "creator_name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "creator_email": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "counts": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "queued": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "sent": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "delivered": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "read": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "failed": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "canceled": {
+                                  "type": [
+                                    "number",
+                                    "null"
+                                  ]
+                                },
+                                "held": {
+                                  "type": "number",
+                                  "description": "Recipients still held back by batching (\"N remaining\")."
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "queued",
+                                "sent",
+                                "delivered",
+                                "read",
+                                "failed",
+                                "canceled",
+                                "held"
+                              ],
+                              "description": "Delivery rollup. Counts are null until the broadcast starts sending."
+                            },
+                            "wave_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "First-wave size for a batched broadcast; null when not batched."
+                            },
+                            "wave_scheduled_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "When the next held wave auto-releases; null when none is pending."
+                            },
+                            "wave_scheduled_count": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Size of that pending wave; null while scheduled means \"all remaining held\"."
+                            },
+                            "auto_retarget_quality": {
+                              "type": "boolean",
+                              "description": "Whether quality-limit failures are auto-retargeted ~24h later."
+                            },
+                            "retarget_parent_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Set on a spawned follow-up — points at the broadcast it retargets."
+                            },
+                            "retarget_count": {
+                              "type": "number",
+                              "description": "Follow-ups this broadcast has spawned (capped at 1)."
+                            },
+                            "recipient_count": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Live audience count resolved at read time. NULL when it could not be resolved."
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "project_id",
+                            "name",
+                            "template_name",
+                            "template_language",
+                            "category",
+                            "audience",
+                            "template_variables",
+                            "status",
+                            "scheduled_at",
+                            "started_at",
+                            "completed_at",
+                            "created_by",
+                            "creator_name",
+                            "creator_email",
+                            "counts",
+                            "wave_size",
+                            "wave_scheduled_at",
+                            "wave_scheduled_count",
+                            "auto_retarget_quality",
+                            "retarget_parent_id",
+                            "retarget_count",
+                            "recipient_count"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "broadcast"
+                      ]
                     }
                   },
                   "required": [
@@ -5704,10 +6770,60 @@
                       "properties": {
                         "webhook": {
                           "type": "object",
-                          "properties": {}
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "project_id": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "HTTPS endpoint deliveries are POSTed to."
+                            },
+                            "events": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "description": "Subscribed event names — platform (`message.received`) or your bot's own custom names."
+                            },
+                            "is_active": {
+                              "type": "boolean",
+                              "description": "False once auto-disabled after repeated delivery failures, or when you disable it."
+                            },
+                            "last_triggered_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "failure_count": {
+                              "type": "number",
+                              "description": "Consecutive delivery failures. Resets on success; drives auto-disable."
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "project_id",
+                            "url",
+                            "events",
+                            "is_active",
+                            "last_triggered_at",
+                            "failure_count",
+                            "created_at",
+                            "updated_at"
+                          ]
                         },
                         "secret": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The `whsec_…` signing secret, used to verify delivery signatures. Returned EXACTLY once — store it now, it is never retrievable again."
                         }
                       },
                       "required": [
@@ -5849,7 +6965,56 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "project_id": {
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string",
+                                "description": "HTTPS endpoint deliveries are POSTed to."
+                              },
+                              "events": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "Subscribed event names — platform (`message.received`) or your bot's own custom names."
+                              },
+                              "is_active": {
+                                "type": "boolean",
+                                "description": "False once auto-disabled after repeated delivery failures, or when you disable it."
+                              },
+                              "last_triggered_at": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "failure_count": {
+                                "type": "number",
+                                "description": "Consecutive delivery failures. Resets on success; drives auto-disable."
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "project_id",
+                              "url",
+                              "events",
+                              "is_active",
+                              "last_triggered_at",
+                              "failure_count",
+                              "created_at",
+                              "updated_at"
+                            ]
                           }
                         }
                       },
@@ -5989,7 +7154,56 @@
                       "properties": {
                         "webhook": {
                           "type": "object",
-                          "properties": {}
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "project_id": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "HTTPS endpoint deliveries are POSTed to."
+                            },
+                            "events": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "description": "Subscribed event names — platform (`message.received`) or your bot's own custom names."
+                            },
+                            "is_active": {
+                              "type": "boolean",
+                              "description": "False once auto-disabled after repeated delivery failures, or when you disable it."
+                            },
+                            "last_triggered_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "failure_count": {
+                              "type": "number",
+                              "description": "Consecutive delivery failures. Resets on success; drives auto-disable."
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "project_id",
+                            "url",
+                            "events",
+                            "is_active",
+                            "last_triggered_at",
+                            "failure_count",
+                            "created_at",
+                            "updated_at"
+                          ]
                         }
                       },
                       "required": [
@@ -6166,7 +7380,56 @@
                       "properties": {
                         "webhook": {
                           "type": "object",
-                          "properties": {}
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "project_id": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "HTTPS endpoint deliveries are POSTed to."
+                            },
+                            "events": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "description": "Subscribed event names — platform (`message.received`) or your bot's own custom names."
+                            },
+                            "is_active": {
+                              "type": "boolean",
+                              "description": "False once auto-disabled after repeated delivery failures, or when you disable it."
+                            },
+                            "last_triggered_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "failure_count": {
+                              "type": "number",
+                              "description": "Consecutive delivery failures. Resets on success; drives auto-disable."
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "project_id",
+                            "url",
+                            "events",
+                            "is_active",
+                            "last_triggered_at",
+                            "failure_count",
+                            "created_at",
+                            "updated_at"
+                          ]
                         }
                       },
                       "required": [
@@ -6472,7 +7735,7 @@
     {
       "scope": "flows:read",
       "label": "Read flows",
-      "description": "View WhatsApp Flows."
+      "description": "List WhatsApp Flows and read a flow's JSON definition."
     },
     {
       "scope": "code:read",

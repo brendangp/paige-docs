@@ -4,7 +4,9 @@ sidebarTitle: "Introduction"
 description: "A REST API for your Paige project — send WhatsApp messages, read conversations, manage templates and contacts, assemble broadcasts, edit your bot's code and flows, and receive signed webhooks."
 ---
 
-Everything you do in the Paige dashboard, your own code can do too. The **Paige API** is a plain REST API over HTTPS: send a WhatsApp message, read a conversation, update a contact's tags, create a template, assemble a broadcast, edit your bot's code, deploy, or register a webhook.
+The **Paige API** is a plain REST API over HTTPS: send a WhatsApp message, read a conversation, update a contact's tags, create a template, assemble a broadcast, read and edit your bot's code and flows, deploy, or register a webhook.
+
+It covers the day-to-day operational surface rather than every screen in the dashboard. Project setup and account administration stay in the app — there are no endpoints for the database tab, secrets, logs, storage uploads, scheduled tasks, or billing, and broadcasts are assembled by API but approved and sent from the dashboard on purpose.
 
 <Note>
   Prefer to let an AI agent do the work instead of writing HTTP calls yourself? Paige also runs an MCP server — see [Connect an AI agent](/guides/connect-an-agent). Both routes sit behind the same keys and the same permissions.
