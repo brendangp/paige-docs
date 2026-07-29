@@ -142,7 +142,8 @@
               "guides/settings-whatsapp",
               "guides/templates",
               "guides/billing",
-              "guides/workspaces"
+              "guides/workspaces",
+              "guides/connect-an-agent"
             ]
           }
         ]
