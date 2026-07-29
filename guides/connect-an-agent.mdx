@@ -1,0 +1,152 @@
+---
+title: "Connect an AI agent to your Paige projects"
+sidebarTitle: "Connect an AI agent"
+description: "Let Claude, ChatGPT, Codex, or any MCP-compatible agent work on your Paige projects. One connection can cover several projects, each with its own permissions — and you can add or remove projects later without reconnecting."
+---
+
+Paige runs an **MCP server** — a standard way for an AI agent to use a product on your behalf. Connect one and it can do the things you'd otherwise do by hand: send a WhatsApp message, read your conversations, edit your bot's code, build a flow, deploy, or draft a broadcast. It only ever does what you approved.
+
+It works with any MCP-compatible agent, because MCP is an open standard they all speak — **Claude**, **ChatGPT**, the **OpenAI Codex** tool, and **Cursor** are all supported.
+
+Everything here lives under **Settings → API**.
+
+<Note>
+  The **API** section is for owners and admins. If you're a workspace member without admin access, it won't appear in your Settings sidebar at all.
+</Note>
+
+## Two ways to connect
+
+<CardGroup cols={2}>
+  <Card title="Sign in — no key" icon="shield-check">
+    For agents that support it, like Claude and ChatGPT. You click **Connect** in the agent, sign in to Paige, tick the projects and permissions, and approve. Nothing to copy or paste.
+  </Card>
+  <Card title="Paste an API key" icon="key">
+    For any client. Create a key under **API Keys**, then copy the ready-made install snippet from the **Connect an AI agent (MCP)** card — a one-line `claude mcp add …` command, or a config block for Claude Desktop, ChatGPT, or Cursor.
+  </Card>
+</CardGroup>
+
+<Tip>
+  The install snippet comes prefilled with your new key **while the key is still on screen** — copy the whole thing then. The secret is never shown again, so afterwards the snippet falls back to a `YOUR_PAIGE_API_KEY` placeholder you fill in yourself.
+</Tip>
+
+## Approving the connection
+
+When you use the sign-in route, Paige shows you a consent screen before anything is granted.
+
+<Steps>
+  <Step title="Check the web address first">
+    Before you look at anything else, check your browser's address bar. It must be Paige's own site at `https://paigeme.dev`. See [Make sure it's really Paige](#make-sure-its-really-paige) below.
+  </Step>
+  <Step title="Tick the projects the agent may use">
+    You can pick **several projects at once** — you don't have to approve the same agent again for each one. Your own projects are grouped under **Personal**, and each workspace you help run gets its own group headed by the workspace name. If you only have one project, it's picked for you.
+  </Step>
+  <Step title="Narrow the permissions per project">
+    Every project you tick starts with all the permissions the agent asked for. Open a project's row to untick anything you don't want it doing *there* — so the same agent might read conversations in one project and edit code in another.
+  </Step>
+  <Step title="Pick a default project">
+    When you tick more than one, choose which is the **default**. That's the project the agent uses when it doesn't say which one it means.
+  </Step>
+  <Step title="Approve">
+    The agent is connected, with exactly the permissions you granted, project by project.
+  </Step>
+</Steps>
+
+{/* TODO: screenshot of the multi-select consent screen with per-project permissions */}
+
+<Note>
+  A **paused** project can't be ticked — the row says so. An agent can't do anything in a paused project, so resume it first.
+</Note>
+
+<Warning>
+  If any project you picked isn't yours to connect — a workspace project where you're only a regular member, for instance — the **whole approval is refused**. Nothing is granted, not even the projects that would have been fine. Untick the one you can't connect and try again, or ask an owner or admin to do it.
+</Warning>
+
+## Make sure it's really Paige
+
+<Warning>
+  **Check the address bar, not the logo.** Before you approve access, look at the web address in your browser: it must be `https://paigeme.dev`. The address bar is the one thing a look-alike page cannot fake, so it's the only thing you should trust.
+
+  The consent card also carries the Green Pages logo and the words **Paige by Green Pages**, which helps you recognise the page at a glance — but treat that as a familiar face, not as proof. Anyone can copy a logo onto their own page.
+
+  If the address looks wrong, or you didn't just ask an agent to connect, close the page and don't approve.
+</Warning>
+
+The screen looks and works the same on a phone. One thing that isn't a warning sign: the small icon your agent shows next to Paige in its *own* list of connectors is chosen by that agent, not by Paige, so it may look plain there for a while.
+
+## One connection, many projects
+
+You don't need a separate connection per project. A single connected agent can cover several projects, and **each project has its own permissions** — a project can't borrow a permission from another project on the same connection.
+
+The headline part is what happens afterwards:
+
+<Note>
+  **You can add or remove projects later without reconnecting the agent.** Go to **Settings → API → Connected agents**, find the agent, and click **Add project**. It takes effect straight away — the agent is not re-approved, nothing is re-pasted, and the connection it already has simply starts covering the new project too.
+</Note>
+
+From the same card you can:
+
+- **Change a project's permissions** on that connection at any time.
+- **Remove a project** from the connection. It stops working on the agent's very next action, while its other projects carry on untouched.
+- **Disconnect** the agent entirely. Its access stops immediately and it would have to connect and be approved again.
+
+<Warning>
+  You can't remove a connection's **last** project — use **Disconnect** instead. Otherwise you'd be left with an agent that's still connected but can't be used or managed. You also can't add a project that's paused or deleted.
+</Warning>
+
+### What the Connected agents card shows
+
+For each connected agent you'll see every project attached to it, and for each of those projects: its own permissions, its own last-used time, and whether it's the **default**.
+
+If a connection also covers projects you don't have authority over, they aren't named to you — you just see **how many** there are, so you still know the connection's full reach.
+
+{/* TODO: screenshot of the Connected agents card with two projects attached */}
+
+## Workspace projects need an owner or admin
+
+You can connect an agent to a **workspace** project, not just your personal ones — but only if you're an **owner or admin** of that workspace.
+
+<Warning>
+  **This changed.** Connecting an agent to a workspace project used to work for any member of the workspace. It now requires owner or admin. An agent can be granted powerful permissions — editing code, deploying, sending broadcasts — so connecting one to a shared project is left to the people who run it. If you're a regular member, ask an owner or admin.
+</Warning>
+
+The same rule applies to the **Connected agents** card itself: on a workspace project, only owners and admins can see the connected agents or disconnect them. Being an admin of one project never lets you attach a different project you don't control. On your own personal projects nothing changes — you manage your agents yourself.
+
+See [Workspaces](/guides/workspaces) for roles and what each one can do.
+
+## How the agent picks which project to work on
+
+There's nothing to configure for this. The agent can ask Paige which projects your connection covers, and it gets back each project's name along with exactly what it's allowed to do there. From then on it names the project it means with each action.
+
+- **Anything that changes something** — sending a message, editing code, deploying, setting up a broadcast — must name the project explicitly once more than one is attached. A change can't land in the wrong project by mistake.
+- **Read-only things**, like listing conversations, fall back to your **default project** when the agent doesn't say.
+
+<Tip>
+  Say the project name in your request — "deploy the Acme Support bot" — and there's nothing to guess. A good agent will ask you rather than pick for you. And if you've just added a project and the agent still says it can't reach it, ask it to look up your projects again; it doesn't need reconnecting.
+</Tip>
+
+## Connecting specific agents
+
+<AccordionGroup>
+  <Accordion title="Claude" icon="message-circle">
+    Claude can connect either way. The no-key route is the easy one: add the Paige server, sign in, pick your projects and permissions, approve. For Claude Code and Claude Desktop the card also gives you a ready install snippet that uses an API key.
+  </Accordion>
+  <Accordion title="ChatGPT" icon="message-square">
+    Add a **custom connector** in ChatGPT and give it Paige's MCP server address, shown on the ChatGPT tab of the card. ChatGPT connectors always sign in — there's no box to paste an API key — so it sends you to Paige to choose your projects and approve.
+  </Accordion>
+  <Accordion title="OpenAI Codex" icon="terminal">
+    Point Codex at the same Paige MCP server address in its connector settings. Codex can either sign in to Paige and approve, or use a Paige API key you paste in — whichever you prefer.
+  </Accordion>
+  <Accordion title="Cursor" icon="code">
+    Use the API key route. Create a key with the scopes you need, then copy the Cursor config block from the card.
+  </Accordion>
+</AccordionGroup>
+
+## When something doesn't work
+
+| The agent says… | What to do |
+|---|---|
+| It doesn't have permission | Permissions are **per project**. Being allowed to edit code in one project doesn't allow it in another. Open **Connected agents**, find the agent, and tick that permission for that specific project. |
+| It can't reach a project you just added | Ask it to look up your projects again. Adding a project doesn't require reconnecting. |
+| The project is paused | That's a billing state. Un-pause the project before an agent can touch it. |
+| Its access is no longer valid | It was disconnected, or its access expired. Connect it again. |
+| It doesn't know which project you mean | Name the project in your request. |
