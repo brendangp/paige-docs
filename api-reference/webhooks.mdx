@@ -1,0 +1,232 @@
+---
+title: "Webhooks"
+description: "Have Paige POST events to your own HTTPS endpoint the moment they happen — inbound messages, delivery status, template approvals, and any custom event your bot emits. Every delivery is signed."
+---
+
+Polling the API to find out what changed is slow and wastes your rate limit. **Webhooks** turn it around: you give Paige an HTTPS endpoint, Paige POSTs each event to it as it happens.
+
+Register one under **Settings → API → Webhooks**, or with `POST /v1/webhooks` (scope `webhooks:manage`).
+
+## What a delivery looks like
+
+Every delivery is a `POST` with a JSON body in this shape:
+
+```json
+{
+  "id": "9c1f0e2a-…",
+  "event": "message.received",
+  "created_at": "2026-07-29T10:14:02.517Z",
+  "webhook_id": "3b7d…",
+  "data": {
+    "conversation_id": "…",
+    "message": {},
+    "conversation": {}
+  }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `id` | The delivery id. **Dedupe on this** — retries reuse the same `id`. |
+| `event` | The event name. |
+| `created_at` | When the event was raised, ISO-8601. |
+| `webhook_id` | Which of your registrations this was delivered to. |
+| `data` | The payload. `null` when an event carries none. |
+
+Alongside these headers:
+
+| Header | Value |
+| --- | --- |
+| `X-Paige-Signature` | `t=<unix seconds>,v1=<hmac>` — see below. |
+| `X-Paige-Event` | The event name, so you can route without parsing the body. |
+| `Content-Type` | `application/json` |
+| `User-Agent` | `Paige-Webhooks/1.0` |
+
+## Verify the signature
+
+<Warning>
+  **Verify every delivery before you act on it.** Your endpoint is a public URL — anyone can POST to it. The signature is the only thing that proves a payload came from Paige.
+</Warning>
+
+When you create a webhook, the response returns a signing secret that looks like `whsec_…`. It is shown **exactly once** — Paige never returns it again, there is no read-back, and there's no rotate. Lose it and you delete the webhook and register a new one.
+
+Each delivery is signed as `HMAC-SHA256(secret, "<timestamp>.<raw body>")`, hex-encoded, and sent as:
+
+```
+X-Paige-Signature: t=1785317642,v1=4f8c2b…
+```
+
+Three things must be true for you to trust a request:
+
+<Steps>
+  <Step title="Recompute the HMAC over the raw bytes">
+    Sign `"<t>.<rawBody>"` using the exact bytes you received. If your framework parsed the JSON and you re-serialise it, whitespace and key order shift and the HMAC will not match.
+  </Step>
+  <Step title="Compare in constant time">
+    Use a timing-safe comparison, not `===`. A naive string compare leaks information about the expected value.
+  </Step>
+  <Step title="Reject stale timestamps">
+    If `t` is more than **300 seconds** away from now, reject it. That's what stops someone replaying a delivery they captured earlier.
+  </Step>
+</Steps>
+
+### Reference verifier
+
+<CodeGroup>
+
+```javascript Node
+const crypto = require('crypto');
+
+function verifyPaigeSignature(secret, rawBody, header, { toleranceSec = 300, nowSec } = {}) {
+  const parts = Object.fromEntries(String(header).split(',').map((p) => {
+    const i = p.indexOf('='); return [p.slice(0, i).trim(), p.slice(i + 1).trim()];
+  }));
+  const t = Number(parts.t); if (!Number.isFinite(t) || !parts.v1) return false;
+  const now = Number.isFinite(nowSec) ? nowSec : Math.floor(Date.now() / 1000);
+  if (Math.abs(now - t) > toleranceSec) return false;
+  const body = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : String(rawBody);
+  const expected = crypto.createHmac('sha256', secret).update(`${t}.${body}`).digest('hex');
+  const a = Buffer.from(expected), b = Buffer.from(parts.v1);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+```javascript Express route
+const express = require('express');
+const app = express();
+
+// Note: express.raw, NOT express.json — you need the untouched bytes.
+app.post('/webhooks/paige', express.raw({ type: 'application/json' }), (req, res) => {
+  const ok = verifyPaigeSignature(
+    process.env.PAIGE_WEBHOOK_SECRET,
+    req.body,
+    req.get('X-Paige-Signature')
+  );
+  if (!ok) return res.sendStatus(401);
+
+  const event = JSON.parse(req.body.toString('utf8'));
+  // Acknowledge fast, then do the work out of band.
+  res.sendStatus(200);
+  handle(event).catch(console.error);
+});
+```
+
+</CodeGroup>
+
+<Tip>
+  The most common cause of "the signature never matches" is a JSON body-parser running before your handler. Capture the raw body first.
+</Tip>
+
+## Events you can subscribe to
+
+### Platform events
+
+Four events come from Paige itself. Each needs its own scope **in addition to** `webhooks:manage`, and the check happens when you subscribe, not when a delivery is attempted.
+
+| Event | Scope required | `data` contains |
+| --- | --- | --- |
+| `message.received` | `events:message_received` | `conversation_id`, `message`, `conversation` |
+| `message.status` | `events:message_status` | `message_id`, `status` |
+| `template.approved` | `events:template_status` | `name`, `language`, `category`, `status` |
+| `template.rejected` | `events:template_status` | `name`, `language`, `category`, `status` |
+
+`message.received` fires for **inbound** messages only — your own outbound sends don't trigger it.
+
+<Note>
+  Nothing is delivered unless you explicitly subscribed to that exact event name. There is no "all events" subscription.
+</Note>
+
+### Custom events from your bot
+
+Your bot code can raise its own events, which is how you get *business* signals rather than just messaging plumbing — an order confirmed, a booking taken, a lead qualified.
+
+```javascript
+const { paige } = require('../utils/paige');
+
+await paige.emit('order_confirmed', { orderId, total, currency: 'ZAR' });
+```
+
+The name you pass is delivered verbatim as `event`, and the payload becomes `data`. Names may use letters, numbers, dots, underscores and hyphens, up to 100 characters. Subscribing to a custom event needs only `webhooks:manage` — no `events:*` scope.
+
+`paige.emit` never throws into your handler. It returns `true` when Paige accepted the event and `false` otherwise, so a webhook problem can't break a customer conversation.
+
+<Warning>
+  Don't give a custom event the same name as a platform event. Subscriptions are matched by name, so a custom `message.received` would be gated behind the platform event's scope.
+</Warning>
+
+## Registering one
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.paigeme.dev/v1/webhooks \
+  -H "Authorization: Bearer pk_live_…" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/webhooks/paige",
+    "events": ["message.received", "order_confirmed"],
+    "is_active": true
+  }'
+```
+
+```json Response (201)
+{
+  "success": true,
+  "data": {
+    "webhook": {
+      "id": "3b7d…",
+      "url": "https://example.com/webhooks/paige",
+      "events": ["message.received", "order_confirmed"],
+      "is_active": true,
+      "failure_count": 0
+    },
+    "secret": "whsec_…"
+  }
+}
+```
+
+</CodeGroup>
+
+The `secret` in that response is the only time you will ever see it. Store it before you do anything else.
+
+Requirements worth knowing up front:
+
+- The URL must be **HTTPS** and at most 512 characters.
+- Between 1 and 50 events per registration.
+- The destination must resolve to a **public** address. Private, loopback, and link-local targets are rejected — so `localhost` and your laptop won't work. Use a tunnelling service while developing.
+- **Redirects are not followed.** A `3xx` counts as a failed delivery. Register the final URL.
+
+`GET`, `PATCH` and `DELETE /v1/webhooks/{id}` manage registrations. None of them ever return the secret, and updating a webhook does not rotate it.
+
+## Retries and failures
+
+Paige retries a failed delivery **5 times in total** with exponential backoff — roughly 5s, 10s, 20s, then 40s after the first attempt, so about 75 seconds end to end. Each attempt has a **10-second** timeout.
+
+A delivery is a success only on a `2xx`. Anything else — `3xx`, `4xx`, `5xx`, a timeout, a connection failure — is a failure and gets retried.
+
+<Warning>
+  After the fifth attempt the event is **dropped**. There is no dead-letter queue and no way to replay it later. If an event matters, acknowledge with a `2xx` as soon as you've durably stored it, and do your processing afterwards.
+</Warning>
+
+### Auto-disable
+
+Each registration keeps a `failure_count`. A single successful delivery resets it to zero. After **10 consecutive failed events**, the webhook is automatically set to `is_active: false` and stops receiving anything.
+
+Check `failure_count` and `is_active` under **Settings → API → Webhooks** or via `GET /v1/webhooks` if deliveries have gone quiet. Re-activate with a `PATCH` once your endpoint is healthy.
+
+## Writing a good consumer
+
+<AccordionGroup>
+  <Accordion title="Acknowledge fast" icon="zap">
+    Return `200` as soon as you've stored the event. Ten seconds is the whole budget, and slow handlers turn into retries — which means duplicates.
+  </Accordion>
+  <Accordion title="Dedupe on id" icon="copy">
+    Retries reuse the same `id`, and there are legitimate reasons you might see one twice. Keep the ids you've processed for a while and skip repeats. Note that two registrations subscribed to the same event get **different** ids for it — dedupe per webhook.
+  </Accordion>
+  <Accordion title="Be tolerant of new fields" icon="git-branch">
+    Ignore event names you don't recognise and fields you weren't expecting. New ones get added.
+  </Accordion>
+  <Accordion title="Never trust an unverified body" icon="shield">
+    Verify the signature before parsing anything into your system. Reject with `401` when it fails.
+  </Accordion>
+</AccordionGroup>

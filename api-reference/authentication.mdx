@@ -1,0 +1,108 @@
+---
+title: "Authentication"
+description: "Every /v1 request carries a project API key as a bearer token. Mint keys under Settings → API, scope them tightly, and store them as secrets — a key is shown once and never again."
+---
+
+Every `/v1` request authenticates with a **project API key**, sent as a bearer token:
+
+```
+Authorization: Bearer pk_live_…
+```
+
+There's no separate login step and no session. Send the header on every call.
+
+## Create a key
+
+Keys live under **Settings → API → API Keys**.
+
+<Note>
+  The **API** section is for **owners and admins**. If you're a workspace member without admin access, it doesn't appear in your Settings sidebar at all.
+</Note>
+
+<Steps>
+  <Step title="Open Settings → API">
+    Pick the project you want the key to act on. A key belongs to that one project.
+  </Step>
+  <Step title="Click New key">
+    Give it a name you'll recognise later — *"Zapier integration"*, *"order webhook worker"*. The name is for you; it's never sent anywhere.
+  </Step>
+  <Step title="Tick only the scopes it needs">
+    Grant the minimum. A key that only sends messages should hold `messages:send` and nothing else. See [Scopes](/api-reference/scopes).
+  </Step>
+  <Step title="Copy the key immediately">
+    The secret is shown **once**, in a dialog, with a copy button. Paige stores only a hash of it — nobody, including Paige support, can show it to you again.
+  </Step>
+</Steps>
+
+<Warning>
+  **Never put a key in front-end code, a mobile app, or a public repository.** Anyone holding it can do everything its scopes allow to your project — including sending WhatsApp messages to your customers. Store it as a server-side secret, for example in an environment variable like `PAIGE_API_KEY`.
+</Warning>
+
+### Rotate and revoke
+
+Each key row has **Rotate** and **Revoke**, plus an option to edit its scopes.
+
+- **Rotate** issues a fresh secret for the same key and shows it once. Update your integration promptly — the old secret stops working.
+- **Revoke** deletes it. Anything still using it starts getting `401 invalid_api_key` immediately.
+
+Rotate when a key may have leaked, when someone with access leaves, or just periodically. Editing scopes takes effect straight away — no new key needed.
+
+## The key is also the project
+
+There is no project id in any `/v1` path. The key resolves to its project on every request, which is why `/v1/messages` needs no more context than the message itself.
+
+Confirm which project a key resolves to, and what it may do there, with `GET /v1/ping`.
+
+<Warning>
+  A key stops working while its project is **paused** or **deleted** — you'll get `403 project_inactive`. Pausing is a billing state, so if an integration suddenly 403s across the board, check the project's subscription before you go hunting through your code.
+</Warning>
+
+## Signing in instead of pasting a key
+
+There's a second way in, for AI agents: Paige's **MCP server** supports OAuth, so clients like Claude and ChatGPT let you click **Connect**, sign in to Paige, and approve on a consent screen. No raw key is ever pasted, and access is revocable from **Settings → API → Connected agents**.
+
+An OAuth connection issues an access token (it starts with `mcp_at_`) that works as a bearer against the same `/v1` endpoints. The differences worth knowing:
+
+- **One connection can reach several projects**, each with its own scopes. Permissions never pool — a project can't borrow a scope from a sibling project on the same connection.
+- Tokens are revocable and can expire. A revoked or expired one returns `401 invalid_token`.
+
+Full walkthrough: [Connect an AI agent](/guides/connect-an-agent).
+
+## Targeting a project with `X-Paige-Project`
+
+Because an OAuth connection can cover several projects, requests can name one:
+
+```
+X-Paige-Project: <project id>
+```
+
+Get valid ids from `GET /v1/projects`, which lists every project the credential may act on along with its per-project scopes and which one is the default. Matching is case-insensitive.
+
+| Situation | What happens |
+| --- | --- |
+| OAuth token, header omitted, **read** (`GET`) | Falls back to the connection's default project. |
+| OAuth token, header omitted, **write** (any non-`GET`) with 2+ projects attached | Rejected with `400 project_required`. A write is never defaulted to a guessed project. |
+| OAuth token, header names a project not on the connection | `403 project_not_attached`. |
+| `pk_` API key, header omitted | The key's own project is used. |
+| `pk_` API key, header names a **different** project | `403 project_not_attached` — the header can't redirect a key. |
+| Any credential, header sent but **blank** | `400 invalid_project_header`. Omit it, or name a project. |
+
+Scopes are always checked against the *selected* project only.
+
+<Tip>
+  A plain `pk_live_…` key covering one project never needs this header. Skip it unless you're building against a multi-project OAuth connection.
+</Tip>
+
+## Authentication errors
+
+| Code | Status | What it means |
+| --- | --- | --- |
+| `api_key_required` | 401 | No `Authorization: Bearer …` header, or it's malformed. |
+| `invalid_api_key` | 401 | The key doesn't exist — usually revoked, rotated, or mistyped. |
+| `invalid_token` | 401 | An OAuth bearer that was revoked or has expired. Reconnect the agent. |
+| `project_inactive` | 403 | The project is paused or deleted. |
+| `insufficient_scope` | 403 | Valid credential, missing permission. See [Scopes](/api-reference/scopes). |
+| `project_not_attached` | 403 | `X-Paige-Project` named a project this credential can't act on. |
+| `no_project_access` | 403 | An OAuth connection with no projects attached. |
+| `project_required` | 400 | A multi-project connection made a write without naming a project. |
+| `invalid_project_header` | 400 | `X-Paige-Project` was sent but empty. |

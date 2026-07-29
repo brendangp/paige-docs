@@ -1,0 +1,47 @@
+---
+title: "API settings"
+sidebarTitle: "API"
+description: "Settings → API is the developer corner of a project — API keys, the MCP server for AI agents, connected agents, webhooks, and a ready-made integration skill."
+---
+
+**Settings → API** is where you give things *other than you* access to a project: your own code, an AI agent, or an endpoint that wants to be told when something happens.
+
+<Note>
+  This section is for **owners and admins**. If you're a workspace member without admin access, it doesn't appear in your Settings sidebar at all.
+</Note>
+
+## What's on the page
+
+<CardGroup cols={2}>
+  <Card title="API Keys" icon="key">
+    Create a key, tick the permissions it carries, and rotate, revoke, or edit its scopes later. The secret is shown once — copy it there and then.
+  </Card>
+  <Card title="Connect an AI agent (MCP)" icon="terminal">
+    The Paige MCP server address, plus copy-ready install snippets for Claude, Claude Desktop, ChatGPT, Codex, and Cursor.
+  </Card>
+  <Card title="Connected agents" icon="plug">
+    Every agent connected by sign-in, the projects each one covers, and per-project permissions. Add a project, change permissions, or disconnect.
+  </Card>
+  <Card title="Webhooks" icon="webhook">
+    Register an HTTPS endpoint and pick the events to deliver to it. The signing secret is shown once when you create it.
+  </Card>
+  <Card title="Integration skill" icon="sparkles">
+    A ready-made brief you hand to a coding agent so it builds against the live spec instead of guessing. Copy it, download it, or copy the OpenAPI URL.
+  </Card>
+</CardGroup>
+
+## Where to go from here
+
+Each card has a page that explains it properly:
+
+- **Building an integration in your own code?** Start at [The Paige API](/api-reference/introduction), then [Authentication](/api-reference/authentication) and [Scopes](/api-reference/scopes).
+- **Connecting Claude, ChatGPT, Codex, or Cursor?** [Connect an AI agent](/guides/connect-an-agent) covers both the sign-in and paste-a-key routes, and how one connection can cover several projects.
+- **Want events pushed to you?** [Webhooks](/api-reference/webhooks) covers the payload, signature verification, and retries.
+
+<Warning>
+  Both secrets on this page — an API key and a webhook signing secret — are shown **once** and never again. Paige stores only what it needs to check them, so nobody can recover one for you. Copy it when the dialog is open.
+</Warning>
+
+<Tip>
+  Give each integration its own key with only the scopes it needs. When something has to be revoked, you revoke one thing instead of breaking everything at once.
+</Tip>

@@ -1,0 +1,127 @@
+---
+title: "Idempotency"
+description: "Send an Idempotency-Key header with POST /v1/messages and a retry replays the original response instead of sending the same WhatsApp message twice."
+---
+
+A network timeout tells you nothing about whether the request arrived. Retry a send blindly and your customer may get the message twice; don't retry and they may get nothing.
+
+An **idempotency key** removes the guesswork. Send one, and Paige remembers the outcome against that key — a retry with the same key replays the stored response instead of sending again.
+
+<Note>
+  Idempotency is **opt-in** and currently applies to **`POST /v1/messages`**. Send the header and you get the protection; omit it and the endpoint behaves normally.
+</Note>
+
+## Using it
+
+Pick a key that's unique to the *thing you're doing*, not to the attempt. Then send the same key on every retry of that same send.
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.paigeme.dev/v1/messages \
+  -H "Authorization: Bearer pk_live_…" \
+  -H "Idempotency-Key: order-8842-shipped" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"text","phone":"+27821234567","content":"Your order has shipped."}'
+```
+
+```javascript JavaScript
+await fetch('https://api.paigeme.dev/v1/messages', {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${process.env.PAIGE_API_KEY}`,
+    'Idempotency-Key': `order-${order.id}-shipped`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    type: 'text',
+    phone: order.phone,
+    content: 'Your order has shipped.',
+  }),
+});
+```
+
+```python Python
+requests.post(
+    "https://api.paigeme.dev/v1/messages",
+    headers={
+        "Authorization": f"Bearer {os.environ['PAIGE_API_KEY']}",
+        "Idempotency-Key": f"order-{order_id}-shipped",
+    },
+    json={"type": "text", "phone": phone, "content": "Your order has shipped."},
+)
+```
+
+</CodeGroup>
+
+The key can be anything up to **255 characters**. A UUID works; so does a natural identifier from your own system like `order-8842-shipped`, which has the nice property that you can reconstruct it later without storing it.
+
+<Warning>
+  A key that changes per attempt — a fresh UUID inside the retry loop, a timestamp — gives you no protection at all. The whole mechanism depends on the retry reusing the key.
+</Warning>
+
+## What happens on a replay
+
+When a key you've already completed comes back, Paige returns the **original stored response**, byte for byte, and adds:
+
+```
+Idempotent-Replay: true
+```
+
+Nothing is re-sent to WhatsApp. Check that header if you want to know whether a call actually did anything.
+
+Keys are remembered for **24 hours**. After that the record expires and the same key behaves as if it were brand new — so idempotency protects you against retries, not against sending the same thing again next week.
+
+## Two conflicts to handle
+
+Both are `409`.
+
+<AccordionGroup>
+  <Accordion title="idempotency_in_progress" icon="hourglass">
+    The first request with this key is **still running**. This is exactly what you want to happen when a retry fires before the original finished — the duplicate is refused rather than racing it.
+
+    Wait a moment and retry with the same key. You'll then get the completed response as a replay.
+  </Accordion>
+  <Accordion title="idempotency_key_mismatch" icon="triangle-alert">
+    This key was already used with a **different request body**. Paige fingerprints each request, so reusing a key for different content is treated as a bug rather than silently returning the wrong stored answer.
+
+    Either you reused a key you shouldn't have, or your code changed the message between attempts. Use a fresh key for genuinely new content.
+  </Accordion>
+</AccordionGroup>
+
+A key that's empty or over 255 characters is rejected up front with `400 invalid_idempotency_key`.
+
+### How the fingerprint works
+
+The fingerprint covers the request **method, path, and body**. Object keys are sorted before hashing, so serialising your JSON with keys in a different order does **not** trip a mismatch. Array order does matter — reordering a list is a different request.
+
+## What gets stored
+
+| Outcome | Stored? | Effect on a retry |
+| --- | --- | --- |
+| Success (`2xx`) | Yes | Replays the success. Nothing re-sent. |
+| Client error (`4xx`) | Yes | Replays the same error. Fix the request and use a new key. |
+| Server error (`5xx`) | **No** | The key is released — a retry genuinely re-attempts the send. |
+
+That last row is the important one. A `500` is exactly the case where you *want* a retry to try again, so it's deliberately not cached.
+
+<Tip>
+  Replayed `4xx` bodies carry the `request_id` of the **original** request, while the `X-Request-Id` header reflects the new one. If those two disagree in your logs, you're looking at a replay — that's the giveaway.
+</Tip>
+
+## A pattern that works
+
+<Steps>
+  <Step title="Derive the key from the event, not the attempt">
+    `order-8842-shipped`, `booking-991-reminder`. One real-world event, one key.
+  </Step>
+  <Step title="Reuse it for every retry of that event">
+    Same key, same body, however many attempts it takes.
+  </Step>
+  <Step title="Retry only 5xx, timeouts, and rate limits">
+    A `400` won't fix itself. See [Errors](/api-reference/errors).
+  </Step>
+  <Step title="Treat 409 in-progress as retryable">
+    Wait briefly, then retry with the same key.
+  </Step>
+</Steps>

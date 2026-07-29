@@ -1,0 +1,123 @@
+---
+title: "Errors"
+description: "Every Paige API failure returns the same envelope with a stable machine-readable code and a request id. Branch on the code, log the request id."
+---
+
+Failures always come back in the same shape, whatever went wrong:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "outside_24h_window",
+    "message": "…"
+  },
+  "request_id": "8f1c2b74-…"
+}
+```
+
+| Field | What it's for |
+| --- | --- |
+| `error.code` | A short, stable identifier. **This is what your code should branch on.** |
+| `error.message` | Human-readable explanation. Useful in logs; never match on it. |
+| `error.details` | Present on some errors with structured extras — for example the daily quota error carries `limit` and `resetAt`. |
+| `request_id` | Identifies this exact request. Also returned as the `X-Request-Id` response header. |
+
+<Tip>
+  Log `request_id` alongside every failure you record. It's the fastest way to have a specific call looked up if you need help with one.
+</Tip>
+
+You can also set your own `X-Request-Id` on a request and Paige will use it, which makes tracing across your system and Paige's much easier.
+
+## Status codes
+
+| Status | Meaning | Do this |
+| --- | --- | --- |
+| `400` | Bad request — validation failed, or something in the request doesn't make sense. | Fix the request. Retrying unchanged won't help. |
+| `401` | Missing, malformed, revoked, or expired credential. | Check the `Authorization` header. See [Authentication](/api-reference/authentication). |
+| `402` | Out of credits. | Top up credits for the project. |
+| `403` | Authenticated, but not allowed. | Usually a missing scope or a paused project. See [Scopes](/api-reference/scopes). |
+| `404` | No such resource. | Check the id or name. |
+| `409` | Conflict with current state. | Depends on the code — see below. |
+| `410` | The resource existed but is gone for good. | Media at Meta expires; re-fetch from the source. |
+| `429` | Throttled, or the daily send allowance is used up. | Honour `Retry-After`. See [Rate limits](/api-reference/rate-limits). |
+| `500` | Something broke on Paige's side. | Safe to retry with backoff. |
+| `502` | Meta (WhatsApp) rejected the upstream call. | Read the message — it carries Meta's own detail. |
+
+## Common error codes
+
+### Request problems (400)
+
+| Code | What happened |
+| --- | --- |
+| `bad_request` | Generic validation failure. |
+| `invalid_request` | The request body didn't match the endpoint's schema. |
+| `invalid_json` | The body isn't valid JSON. |
+| `invalid_id` | An identifier in the path or body isn't a well-formed id. |
+| `invalid_cursor` | The paging cursor you passed isn't one Paige issued. |
+| `invalid_idempotency_key` | The `Idempotency-Key` header is empty or longer than 255 characters. |
+| `invalid_project_header` | `X-Paige-Project` was sent but blank. |
+| `project_required` | A multi-project connection tried a write without naming a project. |
+
+Message sends add their own validation codes — `invalid_phone`, `missing_recipient`, `missing_template_name`, `missing_language`, `template_variable_mismatch`, `unsupported_message_type`, `too_many_buttons`, and others. Each names precisely what to fix.
+
+### Credential problems (401 / 403)
+
+| Code | Status |
+| --- | --- |
+| `api_key_required` | 401 |
+| `invalid_api_key` | 401 |
+| `invalid_token` | 401 |
+| `insufficient_scope` | 403 |
+| `project_inactive` | 403 |
+| `project_not_attached` | 403 |
+| `no_project_access` | 403 |
+| `protected_file` | 403 |
+
+All of these are covered in [Authentication](/api-reference/authentication). `protected_file` is separate: it means a write targeted a file the platform manages, which your integration isn't allowed to edit.
+
+### Conflicts (409)
+
+| Code | What happened |
+| --- | --- |
+| `outside_24h_window` | You tried to send a free-form message to someone who hasn't messaged you in the last 24 hours. Send an approved template instead. |
+| `template_exists` | A template with that name and language already exists. |
+| `idempotency_in_progress` | The same `Idempotency-Key` is still being processed. Retry shortly. |
+| `idempotency_key_mismatch` | That key was already used with a **different** request body. |
+
+The last two are explained in [Idempotency](/api-reference/idempotency).
+
+<Warning>
+  `outside_24h_window` is the single most common surprise for new integrations. WhatsApp only lets you send free-form messages inside a 24-hour window that opens when the customer messages you. Outside it, an approved template is the only thing that goes through. See [Templates](/guides/templates).
+</Warning>
+
+### Too many requests (429)
+
+| Code | What happened |
+| --- | --- |
+| `rate_limited` | Too many API requests. Back off and retry. |
+| `quota_exceeded` | The project's daily WhatsApp send allowance is used up. |
+
+Both carry `Retry-After`. They're genuinely different problems — see [Rate limits](/api-reference/rate-limits).
+
+### Upstream and server (5xx)
+
+| Code | Status | What happened |
+| --- | --- | --- |
+| `meta_auth_error` | 502 | Meta rejected the project's WhatsApp credentials. Reconnect WhatsApp under **Settings → WhatsApp**. |
+| `build_failed` | 502 | The code agent couldn't complete the build. |
+| `server_error` | 500 | An unexpected error on Paige's side. |
+
+You'll also see some codes in `SCREAMING_SNAKE_CASE` — `PROJECT_NOT_FOUND`, `SEGMENT_NOT_FOUND`, `MEDIA_EXPIRED`, `BROADCAST_NOT_FOUND` and similar. They come from the shared capability layer that the AI agent tools use too, and they behave exactly like any other code. Match on them the same way.
+
+## Retrying
+
+| Status | Retry? |
+| --- | --- |
+| `400`, `401`, `403`, `404`, `409` | No — the request itself needs changing. |
+| `429` | Yes, after `Retry-After` seconds. |
+| `500`, `502` | Yes, with exponential backoff. |
+
+<Warning>
+  Before you retry a `POST /v1/messages` that timed out or 5xx'd, read [Idempotency](/api-reference/idempotency). Without an `Idempotency-Key`, a retry can send the same WhatsApp message to a customer twice.
+</Warning>

@@ -1,0 +1,106 @@
+---
+title: "Rate limits"
+description: "The API allows 60 requests per minute per key. That's separate from your project's daily WhatsApp send quota — both return 429, but they mean different things and need different fixes."
+---
+
+Two different limits can return a `429`, and confusing them wastes a lot of debugging time. Check `error.code` first:
+
+<CardGroup cols={2}>
+  <Card title="rate_limited" icon="gauge">
+    **You're calling the API too fast.** 60 requests per minute, per credential. Back off and carry on.
+  </Card>
+  <Card title="quota_exceeded" icon="calendar-x">
+    **You've used up the project's WhatsApp sends for the day.** Slowing down won't help — it resets at UTC midnight.
+  </Card>
+</CardGroup>
+
+## The API rate limit
+
+**60 requests per minute**, counted in a rolling one-minute window. The limit is flat — it doesn't vary by plan or by endpoint.
+
+It's counted **per credential**, not per project or per IP. Each API key gets its own 60, and each connected AI agent gets its own. Two integrations on the same project don't eat each other's budget; two copies of the same integration sharing one key do.
+
+### The headers
+
+Every rate-limited response carries these, not just the ones that fail:
+
+| Header | Meaning |
+| --- | --- |
+| `RateLimit-Limit` | Requests permitted in the current window. |
+| `RateLimit-Remaining` | Requests left in it. |
+| `RateLimit-Reset` | Seconds until the window resets. |
+| `RateLimit-Policy` | The policy in force, as `60;w=60`. |
+
+On a `429` you also get:
+
+| Header | Meaning |
+| --- | --- |
+| `Retry-After` | Seconds to wait before trying again. |
+
+<Tip>
+  Watch `RateLimit-Remaining` and slow down as it approaches zero, rather than sprinting into a `429` and reacting. It costs nothing and keeps your integration smooth.
+</Tip>
+
+### Handling it
+
+```javascript
+async function callPaige(path, init, attempt = 0) {
+  const res = await fetch(`https://api.paigeme.dev${path}`, init);
+
+  if (res.status === 429) {
+    const body = await res.json();
+    if (body.error?.code === 'quota_exceeded') throw new Error('Daily send quota exhausted');
+
+    const wait = Number(res.headers.get('Retry-After') ?? 1);
+    if (attempt >= 5) throw new Error('Rate limited too many times');
+    await new Promise((r) => setTimeout(r, wait * 1000));
+    return callPaige(path, init, attempt + 1);
+  }
+
+  return res.json();
+}
+```
+
+Note the code check: retrying a `quota_exceeded` in a tight loop just burns requests against the rate limit for no benefit.
+
+<Note>
+  The throttle **fails open**. If the counter store has a blip, requests are allowed through rather than rejected — a hiccup in Paige's infrastructure will never turn into a wall of `429`s for you. Don't design around it; just know that a brief window of no limiting isn't a bug.
+</Note>
+
+## The daily WhatsApp send quota
+
+This is a completely separate control, and it only applies to `POST /v1/messages`.
+
+Every project has a **daily allowance of WhatsApp messages**, defaulting to 1,000 per project. It's counted per **UTC calendar day** and resets at UTC midnight. It exists so a runaway loop can't send thousands of messages to your customers — and, because WhatsApp sends cost money, can't quietly run up a bill.
+
+When it's used up:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "quota_exceeded",
+    "message": "Daily WhatsApp message quota exceeded. It resets at the next UTC midnight.",
+    "details": {
+      "limit": 1000,
+      "resetAt": "2026-07-30T00:00:00.000Z"
+    }
+  },
+  "request_id": "8f1c…"
+}
+```
+
+`details.limit` is your project's actual allowance and `details.resetAt` is exactly when it lifts. A `Retry-After` header carries the same wait in seconds.
+
+<Warning>
+  Backing off and retrying does **not** clear `quota_exceeded`. Nothing changes until the reset. Queue the work, alert someone, or drop it — but don't hammer.
+</Warning>
+
+Broadcasts are the right tool for high-volume sends. They're paced for you and don't require you to build your own throttling. See [Broadcasts](/guides/broadcasts).
+
+## Designing to stay under both
+
+- **Batch reads.** `GET /v1/conversations` with `limit=100` is one request; a hundred single-conversation lookups is a hundred.
+- **Use webhooks instead of polling.** A poll every few seconds burns your budget continuously and still tells you about events late. [Webhooks](/api-reference/webhooks) push them the moment they happen.
+- **Give each integration its own key.** Separate budgets, and separate scopes, so one busy job can't starve another.
+- **Never retry into a `429` without waiting.** Honour `Retry-After` every time.

@@ -1,0 +1,133 @@
+---
+title: "The Paige API"
+sidebarTitle: "Introduction"
+description: "A REST API for your Paige project — send WhatsApp messages, read conversations, manage templates and contacts, assemble broadcasts, edit your bot's code and flows, and receive signed webhooks."
+---
+
+Everything you do in the Paige dashboard, your own code can do too. The **Paige API** is a plain REST API over HTTPS: send a WhatsApp message, read a conversation, update a contact's tags, create a template, assemble a broadcast, edit your bot's code, deploy, or register a webhook.
+
+<Note>
+  Prefer to let an AI agent do the work instead of writing HTTP calls yourself? Paige also runs an MCP server — see [Connect an AI agent](/guides/connect-an-agent). Both routes sit behind the same keys and the same permissions.
+</Note>
+
+## Base URL
+
+All endpoints live under `/v1`:
+
+```
+https://api.paigeme.dev
+```
+
+## Your key carries the project
+
+There is **no project id in any path**. An API key belongs to exactly one project, so `POST /v1/messages` sends from *that* project's WhatsApp number and `GET /v1/conversations` reads *that* project's conversations. Nothing to pass, nothing to get wrong.
+
+See [Authentication](/api-reference/authentication) for how to mint a key, and how this works for an AI agent connected to several projects at once.
+
+## Try it in 60 seconds
+
+Create a key under **Settings → API**, then check it works:
+
+<CodeGroup>
+
+```bash curl
+curl https://api.paigeme.dev/v1/ping \
+  -H "Authorization: Bearer pk_live_your_key_here"
+```
+
+```javascript JavaScript
+const res = await fetch('https://api.paigeme.dev/v1/ping', {
+  headers: { Authorization: `Bearer ${process.env.PAIGE_API_KEY}` },
+});
+console.log(await res.json());
+```
+
+```python Python
+import os, requests
+
+res = requests.get(
+    "https://api.paigeme.dev/v1/ping",
+    headers={"Authorization": f"Bearer {os.environ['PAIGE_API_KEY']}"},
+)
+print(res.json())
+```
+
+</CodeGroup>
+
+You'll get back the project the key resolved to and exactly what it's allowed to do:
+
+```json
+{
+  "success": true,
+  "data": {
+    "ok": true,
+    "projectId": "a3f62fcb-…",
+    "scopes": ["messages:send", "conversations:read"]
+  }
+}
+```
+
+That's the fastest way to confirm a key is live and correctly scoped before you write anything else.
+
+## The response envelope
+
+Every response uses one of two shapes. On success:
+
+```json
+{ "success": true, "data": {} }
+```
+
+On failure:
+
+```json
+{
+  "success": false,
+  "error": { "code": "insufficient_scope", "message": "…" },
+  "request_id": "8f1c…"
+}
+```
+
+<Tip>
+  Branch your code on `error.code`, never on `error.message`. Codes are stable; wording isn't.
+</Tip>
+
+Responses also carry an **`X-Request-Id`** header — the same value that appears as `request_id` in an error body. Log it. If you ever need help with a specific failed call, that id is what identifies it.
+
+See [Errors](/api-reference/errors) for the full list of codes.
+
+## Paging through results
+
+Paging isn't identical everywhere, so check the endpoint you're calling. Conversations and their messages use an opaque keyset **`cursor`**: pass `limit` (max 100, default 50), then feed the `nextCursor` from the response back as `cursor` to get the next page. Broadcast recipients instead use **`limit`** and **`offset`**, and return a `total` so you know how far there is to go.
+
+## What you'll need next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    Mint a key, keep it safe, and target the right project.
+  </Card>
+  <Card title="Scopes" icon="shield-check" href="/api-reference/scopes">
+    The 17 permissions a key can carry, and what each unlocks.
+  </Card>
+  <Card title="Errors" icon="triangle-alert" href="/api-reference/errors">
+    Status codes, error codes, and what to do about each.
+  </Card>
+  <Card title="Rate limits" icon="gauge" href="/api-reference/rate-limits">
+    The per-key throttle, and the separate daily send quota.
+  </Card>
+  <Card title="Idempotency" icon="repeat" href="/api-reference/idempotency">
+    Retry a send safely without messaging a customer twice.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Get events pushed to you, and verify they're really from Paige.
+  </Card>
+</CardGroup>
+
+## Building with an AI coding agent
+
+If you're having Claude, Codex, or Cursor write the integration for you, hand it the ready-made skill file rather than pasting docs at it:
+
+```
+https://api.paigeme.dev/v1/skill.md
+```
+
+It points the agent at the live OpenAPI document — `https://api.paigeme.dev/v1/openapi.json`, public and unauthenticated — as its source of truth, and gives it working recipes for the common tasks. You'll find the same file in the app under **Settings → API → Integration skill**, with copy and download buttons.

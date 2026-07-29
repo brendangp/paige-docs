@@ -23,7 +23,18 @@
     "eyebrows": "breadcrumbs"
   },
   "contextual": {
-    "options": ["copy", "view", "assistant"]
+    "options": ["copy", "view", "assistant", "download-spec"]
+  },
+  "api": {
+    "playground": {
+      "display": "simple"
+    },
+    "params": {
+      "expanded": "closed"
+    },
+    "examples": {
+      "languages": ["curl", "javascript", "python"]
+    }
   },
   "navigation": {
     "tabs": [
@@ -143,8 +154,34 @@
               "guides/templates",
               "guides/billing",
               "guides/workspaces",
+              "guides/settings-api",
               "guides/connect-an-agent"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "API",
+        "icon": "code",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/scopes",
+              "api-reference/errors",
+              "api-reference/rate-limits",
+              "api-reference/idempotency",
+              "api-reference/webhooks"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": {
+              "source": "api-reference/openapi.json",
+              "directory": "api-reference/endpoints"
+            }
           }
         ]
       },

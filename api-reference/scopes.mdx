@@ -1,0 +1,85 @@
+---
+title: "Scopes"
+description: "Each API key carries a set of scopes, and every endpoint requires one. Grant the minimum a key needs — a key missing a required scope gets 403 insufficient_scope."
+---
+
+A scope is a single permission. You tick scopes when you create a key under **Settings → API → API Keys**, and you can edit them afterwards without issuing a new key.
+
+Every endpoint states the scope it needs, both in its description and in the `x-required-scopes` field of the [OpenAPI document](https://api.paigeme.dev/v1/openapi.json). Grant exactly those and no more.
+
+## The full catalogue
+
+<Tabs>
+  <Tab title="Messaging">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `messages:send` | Send WhatsApp session and template messages. |
+    | `conversations:read` | List conversations and read their messages and delivery status. |
+    | `conversations:write` | Change a conversation's state (for example handover, open, closed). |
+    | `contacts:read` | Read contact records. |
+    | `contacts:write` | Create or update a contact name and tags. |
+  </Tab>
+  <Tab title="Templates & broadcasts">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `templates:read` | List message templates and their approval status. |
+    | `templates:manage` | Create and delete WhatsApp message templates. |
+    | `broadcasts:read` | View broadcast campaigns and their status. |
+    | `broadcasts:manage` | Create, schedule, and send broadcast campaigns. |
+  </Tab>
+  <Tab title="Code & flows">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `code:read` | List and read the project bot code files. |
+    | `code:write` | Edit project code files and deploy dev → production. |
+    | `flows:read` | View WhatsApp Flows. |
+    | `flows:write` | Generate and update WhatsApp Flows (routed through the flows agent). |
+  </Tab>
+  <Tab title="Webhooks & events">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `webhooks:manage` | Register and manage outbound webhook subscriptions. |
+    | `events:message_received` | Deliver a webhook when an inbound message arrives. |
+    | `events:message_status` | Deliver a webhook when a message delivery status changes. |
+    | `events:template_status` | Deliver a webhook when a template approval status changes. |
+  </Tab>
+</Tabs>
+
+That's 17 scopes in total.
+
+## When a scope is missing
+
+A valid key calling an endpoint it isn't scoped for gets:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "insufficient_scope",
+    "message": "…"
+  },
+  "request_id": "8f1c…"
+}
+```
+
+with HTTP **403**. Fix it by editing the key's scopes in **Settings → API** — you don't need a new key.
+
+<Tip>
+  `GET /v1/ping` echoes back the scopes the credential actually holds. When a call 403s unexpectedly, ping first and compare against the endpoint's `x-required-scopes` before changing anything else.
+</Tip>
+
+## Two things that catch people out
+
+**`webhooks:manage` isn't enough on its own.** Registering a webhook always needs `webhooks:manage`, but *subscribing to a platform event* also needs that event's own `events:*` scope. Asking for `message.received` without `events:message_received` fails with `403 insufficient_scope` at registration time, not at delivery time. Custom events your own bot emits need only `webhooks:manage`. See [Webhooks](/api-reference/webhooks).
+
+**Scopes don't pool across projects.** If an AI agent is connected to several projects at once, each project carries its own grant. Being allowed to edit code in one project never implies it in another — the check runs against the selected project only.
+
+## Picking scopes for a job
+
+| If you're building… | Grant |
+| --- | --- |
+| Order notifications out of your own system | `messages:send`, plus `templates:read` if you look templates up |
+| A shared inbox or CRM sync | `conversations:read`, `contacts:read`, `contacts:write` |
+| A marketing campaign tool | `broadcasts:manage`, `broadcasts:read`, `templates:read` |
+| An AI agent that edits your bot | `code:read`, `code:write`, `flows:write` |
+| An event consumer | `webhooks:manage` plus each `events:*` you subscribe to |
