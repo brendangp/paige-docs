@@ -46,11 +46,17 @@ Open the **Conversations** tab in the dashboard. The chat sidebar switches to th
   <Card title="Draft replies" icon="pen-line">
     Compose a reply for you to review, copy, and send yourself. It never sends on its own.
   </Card>
+  <Card title="Propose a template send" icon="send">
+    When the 24-hour window has closed, it can put an approved template in front of you, filled in and ready — you press the button.
+  </Card>
+  <Card title="Propose a new template" icon="file-plus">
+    If no template fits, it can draft one and hand it to you to submit to Meta.
+  </Card>
 </CardGroup>
 
 ## The tools it uses
 
-The agent has six built-in tools it uses behind the scenes to complete your requests.
+The agent has eight built-in tools it uses behind the scenes to complete your requests.
 
 <CardGroup cols={2}>
   <Card title="list_contacts" icon="users">
@@ -71,7 +77,19 @@ The agent has six built-in tools it uses behind the scenes to complete your requ
   <Card title="draft_message" icon="pen-line">
     Returns a draft reply for a contact. It never sends — you copy the draft and send it from the conversation view.
   </Card>
+  <Card title="propose_template_send" icon="send">
+    Puts an approved template, with its placeholders filled in, into an approval card in the chat. Nothing is sent until you press the button on that card.
+  </Card>
+  <Card title="propose_template_create" icon="file-plus">
+    Drafts a new template — name, category, body, example values — into an approval card. Submitting it to Meta is your click, not the agent's.
+  </Card>
 </CardGroup>
+
+### Proposals are cards, not actions
+
+The two `propose_*` tools don't do anything by themselves. They render a card in the chat, and **your browser** performs the send or the submission when you press its button — under your own session, with your own permissions.
+
+That's a structural guarantee rather than a promise about the agent's behaviour: there is no tool that sends a template or creates one, so a confused or misled agent has nothing to call. The worst it can do is put a card in front of you that you decline.
 
 ## The 24-hour window and handover
 
@@ -97,7 +115,7 @@ When you ask the agent to move a conversation **into handover**, that change run
 ## What it can't do
 
 <Note>
-  The Conversations Agent works only with your existing conversation data. It **can't** send a message, delete a contact or conversation, change your bot's code, or reach any system outside your inbox. Ask it to write or fix bot behavior and it'll point you to the [Code Agent](/agents/code-agent).
+  The Conversations Agent works only with your existing conversation data. It **can't** send a message, submit a template to Meta, delete a contact or conversation, change your bot's code, or reach any system outside your inbox. It can *propose* a template send or a new template, but you are the one who presses the button. Ask it to write or fix bot behavior and it'll point you to the [Code Agent](/agents/code-agent).
 </Note>
 
 {/* TODO: screenshot — Conversations tab with the Conversations Agent open in the sidebar, showing a draft reply */}

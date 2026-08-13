@@ -47,7 +47,31 @@ To hand back, click **Handover ON** and pick the [state](/concepts/conversations
 
 ### When the window has closed
 
-If the 24-hour window has expired, the handover button reads **24h expired** and the reply box shows *24-hour messaging window has expired*. Your only way to reach the contact after that is an approved [message template](/guides/templates).
+If the 24-hour window has expired, the handover button reads **24h expired** and the reply box shows *24-hour messaging window has expired*. Your only way to reach the contact after that is an approved [message template](/guides/templates) — and you can send one without leaving this tab.
+
+## Sending a template
+
+Click the **Send template** button in the composer to open the picker. It works whether or not the window is open, and whether or not handover is on — unlike the reply box, it isn't gated, because a template is exactly what you need when everything else is unavailable.
+
+The picker shows the templates Meta has already approved for your number. Pick one and you'll see it exactly as the customer will.
+
+### Filling in the blanks
+
+If the template has placeholders — `{{1}}`, `{{2}}` — you fill them in right there in the picker, and the preview updates as you type. You can't send until every placeholder has a value, so a customer never receives a message with a raw `{{1}}` in it.
+
+### The conversation starter
+
+Paige keeps one standard template, the **conversation starter**, pinned to the top of the picker. It's a plain one-tap opener whose only job is to get a reply — and a reply is what reopens the 24-hour window so you can talk normally again.
+
+If your project doesn't have one yet, the picker offers to create it for you. Meta reviews it like any other template, which usually takes a few minutes.
+
+<Warning>
+  **Sending the starter takes the conversation over.** It switches the conversation into handover so you reply yourself and your bot stops answering, until you switch handover back off. There's no opt-out — the whole point of the starter is to begin a human conversation.
+</Warning>
+
+<Note>
+  Sending a template costs you a Meta conversation charge, and templates are the one message type that can reach someone who hasn't written to you recently. Use them to restart a real conversation, not to broadcast — for that, use [Broadcasts](/guides/broadcasts), which is built for sending to many people at once.
+</Note>
 
 ## Let the Conversations Agent help
 

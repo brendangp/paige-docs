@@ -50,6 +50,10 @@
       "description": "Read/edit bot code, deploy, read/generate/update flows."
     },
     {
+      "name": "Tables",
+      "description": "Read and write the project's own database tables. Paige platform tables are denied, and an update or delete must always be filtered."
+    },
+    {
       "name": "Webhooks",
       "description": "Register signed outbound webhooks."
     }
@@ -1098,6 +1102,16 @@
           },
           "409": {
             "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The project's **self-hosted** backend cannot perform the action (`TEMPLATE_SEND_UNSUPPORTED` — it answered the `capabilities` handshake without `send_template`, or rejected the command with `UNKNOWN_COMMAND`). `error.details` carries `command`, `specDoc` and `detected`. Fix it by implementing the optional `send_template` webhook command in your backend, not by retrying.\n\n**Changed behaviour:** before this was introduced, a self-hosted backend that did not implement `send_template` produced `502 WEBHOOK_FAILED` on `POST /v1/messages` with `type: \"template\"`. That case is now `422 TEMPLATE_SEND_UNSUPPORTED`. If you branch on `502`/`WEBHOOK_FAILED` for this scenario, handle `422` too — `502 WEBHOOK_FAILED` still means a genuinely failing backend (it now also carries the backend's own reason in the message and in `error.details.backendMessage` / `backendCode`). Projects on Paige-hosted (VM) numbers are unaffected: they are never probed and never return `422` here.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3906,15 +3920,18 @@
                 "properties": {
                   "content": {
                     "type": "string",
-                    "maxLength": 1000000
+                    "maxLength": 1000000,
+                    "description": "Full new file content (whole-file write). Provide this OR old_string/new_string."
                   },
                   "old_string": {
                     "type": "string",
-                    "maxLength": 1000000
+                    "maxLength": 1000000,
+                    "description": "Exact existing substring to replace (targeted edit). Must match exactly one location."
                   },
                   "new_string": {
                     "type": "string",
-                    "maxLength": 1000000
+                    "maxLength": 1000000,
+                    "description": "Replacement text for old_string."
                   }
                 }
               }
@@ -4283,13 +4300,15 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "description": "Custom table names whose DATA to copy dev→prod. Structure always syncs; omit to leave production rows untouched."
                   },
                   "flows": {
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "description": "Flow ids to (re)publish on the connected WhatsApp number during this deploy."
                   }
                 }
               }
@@ -6754,6 +6773,1454 @@
         }
       }
     },
+    "/v1/tables": {
+      "get": {
+        "operationId": "listTables",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "List the project's own database tables",
+        "description": "Returns the tables your bot uses for its own data.\n\n**Paige platform tables are never listed** — `contacts`, `conversations`, `messages`, `execution_logs` and `broadcast_recipients` are absent entirely, not flagged. Read those through their dedicated endpoints (`/v1/contacts/{id}/messages`, `/v1/conversations`, `/v1/broadcasts/{id}/recipients`), which carry their own scopes.\n\nDefaults to the `public` (production) schema — the one the live bot reads. Pass `schema=preview` for the dev sandbox.\n\n**Required scope:** `tables:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public",
+                "preview"
+              ],
+              "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+            },
+            "required": false,
+            "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox).",
+            "name": "schema",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "schema": {
+                          "type": "string",
+                          "description": "The schema that was read."
+                        },
+                        "tables": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Table name."
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "schema",
+                        "tables"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tables/{table}/schema": {
+      "get": {
+        "operationId": "getTableSchema",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "Read one table's columns, types and primary key",
+        "description": "Column names, Postgres types, nullability, defaults and primary-key flags for one of your tables. Use it to discover what you may pass as `columns`, `filters` and `order_by` on the rows endpoint.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Required scope:** `tables:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected."
+            },
+            "required": true,
+            "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected.",
+            "name": "table",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public",
+                "preview"
+              ],
+              "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+            },
+            "required": false,
+            "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox).",
+            "name": "schema",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "type": "string"
+                        },
+                        "schema": {
+                          "type": "string"
+                        },
+                        "columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Column name."
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "Postgres data type, e.g. \"text\", \"integer\", \"timestamp with time zone\"."
+                              },
+                              "nullable": {
+                                "type": "boolean",
+                                "description": "Whether the column accepts NULL."
+                              },
+                              "default_value": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Column default expression, or null."
+                              },
+                              "is_primary_key": {
+                                "type": "boolean",
+                                "description": "Whether the column is part of the primary key."
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "type",
+                              "nullable",
+                              "default_value",
+                              "is_primary_key"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "table",
+                        "schema",
+                        "columns"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tables/{table}/rows": {
+      "get": {
+        "operationId": "queryTableRows",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "Read rows from one of your tables",
+        "description": "Filtered, ordered, paged row reads. A GET carries no body, so the structured arguments travel as strings:\n\n- `columns` is a comma-separated list, e.g. `id,farm_name`. Omit it for all columns.\n- `filters` is a JSON array of predicates, e.g. `[{\"column\":\"status\",\"op\":\"eq\",\"value\":\"due\"}]`. Predicates are AND-joined; up to 20. Supported ops: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `is` (`is` takes only null / true / false).\n\n**Pattern grammar.** `like` and `ilike` take a **SQL LIKE pattern**: `%` matches any sequence of characters, `_` matches exactly one. `*` is **not** a wildcard and a value containing one is `400` — it is refused rather than translated because the two database backends Paige runs on would disagree about it, and a filter must mean the same thing on every project. `like` and `ilike` are read-only: they are not accepted on the update or delete endpoints.\n\nEvery column you name — projection, filter or ordering — is checked against the columns the table actually has; an unknown one is `400 unknown_column`.\n\nOrdering defaults to the primary key, which makes paging stable. A table with **no primary key** and no explicit `order_by` is returned unordered — Postgres guarantees no row order there, so paging such a table can repeat or skip rows. Pass `order_by` on a table without a primary key.\n\nPagination follows the standard cursor convention: read `pagination.hasMore` and pass `pagination.nextCursor` straight back as `cursor`. Treat the cursor as opaque — never construct one.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected."
+            },
+            "required": true,
+            "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected.",
+            "name": "table",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public",
+                "preview"
+              ],
+              "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+            },
+            "required": false,
+            "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox).",
+            "name": "schema",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 2000,
+              "description": "Comma-separated column names, e.g. \"id,farm_name\". Omit for all columns."
+            },
+            "required": false,
+            "description": "Comma-separated column names, e.g. \"id,farm_name\". Omit for all columns.",
+            "name": "columns",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 4000,
+              "description": "A JSON array of predicates, e.g. [{\"column\":\"status\",\"op\":\"eq\",\"value\":\"due\"}]. AND-joined, max 20."
+            },
+            "required": false,
+            "description": "A JSON array of predicates, e.g. [{\"column\":\"status\",\"op\":\"eq\",\"value\":\"due\"}]. AND-joined, max 20.",
+            "name": "filters",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Column to order by. Omit to order by the primary key. Every primary-key column is always appended as a tie-breaker, so paging stays stable even when this column has duplicate values."
+            },
+            "required": false,
+            "description": "Column to order by. Omit to order by the primary key. Every primary-key column is always appended as a tie-breaker, so paging stays stable even when this column has duplicate values.",
+            "name": "order_by",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Order direction."
+            },
+            "required": false,
+            "description": "Order direction.",
+            "name": "order_dir",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Rows per page, 1-50. Default 20."
+            },
+            "required": false,
+            "description": "Rows per page, 1-50. Default 20.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "Opaque nextCursor from a previous page. Do not construct one by hand."
+            },
+            "required": false,
+            "description": "Opaque nextCursor from a previous page. Do not construct one by hand.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "type": "string"
+                        },
+                        "schema": {
+                          "type": "string"
+                        },
+                        "rows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "The matching rows, shaped by your table."
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "hasMore": {
+                              "type": "boolean",
+                              "description": "Whether another page follows."
+                            },
+                            "nextCursor": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Opaque cursor for the next page, or null on the last page."
+                            }
+                          },
+                          "required": [
+                            "hasMore",
+                            "nextCursor"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "table",
+                        "schema",
+                        "rows",
+                        "pagination"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "insertTableRows",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "Insert rows into one of your tables",
+        "description": "Inserts 1-50 rows and returns them **as stored** — generated primary keys, column defaults and trigger output included — so you can reference what you just wrote.\n\n**All-or-nothing.** The batch is a single statement, so either every row lands or none does; there is no partial success to reconcile.\n\n**Every row must set the same columns**, and at least one. To accept a column's default, omit it from *every* row. A mixed batch is `400 inconsistent_rows`; an empty row object is `400`.\n\nEvery column you name is checked against the columns the table actually has; an unknown one is `400 unknown_column`. Primary keys may be set — a collision is `409 unique_violation`. A constraint the row violates is `400 constraint_violation`, never an opaque 500.\n\nWrites land in the `public` (production) schema by default — the one the live bot reads. Pass `schema=preview` only to write the dev sandbox.\n\nSend an `Idempotency-Key` header to make a retry safe: the original response is replayed rather than the rows inserted twice.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:write`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:write"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected."
+            },
+            "required": true,
+            "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected.",
+            "name": "table",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "public",
+                      "preview"
+                    ],
+                    "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+                  },
+                  "rows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "array",
+                            "items": {}
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "A column value: string, number, boolean, null, or a JSON object/array for json/jsonb columns."
+                      },
+                      "description": "Column name → value. At least one column is required, and every column must exist on the table."
+                    },
+                    "description": "Rows to insert, 1-50. All rows must set the same columns. All-or-nothing: a failure inserts none of them."
+                  }
+                },
+                "required": [
+                  "rows"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "type": "string"
+                        },
+                        "schema": {
+                          "type": "string"
+                        },
+                        "inserted": {
+                          "type": "number",
+                          "description": "How many rows were inserted."
+                        },
+                        "rows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": {},
+                            "description": "One row, shaped by your table."
+                          },
+                          "description": "The inserted rows as stored, including generated keys and defaults."
+                        }
+                      },
+                      "required": [
+                        "table",
+                        "schema",
+                        "inserted",
+                        "rows"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateTableRows",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "Update the rows matching a filter",
+        "description": "A **partial patch** of every row matching `filters`: only the columns in `values` are written, the rest are left alone. Returns the updated rows as stored.\n\n**`filters` is required and must be non-empty.** Paige does not run an unconstrained UPDATE over this API — an empty or missing filter is `400`, not a whole-table write. Predicates are AND-joined; up to 20. Ops: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `is`.\n\n**`like` and `ilike` are read-only** and are rejected here (`400 filter_op_not_allowed`). A pattern match has no bounded row set — `like` with a `%` pattern can match the whole table and looks no different from a narrow one — so Paige will not write through one. Read the rows you mean from `GET /v1/tables/{table}/rows`, then update them by primary key.\n\n**`values` must set at least one column** (`400 empty_payload`).\n\n**Primary-key columns cannot be changed** (`400 primary_key_immutable`) — delete the row and insert a replacement instead. Every other column you name is checked against the table's real columns (`400 unknown_column`).\n\nA column whose name collides with a reserved database query parameter (`select`, `order`, `limit`, `offset`, `columns`, `and`, `or`, `not`, `on_conflict`) cannot be used as a *filter* column — the predicate would be silently discarded, so it is refused with `400 reserved_filter_column`.\n\nDefaults to the `public` (production) schema.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:write`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:write"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected."
+            },
+            "required": true,
+            "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected.",
+            "name": "table",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "public",
+                      "preview"
+                    ],
+                    "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+                  },
+                  "values": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": {}
+                        },
+                        {
+                          "type": "array",
+                          "items": {}
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "A column value: string, number, boolean, null, or a JSON object/array for json/jsonb columns."
+                    },
+                    "description": "Columns to set on every matched row, at least one. A partial patch — columns you omit are left unchanged."
+                  },
+                  "filters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "column": {
+                          "type": "string",
+                          "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+                          "description": "Column name. Must be a column that actually exists on the table."
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "eq",
+                            "neq",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte",
+                            "is"
+                          ],
+                          "description": "Comparison operator. `like` and `ilike` are NOT accepted on an update or delete — pattern-matched writes are refused; read the rows first, then write by key."
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "Value to compare against. With op \"is\" only null, true or false are accepted; with \"like\"/\"ilike\" it is a SQL LIKE pattern (\"%\" and \"_\" are the wildcards)."
+                        }
+                      },
+                      "required": [
+                        "column",
+                        "op",
+                        "value"
+                      ],
+                      "description": "One predicate. Multiple filters are AND-joined."
+                    },
+                    "description": "Which rows to affect. REQUIRED and non-empty: 1-20 AND-joined predicates. Ops: eq, neq, gt, gte, lt, lte, is — `like`/`ilike` are read-only. An unfiltered update or delete is rejected, never executed against the whole table."
+                  }
+                },
+                "required": [
+                  "values",
+                  "filters"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "type": "string"
+                        },
+                        "schema": {
+                          "type": "string"
+                        },
+                        "updated": {
+                          "type": "number",
+                          "description": "How many rows matched the filters and were updated."
+                        },
+                        "rows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": {},
+                            "description": "One row, shaped by your table."
+                          },
+                          "description": "The updated rows as stored."
+                        }
+                      },
+                      "required": [
+                        "table",
+                        "schema",
+                        "updated",
+                        "rows"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTableRows",
+        "tags": [
+          "Tables"
+        ],
+        "summary": "Delete the rows matching a filter",
+        "description": "Deletes every row matching `filters` and returns how many went. The rows themselves are not echoed back.\n\n**`filters` is required.** There is no \"delete everything\" form of this endpoint — omitting the parameter is `400`, never a whole-table wipe. To clear a table, use the dashboard Database tab.\n\nPredicates travel in the query string as a JSON array (a DELETE body is widely stripped in transit, and a dropped body here would be catastrophic): `filters=[{\"column\":\"id\",\"op\":\"eq\",\"value\":42}]`. AND-joined, 1-20. Ops: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `is`.\n\n**`like` and `ilike` are read-only** and are rejected here (`400 filter_op_not_allowed`). A pattern match has no bounded row set, so Paige will not delete through one — read the rows you mean from `GET /v1/tables/{table}/rows` first, then delete them by primary key.\n\nEvery filter column is checked against the table's real columns (`400 unknown_column`), and a column colliding with a reserved database query parameter is refused (`400 reserved_filter_column`) because its predicate would be silently discarded.\n\nDefaults to the `public` (production) schema.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:write`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "tables:write"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,62}$",
+              "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected."
+            },
+            "required": true,
+            "description": "Table name. Lowercase letters, digits and underscores only. Paige platform tables are rejected.",
+            "name": "table",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public",
+                "preview"
+              ],
+              "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox)."
+            },
+            "required": false,
+            "description": "Which database schema to target: \"public\" (production, the default) or \"preview\" (dev sandbox).",
+            "name": "schema",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000,
+              "description": "REQUIRED. A JSON array of predicates, e.g. [{\"column\":\"id\",\"op\":\"eq\",\"value\":42}]. AND-joined, 1-20. There is no \"delete everything\" form."
+            },
+            "required": true,
+            "description": "REQUIRED. A JSON array of predicates, e.g. [{\"column\":\"id\",\"op\":\"eq\",\"value\":42}]. AND-joined, 1-20. There is no \"delete everything\" form.",
+            "name": "filters",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "type": "string"
+                        },
+                        "schema": {
+                          "type": "string"
+                        },
+                        "deleted": {
+                          "type": "number",
+                          "description": "How many rows matched the filters and were deleted."
+                        }
+                      },
+                      "required": [
+                        "table",
+                        "schema",
+                        "deleted"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "post": {
         "operationId": "createWebhook",
@@ -7815,6 +9282,16 @@
       "scope": "flows:write",
       "label": "Build flows",
       "description": "Generate and update WhatsApp Flows (routed through the flows agent)."
+    },
+    {
+      "scope": "tables:read",
+      "label": "Read project tables",
+      "description": "List the project's own tables and read their rows and columns. Paige platform tables are excluded."
+    },
+    {
+      "scope": "tables:write",
+      "label": "Write project tables",
+      "description": "Insert, update and delete rows in the project's own tables. Paige platform tables are excluded, and an update or delete must always be filtered."
     },
     {
       "scope": "webhooks:manage",

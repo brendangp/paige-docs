@@ -6,6 +6,24 @@ description: "Release notes and updates for Paige — new features, improvements
 
 Track new features, improvements, and fixes shipped to Paige.
 
+## August 2026
+
+One release, focused on the thing you couldn't do before without writing code: reaching a customer after their 24-hour window had closed.
+
+### New features
+
+- **Send a template straight from Conversations.** A **Send template** button now sits in the message composer. Pick an approved template, fill in its placeholders inline with a live preview, and send — the way to reach someone whose 24-hour window has closed. See [Sending a template](/guides/conversations-tab#sending-a-template).
+- **A standard conversation starter.** Paige keeps a one-tap opener pinned at the top of the template picker, and offers to create it if your project doesn't have one. Its job is to get a reply, because a reply is what reopens the 24-hour window. Sending it switches the conversation into handover so you take it from there. See [The conversation starter](/guides/conversations-tab#the-conversation-starter).
+- **You're told when Meta approves a template.** Approval and rejection now arrive as a toast wherever you are in the project, and the badge under **Settings → Templates** updates itself. A rejection shows Meta's reason, with a **View** action that takes you to the template. Previously nothing told you — you had to keep reloading the page. See [Template approval](/guides/templates#template-approval).
+- **The Conversations Agent can propose a template.** Ask it to reach someone outside the window and it puts an approved template, filled in, into an approval card — or drafts a brand-new template if none fits. It never sends or submits: your browser does that when you press the button. See [the Conversations Agent](/agents/conversations-agent).
+- **Read and write your tables over the API.** `/v1/tables` lists your project's tables, returns a table's columns, and reads its rows with filters, ordering, and paging — and the write side inserts, updates, and deletes rows. Two new permissions, `tables:read` and `tables:write`, cover them, and connected AI agents get the matching tools. Paige's own platform tables stay out of reach, and every update or delete must carry a filter. See [Scopes](/api-reference/scopes).
+- **Disconnect a WhatsApp number.** You can now release the number connected to a project so a different one can be connected in its place.
+
+### Fixes
+
+- Messages sent through the API now appear immediately in an open conversation, instead of only after a reload.
+- When one of the AI agents fails to complete a tool call, it now tells you it failed rather than reporting success.
+
 ## July 2026
 
 Three releases. The middle one reorganised where your bot's building blocks live, added Slack, and rebuilt onboarding. The last opened Paige up to the outside world with a public API.

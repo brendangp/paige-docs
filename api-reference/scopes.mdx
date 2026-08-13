@@ -35,6 +35,12 @@ Every endpoint states the scope it needs, both in its description and in the `x-
     | `flows:read` | List WhatsApp Flows and read a flow's JSON definition. |
     | `flows:write` | Generate and update WhatsApp Flows (routed through the flows agent). |
   </Tab>
+  <Tab title="Tables">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `tables:read` | List your project's own tables and read their columns and rows. |
+    | `tables:write` | Insert, update, and delete rows in your project's own tables. |
+  </Tab>
   <Tab title="Webhooks & events">
     | Scope | Lets a key |
     | --- | --- |
@@ -45,7 +51,11 @@ Every endpoint states the scope it needs, both in its description and in the `x-
   </Tab>
 </Tabs>
 
-That's 17 scopes in total.
+That's 19 scopes in total.
+
+<Warning>
+  **The table scopes reach your tables only.** Paige's own platform tables — contacts, conversations, messages, execution logs, and broadcast recipients — are not addressable through `/v1/tables`, whatever scopes the key holds. Read those through their own endpoints instead, where the rules that protect them still apply. A write must also always carry a filter, so there is no way to accidentally update or delete a whole table in one call.
+</Warning>
 
 <Warning>
   **`broadcasts:manage` is not a licence to send.** `POST /v1/broadcasts` always lands the campaign in `pending_approval`, whatever scopes the credential holds. There is no send, launch, approve, or retry endpoint — a human releases the campaign from the **Broadcasts** tab in the dashboard. Don't design a flow that expects the API to send; it never will. See [Broadcasts](/guides/broadcasts).
