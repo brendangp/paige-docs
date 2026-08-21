@@ -7,6 +7,10 @@ Polling the API to find out what changed is slow and wastes your rate limit. **W
 
 Register one under **Settings → API → Webhooks**, or with `POST /v1/webhooks` (scope `webhooks:manage`).
 
+<Note>
+  **This is Paige calling out to you.** If you want the opposite — an outside service calling **in** to your bot, because its console only has a field for a URL — you want an [inbound hook](/guides/inbound-hooks), not a webhook.
+</Note>
+
 ## Set one up in the dashboard
 
 You don't need to call the API to manage webhooks. The **Webhooks** card under **Settings → API** does the whole lifecycle — create, list, edit, delete.

@@ -8,10 +8,13 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ## August 2026
 
-One release, focused on the thing you couldn't do before without writing code: reaching a customer after their 24-hour window had closed.
+Two releases. The first was about reaching a customer after their 24-hour window had closed. The second opened the other direction — letting an outside service reach your bot — and put your media library on the API.
 
 ### New features
 
+- **Inbound hooks — let another service call your bot.** Mint a URL under **Settings → API → Inbound hooks** and paste it into a payment provider, a booking tool, your CRM, or a form builder. Whenever something happens over there, it's delivered straight to your bot to act on, exactly as it arrived. Holding the URL is the permission, so there's nothing for the other service to sign up for; the URL is redisplayable rather than show-once, and **Rotate** is how you invalidate one. Each hook shows its 20 most recent arrivals so you can see whether requests are landing. Paige creates the `src/routes/inbound.js` handler for you and never overwrites it — and because Paige can't vouch for who sent a request, your bot verifies the sender. See [Inbound hooks](/guides/inbound-hooks).
+- **Manage your media library over the API.** `/v1/media` uploads a file, lists the project's assets, returns a signed URL for one, and deletes one — so a catalogue sync or a connected AI agent can add images and documents the bot sends, without anyone clicking Upload. Three ways to send the file: a public URL Paige downloads, base64 bytes inline, or a normal multipart upload. Two new permissions, `media:read` and `media:write`, cover it. See [Storage](/guides/storage#uploading-from-your-own-code-or-an-agent).
+- **Connected agents can read your flows and add media.** Four new agent tools: `list_flows` and `get_flow` let an agent see what a bot already does before it changes anything, and `upload_media` and `list_media` let it add a file and reference it by slug. See [What a connected agent can do](/guides/agent-tools).
 - **Send a template straight from Conversations.** A **Send template** button now sits in the message composer. Pick an approved template, fill in its placeholders inline with a live preview, and send — the way to reach someone whose 24-hour window has closed. See [Sending a template](/guides/conversations-tab#sending-a-template).
 - **A standard conversation starter.** Paige keeps a one-tap opener pinned at the top of the template picker, and offers to create it if your project doesn't have one. Its job is to get a reply, because a reply is what reopens the 24-hour window. Sending it switches the conversation into handover so you take it from there. See [The conversation starter](/guides/conversations-tab#the-conversation-starter).
 - **You're told when Meta approves a template.** Approval and rejection now arrive as a toast wherever you are in the project, and the badge under **Settings → Templates** updates itself. A rejection shows Meta's reason, with a **View** action that takes you to the template. Previously nothing told you — you had to keep reloading the page. See [Template approval](/guides/templates#template-approval).
@@ -21,6 +24,9 @@ One release, focused on the thing you couldn't do before without writing code: r
 
 ### Fixes
 
+- The email that verifies your address no longer puts the code in the subject line, which was getting the message filtered as junk by some providers and blocking signups. The code is still in the body.
+- Filtering rows over the API with a `null` value is now refused rather than quietly meaning different things on different projects. Use the `is` operator to match nulls.
+- A table whose primary key was given a custom name no longer picks up a neighbouring table's columns as its own, which could order a page of rows by the wrong column.
 - Messages sent through the API now appear immediately in an open conversation, instead of only after a reload.
 - When one of the AI agents fails to complete a tool call, it now tells you it failed rather than reporting success.
 

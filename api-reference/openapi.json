@@ -54,6 +54,10 @@
       "description": "Read and write the project's own database tables. Paige platform tables are denied, and an update or delete must always be filtered."
     },
     {
+      "name": "Media",
+      "description": "Upload, list, retrieve and delete the project's media assets. The slug an upload returns is what the bot sends by."
+    },
+    {
       "name": "Webhooks",
       "description": "Register signed outbound webhooks."
     }
@@ -175,8 +179,8 @@
         "tags": [
           "Meta"
         ],
-        "summary": "The pasteable \"build a Paige integration\" agent skill (no auth)",
-        "description": "Serves the integration skill as markdown — hand it to a coding agent (Claude, Codex, Cursor) instead of pasting docs at it. Public, like `/v1/openapi.json`; the same file is downloadable in the app under **Settings → API → Integration skill**. Responds `text/markdown`, NOT the JSON envelope.",
+        "summary": "The pasteable Paige integration agent skill (no auth)",
+        "description": "Serves the \"build a Paige integration\" skill as markdown — hand it to a coding agent (Claude, Codex, Cursor) instead of pasting docs at it. Public, like `/v1/openapi.json`; the same file is downloadable in the app under **Settings → API → Integration skill**. Responds `text/markdown`, NOT the JSON envelope.",
         "security": [],
         "x-required-scopes": [],
         "responses": {
@@ -210,8 +214,8 @@
         "tags": [
           "Meta"
         ],
-        "summary": "Smoke check — echo the resolved project + scopes",
-        "description": "Smoke check — echo the resolved project + scopes\n\n**Required scope:** any valid key.",
+        "summary": "Smoke check, echoing the resolved project and scopes",
+        "description": "Smoke check, echoing the resolved project and scopes\n\n**Required scope:** any valid key.",
         "security": [
           {
             "ApiKeyAuth": []
@@ -1051,7 +1055,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1495,7 +1499,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1581,7 +1585,7 @@
             }
           },
           "502": {
-            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1691,7 +1695,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1863,7 +1867,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1949,7 +1953,7 @@
             }
           },
           "502": {
-            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2182,7 +2186,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2416,7 +2420,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2672,7 +2676,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2840,7 +2844,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2934,8 +2938,8 @@
         "tags": [
           "Messages"
         ],
-        "summary": "Retrieve the media attached to a message (bytes or 302 redirect)",
-        "description": "Retrieve the media attached to a message (bytes or 302 redirect)\n\n**Required scope:** `conversations:read`",
+        "summary": "Retrieve the media attached to a message",
+        "description": "Responds with the raw media BYTES, or a `302` redirect to a direct URL — follow redirects. Not the JSON envelope. Media Meta has already aged out is `410 MEDIA_EXPIRED`.\n\n**Required scope:** `conversations:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -2977,7 +2981,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3179,7 +3183,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3273,7 +3277,7 @@
         "tags": [
           "Contacts"
         ],
-        "summary": "Update a contact name / tags / custom attributes",
+        "summary": "Update a contact name, tags or custom attributes",
         "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Required scope:** `contacts:write`",
         "security": [
           {
@@ -3452,7 +3456,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3621,7 +3625,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3790,7 +3794,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3882,7 +3886,7 @@
         "tags": [
           "Build"
         ],
-        "summary": "Edit/create a file via the code agent",
+        "summary": "Create or edit a file via the code agent",
         "description": "**Send exactly one of two forms** — a whole-file write (`content`) **or** one exact replacement (`old_string` **and** `new_string`, both required together). The choice is enforced by a cross-field rule the schema below cannot express: sending neither, or both, is `400 invalid_request`. An `old_string` that matches zero or more than one location in the file is also rejected, so make it long enough to be unique. Flow JSON is rejected — use the flow endpoints. Platform-critical / injected / auto-generated files (e.g. `routes/whatsapp_webhook.js`, `app.js`, `config/db.js`, `services/messages.js`, `config/mediaAssets.js`, matched across both flat and `src/` layouts) are rejected with `403 protected_file`; the file is left unchanged. Reads (`GET /v1/files`, `GET /v1/files/{path}`) are NOT restricted.\n\n**Required scope:** `code:write`",
         "security": [
           {
@@ -3982,7 +3986,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4076,8 +4080,8 @@
         "tags": [
           "Build"
         ],
-        "summary": "Author/edit bot code from a natural-language instruction via the code agent",
-        "description": "Runs Paige's code agent (its system prompt, scaffold + connector awareness, and guardrails) in a bounded headless loop to write/edit the bot's code — the higher-quality counterpart to `PUT /v1/files/{path}`. Flow JSON is rejected (use the flow endpoints). Frozen/injected/auto-generated files (e.g. `services/messages.js`, `config/mediaAssets.js`, `package.json`, `.paige/**`) are refused, while the agent still authors the bot wiring it owns (`routes/*`, `app.js`, `config/db.js`). Consumes credits; rejected with `402 insufficient_credits` when out of balance. A truncated or failed agent run returns `502 build_failed`.\n\n**Required scope:** `code:write`",
+        "summary": "Author or edit bot code via the code agent",
+        "description": "Runs Paige's code agent (its system prompt, scaffold + connector awareness, and guardrails) in a bounded headless loop to write/edit the bot's code from a natural-language instruction — the higher-quality counterpart to `PUT /v1/files/{path}`. Flow JSON is rejected (use the flow endpoints). Frozen/injected/auto-generated files (e.g. `services/messages.js`, `config/mediaAssets.js`, `package.json`, `.paige/**`) are refused, while the agent still authors the bot wiring it owns (`routes/*`, `app.js`, `config/db.js`). Consumes credits; rejected with `402 insufficient_credits` when out of balance. A truncated or failed agent run returns `502 build_failed`.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4164,7 +4168,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4250,7 +4254,7 @@
             }
           },
           "502": {
-            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4268,8 +4272,8 @@
         "tags": [
           "Build"
         ],
-        "summary": "Promote dev → production",
-        "description": "Copies the dev working copy to production and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
+        "summary": "Promote dev to production",
+        "description": "Copies the dev working copy to production (dev → production) and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4410,7 +4414,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4878,7 +4882,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4964,7 +4968,7 @@
             }
           },
           "502": {
-            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5398,7 +5402,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5484,7 +5488,7 @@
             }
           },
           "502": {
-            "description": "Upstream Meta rejection (`invalid_template` / `meta_auth_error`).",
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5661,7 +5665,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5875,7 +5879,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5959,8 +5963,8 @@
         "tags": [
           "Broadcasts"
         ],
-        "summary": "Assemble a broadcast — ALWAYS lands in pending_approval (never sends)",
-        "description": "Guardrail: an assembled broadcast is held in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Beyond `name`, a valid call needs two things the schema below cannot mark required** (they are checked by the assembler, which reports failures as `400`):\n\n- **A template** — `template_name` (with `template_language`) or `template_id`. It must already be APPROVED by Meta.\n- **An audience** — either a saved `segment_id`, or an inline filter built from `opted_in` / `tags` / `clicked`. An audience that resolves to zero contacts is rejected.\n\nAlso supply `variable_mapping` whenever the template has variables; a mapping that does not match the template is rejected. `schedule` is genuinely optional — omit it to assemble for immediate approval.\n\n**Required scope:** `broadcasts:manage`",
+        "summary": "Assemble a broadcast for approval",
+        "description": "**Assembly NEVER sends.** Guardrail: an assembled broadcast ALWAYS lands in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Beyond `name`, a valid call needs two things the schema below cannot mark required** (they are checked by the assembler, which reports failures as `400`):\n\n- **A template** — `template_name` (with `template_language`) or `template_id`. It must already be APPROVED by Meta.\n- **An audience** — either a saved `segment_id`, or an inline filter built from `opted_in` / `tags` / `clicked`. An audience that resolves to zero contacts is rejected.\n\nAlso supply `variable_mapping` whenever the template has variables; a mapping that does not match the template is rejected. `schedule` is genuinely optional — omit it to assemble for immediate approval.\n\n**Required scope:** `broadcasts:manage`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -6106,7 +6110,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6473,7 +6477,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6685,7 +6689,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6866,7 +6870,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7084,7 +7088,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7189,7 +7193,7 @@
           "Tables"
         ],
         "summary": "Read rows from one of your tables",
-        "description": "Filtered, ordered, paged row reads. A GET carries no body, so the structured arguments travel as strings:\n\n- `columns` is a comma-separated list, e.g. `id,farm_name`. Omit it for all columns.\n- `filters` is a JSON array of predicates, e.g. `[{\"column\":\"status\",\"op\":\"eq\",\"value\":\"due\"}]`. Predicates are AND-joined; up to 20. Supported ops: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `is` (`is` takes only null / true / false).\n\n**Pattern grammar.** `like` and `ilike` take a **SQL LIKE pattern**: `%` matches any sequence of characters, `_` matches exactly one. `*` is **not** a wildcard and a value containing one is `400` — it is refused rather than translated because the two database backends Paige runs on would disagree about it, and a filter must mean the same thing on every project. `like` and `ilike` are read-only: they are not accepted on the update or delete endpoints.\n\nEvery column you name — projection, filter or ordering — is checked against the columns the table actually has; an unknown one is `400 unknown_column`.\n\nOrdering defaults to the primary key, which makes paging stable. A table with **no primary key** and no explicit `order_by` is returned unordered — Postgres guarantees no row order there, so paging such a table can repeat or skip rows. Pass `order_by` on a table without a primary key.\n\nPagination follows the standard cursor convention: read `pagination.hasMore` and pass `pagination.nextCursor` straight back as `cursor`. Treat the cursor as opaque — never construct one.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:read`",
+        "description": "Filtered, ordered, paged row reads. A GET carries no body, so the structured arguments travel as strings:\n\n- `columns` is a comma-separated list, e.g. `id,farm_name`. Omit it for all columns.\n- `filters` is a JSON array of predicates, e.g. `[{\"column\":\"status\",\"op\":\"eq\",\"value\":\"due\"}]`. Predicates are AND-joined; up to 20. Supported ops: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `is` (`is` takes only null / true / false).\n\n**Pattern grammar.** `like` and `ilike` take a **SQL LIKE pattern**: `%` matches any sequence of characters, `_` matches exactly one. `*` is **not** a wildcard and a value containing one is `400` — it is refused rather than translated because the two database backends Paige runs on would disagree about it, and a filter must mean the same thing on every project. `like` and `ilike` are read-only: they are not accepted on the update or delete endpoints.\n\n**Null comparands belong to `is`.** Only `is` may be given `null`; on every other op both `null` and the string `\"null\"` are `400 null_filter_value`. Same reason as `*`: one backend reads the null as SQL `NULL` and matches every null row, while the other binds it as a parameter, where `col = NULL` matches nothing. Send `{\"column\":\"…\",\"op\":\"is\",\"value\":null}` to match rows whose column is NULL.\n\nEvery column you name — projection, filter or ordering — is checked against the columns the table actually has; an unknown one is `400 unknown_column`.\n\nOrdering defaults to the primary key, which makes paging stable. A table with **no primary key** and no explicit `order_by` is returned unordered — Postgres guarantees no row order there, so paging such a table can repeat or skip rows. Pass `order_by` on a table without a primary key.\n\nPagination follows the standard cursor convention: read `pagination.hasMore` and pass `pagination.nextCursor` straight back as `cursor`. Treat the cursor as opaque — never construct one.\n\nA Paige platform table is `403 platform_table_forbidden`; an unknown table is `404 table_not_found`.\n\n**Only base tables are addressable.** A view (or any other non-table relation) answers the same `404 table_not_found` an unknown name does — including a view defined over a Paige platform table, which would otherwise be a writable alias for it.\n\n**Required scope:** `tables:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -7373,7 +7377,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7621,7 +7625,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7843,7 +7847,7 @@
                               "type": "null"
                             }
                           ],
-                          "description": "Value to compare against. With op \"is\" only null, true or false are accepted; with \"like\"/\"ilike\" it is a SQL LIKE pattern (\"%\" and \"_\" are the wildcards)."
+                          "description": "Value to compare against. Only op \"is\" accepts null (or the string \"null\") — every other op rejects it, so use `is` to match NULL. With op \"is\" only null, true or false are accepted; with \"like\"/\"ilike\" it is a SQL LIKE pattern (\"%\" and \"_\" are the wildcards)."
                         }
                       },
                       "required": [
@@ -7919,7 +7923,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8123,11 +8127,1299 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/media": {
+      "post": {
+        "operationId": "uploadMedia",
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload a media asset",
+        "description": "Stores one file against the project, registers it with Meta for sending, and returns the `slug` your bot resolves it by at runtime (`sendMedia(to, \"<slug>\")` / `getMediaId(\"<slug>\")`). Write the slug into a table row with `POST /v1/tables/{table}/rows` and the bot can send the asset later without ever touching the dashboard.\n\n**Three transports, pick one.** Every one of them needs the file itself:\n\n- `multipart/form-data` with a single part named **`file`**, plus optional `name` and `caption` text fields. Up to **20 MB**.\n- JSON `{ \"source_url\": \"https://...\" }` — Paige downloads it for you. Up to **20 MB**. Only public http(s) URLs: private, loopback, link-local and other reserved addresses are refused (`400 blocked_source_url`), redirects are re-checked at every hop and capped, and a non-http(s) scheme is `400 invalid_source_url`. Add `filename` / `mime` to override what the remote server declares.\n- JSON `{ \"data\": \"<base64>\", \"filename\": \"...\", \"mime\": \"...\" }` — inline bytes, capped at **8 MB decoded**, lower than the other two on purpose: base64 costs about 4/3 in transit and is buffered whole in memory, so large files belong on multipart or `source_url`. A `data:` URI prefix is accepted and stripped.\n\n**`name` is the slug.** Send it to choose the bot-facing name; omit it and the filename is used. It is normalized to lowercase letters, digits and hyphens. **A slug that already exists is `409 SLUG_EXISTS`** — it is never overwritten, because the existing asset may already be referenced by deployed code or a published flow.\n\n**Meta registration is best-effort, and the response tells you the truth about it.** `media_id` is `null` and `meta_status` is `\"pending\"` when the file was stored but not registered (typically because no WhatsApp number is connected). The asset is still usable and Paige retries registration on a schedule; a failed register is never reported as a success. `meta_status` is `\"expired\"` once the id passes Meta's 30-day lifetime.\n\n**Size and type.** Oversize is `413 file_too_large`; a type Paige cannot ingest is `415`; an empty file is `400`. Images, video, audio, PDF, DOCX, plain text and markdown are accepted.\n\n**Uploading an image costs credits.** Paige runs one AI vision call per image to write the knowledge description your bot answers from, and that call is billed to the project like any other AI usage — it shows up in Usage alongside builds. Out of credits is `402 insufficient_credits`. Send `describe_image: false` to skip it: the file is still stored, still registered with Meta and still usable, it just gets no AI-written description and costs nothing. Non-image uploads (PDF, DOCX, text) use no AI at all and are always free.\n\n**Two limits apply beyond the per-request throttle.** Uploads are metered by BYTES as well as by request count, so a burst of large files can return `429 rate_limited` even while you are inside the request-per-minute budget — retry after the window or upload in smaller batches. And each project has a total media storage ceiling: an upload that would exceed it is refused with `413 storage_limit_exceeded` rather than quietly succeeding. `GET /v1/media` reports `storage.used_bytes` / `storage.remaining_bytes` so you can check before you push.\n\nSend an `Idempotency-Key` header to make a retry safe. The fingerprint covers the **file bytes**, so retrying the same upload replays the original response, while reusing the key for a *different* file is `409 idempotency_key_mismatch` rather than a silently-dropped upload.\n\n**Required scope:** `media:write`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "media:write"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "source_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Public http(s) URL Paige downloads the file from. Private, loopback and link-local addresses are refused, redirects are re-checked at every hop."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Optional bot-facing name for the asset. Normalized to a slug; blank falls back to the filename."
+                      },
+                      "caption": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "maxLength": 2000
+                      },
+                      "filename": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Overrides the filename derived from the URL. The slug still comes from `name` when you send one."
+                      },
+                      "mime": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Overrides the server's `Content-Type`. Use it when the host serves the file as `application/octet-stream`."
+                      },
+                      "describe_image": {
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "true",
+                              "false",
+                              "1",
+                              "0",
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                      }
+                    },
+                    "required": [
+                      "source_url"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The file bytes, base64-encoded. Plain base64 or a `data:` URI; both are accepted."
+                      },
+                      "filename": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Original filename, including its extension. Also the slug fallback when `name` is omitted."
+                      },
+                      "mime": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "The file's mime type, e.g. `image/png`. Checked against the types Paige can ingest."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Optional bot-facing name for the asset. Normalized to a slug; blank falls back to the filename."
+                      },
+                      "caption": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "maxLength": 2000
+                      },
+                      "describe_image": {
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "true",
+                              "false",
+                              "1",
+                              "0",
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                      }
+                    },
+                    "required": [
+                      "data",
+                      "filename",
+                      "mime"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "description": "The file bytes. Exactly one part, named `file`.",
+                    "format": "binary"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Optional bot-facing name for the asset. Normalized to a slug; blank falls back to the filename."
+                  },
+                  "caption": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2000
+                  },
+                  "describe_image": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "true",
+                          "false",
+                          "1",
+                          "0",
+                          ""
+                        ]
+                      }
+                    ],
+                    "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "asset": {
+                          "type": "object",
+                          "properties": {
+                            "slug": {
+                              "type": "string",
+                              "description": "The bot-facing name. `sendMedia(to, \"<slug>\")` and `getMediaId(\"<slug>\")` resolve by this."
+                            },
+                            "media_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Meta's id for the registered copy, used when the bot sends the file. **Null when registration did not happen** (usually no WhatsApp number connected) — the asset is still stored and Paige retries on a schedule."
+                            },
+                            "meta_status": {
+                              "type": "string",
+                              "enum": [
+                                "registered",
+                                "pending",
+                                "expired"
+                              ],
+                              "description": "`registered` — ready to send. `pending` — stored but not registered with Meta yet. `expired` — the id passed Meta's 30-day lifetime and is being refreshed."
+                            },
+                            "meta_uploaded_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "When the file was registered with Meta (ISO 8601), or null."
+                            },
+                            "mime": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Stored mime type, e.g. `image/png`."
+                            },
+                            "bytes": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Size of the stored original."
+                            },
+                            "filename": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "The original filename it was uploaded under."
+                            },
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "image",
+                                "video",
+                                "audio",
+                                "knowledge"
+                              ],
+                              "description": "What Paige did with it. `knowledge` means it was text-extracted into the bot's knowledge base (PDF, DOCX, text, markdown)."
+                            },
+                            "caption": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "The caption supplied at upload, if any."
+                            },
+                            "source": {
+                              "type": "string",
+                              "enum": [
+                                "chat_upload",
+                                "conversation_inbound"
+                              ],
+                              "description": "`chat_upload` is your own upload. `conversation_inbound` is a file a customer sent in over WhatsApp — only ever returned to a key that also holds `conversations:read`."
+                            },
+                            "created_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "When the asset was created (ISO 8601)."
+                            }
+                          },
+                          "required": [
+                            "slug",
+                            "media_id",
+                            "meta_status",
+                            "meta_uploaded_at",
+                            "mime",
+                            "bytes",
+                            "filename",
+                            "kind",
+                            "caption",
+                            "source",
+                            "created_at"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "asset"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Out of credits (`insufficient_credits`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listMedia",
+        "tags": [
+          "Media"
+        ],
+        "summary": "List the project's media assets",
+        "description": "Newest first. Each image also carries a short-lived `preview_url`; other kinds have `null` there, so fetch their bytes through `GET /v1/media/{slug}`.\n\n**Only your own uploads by default.** Media that CUSTOMERS sent in over WhatsApp is a separate class of data (`source: \"conversation_inbound\"`) and is excluded. Pass `include_inbound=true` to include it — that additionally requires the `conversations:read` scope, and a key without it gets `403` rather than a quietly-filtered list.\n\n`include_usage=true` adds `used_in`, the flows and code files referencing each slug. It costs one read per project file, so it is off by default.\n\nEvery response also carries `storage`: how many bytes this project is storing, the ceiling, and the headroom left. An upload past the ceiling is refused with `413 storage_limit_exceeded`, so read this before a bulk sync. Media customers sent in over WhatsApp counts toward the total even when it is filtered out of `assets`.\n\n**Required scope:** `media:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "media:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "1",
+                "0",
+                ""
+              ],
+              "description": "Also return `used_in` for each asset — the flows and code files referencing its slug. Costs one read per project file, so it is off by default."
+            },
+            "required": false,
+            "description": "Also return `used_in` for each asset — the flows and code files referencing its slug. Costs one read per project file, so it is off by default.",
+            "name": "include_usage",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "1",
+                "0",
+                ""
+              ],
+              "description": "Also return media customers sent in over WhatsApp. Requires the `conversations:read` scope as well."
+            },
+            "required": false,
+            "description": "Also return media customers sent in over WhatsApp. Requires the `conversations:read` scope as well.",
+            "name": "include_inbound",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "storage": {
+                          "type": "object",
+                          "properties": {
+                            "used_bytes": {
+                              "type": "number",
+                              "description": "Total bytes of media stored for this project, across every source."
+                            },
+                            "asset_count": {
+                              "type": "number",
+                              "description": "How many media assets that is."
+                            },
+                            "limit_bytes": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "The per-project storage ceiling in bytes, or null when no ceiling is configured."
+                            },
+                            "remaining_bytes": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Headroom left before an upload is refused, or null when there is no ceiling."
+                            },
+                            "by_source": {
+                              "type": "object",
+                              "properties": {
+                                "chat_upload": {
+                                  "type": "object",
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "number"
+                                    },
+                                    "count": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "bytes",
+                                    "count"
+                                  ],
+                                  "description": "The project's own uploads."
+                                },
+                                "conversation_inbound": {
+                                  "type": "object",
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "number"
+                                    },
+                                    "count": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "bytes",
+                                    "count"
+                                  ],
+                                  "description": "Media customers sent in over WhatsApp. Counts toward the total."
+                                }
+                              },
+                              "required": [
+                                "chat_upload",
+                                "conversation_inbound"
+                              ],
+                              "description": "The total split by where the media came from. Both halves count toward `used_bytes`."
+                            },
+                            "enforced_for": {
+                              "type": "string",
+                              "description": "Who the ceiling is enforced against. Always \"api_key\" — dashboard uploads are never refused for storage."
+                            }
+                          },
+                          "required": [
+                            "used_bytes",
+                            "asset_count",
+                            "limit_bytes",
+                            "remaining_bytes",
+                            "by_source",
+                            "enforced_for"
+                          ]
+                        },
+                        "assets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "slug": {
+                                "type": "string",
+                                "description": "The bot-facing name. `sendMedia(to, \"<slug>\")` and `getMediaId(\"<slug>\")` resolve by this."
+                              },
+                              "media_id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Meta's id for the registered copy, used when the bot sends the file. **Null when registration did not happen** (usually no WhatsApp number connected) — the asset is still stored and Paige retries on a schedule."
+                              },
+                              "meta_status": {
+                                "type": "string",
+                                "enum": [
+                                  "registered",
+                                  "pending",
+                                  "expired"
+                                ],
+                                "description": "`registered` — ready to send. `pending` — stored but not registered with Meta yet. `expired` — the id passed Meta's 30-day lifetime and is being refreshed."
+                              },
+                              "meta_uploaded_at": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "When the file was registered with Meta (ISO 8601), or null."
+                              },
+                              "mime": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Stored mime type, e.g. `image/png`."
+                              },
+                              "bytes": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Size of the stored original."
+                              },
+                              "filename": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "The original filename it was uploaded under."
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "image",
+                                  "video",
+                                  "audio",
+                                  "knowledge"
+                                ],
+                                "description": "What Paige did with it. `knowledge` means it was text-extracted into the bot's knowledge base (PDF, DOCX, text, markdown)."
+                              },
+                              "caption": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "The caption supplied at upload, if any."
+                              },
+                              "source": {
+                                "type": "string",
+                                "enum": [
+                                  "chat_upload",
+                                  "conversation_inbound"
+                                ],
+                                "description": "`chat_upload` is your own upload. `conversation_inbound` is a file a customer sent in over WhatsApp — only ever returned to a key that also holds `conversations:read`."
+                              },
+                              "created_at": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "When the asset was created (ISO 8601)."
+                              },
+                              "preview_url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Short-lived signed URL, images only. Null for every other kind."
+                              },
+                              "used_in": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "flow",
+                                        "code"
+                                      ],
+                                      "description": "Whether a flow embeds the asset or code resolves its slug."
+                                    },
+                                    "path": {
+                                      "type": "string",
+                                      "description": "The project file, e.g. `flows/booking.json`."
+                                    }
+                                  },
+                                  "required": [
+                                    "kind",
+                                    "path"
+                                  ]
+                                },
+                                "description": "Present only when `include_usage=true`."
+                              }
+                            },
+                            "required": [
+                              "slug",
+                              "media_id",
+                              "meta_status",
+                              "meta_uploaded_at",
+                              "mime",
+                              "bytes",
+                              "filename",
+                              "kind",
+                              "caption",
+                              "source",
+                              "created_at",
+                              "preview_url"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "storage",
+                        "assets"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/media/{slug}": {
+      "get": {
+        "operationId": "getMedia",
+        "tags": [
+          "Media"
+        ],
+        "summary": "Retrieve one media asset and a signed URL",
+        "description": "The asset plus a short-lived signed `url` for its bytes. The URL is unauthenticated once minted, so treat it as a secret and let it expire — `expires_in` is capped, deliberately, so a scoped read cannot be turned into a permanent public link.\n\n`download=true` signs it with a download disposition (the browser saves the file) instead of an inline one.\n\nAn unknown slug is `404 ASSET_NOT_FOUND`. So is a slug that exists but belongs to inbound customer media when the key lacks `conversations:read` — identical response either way, so probing slugs reveals nothing about what a customer sent in.\n\n**Required scope:** `media:read`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "media:read"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{0,119}$",
+              "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by."
+            },
+            "required": true,
+            "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by.",
+            "name": "slug",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "1",
+                "0",
+                ""
+              ],
+              "description": "Sign the URL with a download disposition instead of an inline one."
+            },
+            "required": false,
+            "description": "Sign the URL with a download disposition instead of an inline one.",
+            "name": "download",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 3600,
+              "description": "Signed-URL lifetime in seconds (30-3600, default 300)."
+            },
+            "required": false,
+            "description": "Signed-URL lifetime in seconds (30-3600, default 300).",
+            "name": "expires_in",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "asset": {
+                          "type": "object",
+                          "properties": {
+                            "slug": {
+                              "type": "string",
+                              "description": "The bot-facing name. `sendMedia(to, \"<slug>\")` and `getMediaId(\"<slug>\")` resolve by this."
+                            },
+                            "media_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Meta's id for the registered copy, used when the bot sends the file. **Null when registration did not happen** (usually no WhatsApp number connected) — the asset is still stored and Paige retries on a schedule."
+                            },
+                            "meta_status": {
+                              "type": "string",
+                              "enum": [
+                                "registered",
+                                "pending",
+                                "expired"
+                              ],
+                              "description": "`registered` — ready to send. `pending` — stored but not registered with Meta yet. `expired` — the id passed Meta's 30-day lifetime and is being refreshed."
+                            },
+                            "meta_uploaded_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "When the file was registered with Meta (ISO 8601), or null."
+                            },
+                            "mime": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Stored mime type, e.g. `image/png`."
+                            },
+                            "bytes": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Size of the stored original."
+                            },
+                            "filename": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "The original filename it was uploaded under."
+                            },
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "image",
+                                "video",
+                                "audio",
+                                "knowledge"
+                              ],
+                              "description": "What Paige did with it. `knowledge` means it was text-extracted into the bot's knowledge base (PDF, DOCX, text, markdown)."
+                            },
+                            "caption": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "The caption supplied at upload, if any."
+                            },
+                            "source": {
+                              "type": "string",
+                              "enum": [
+                                "chat_upload",
+                                "conversation_inbound"
+                              ],
+                              "description": "`chat_upload` is your own upload. `conversation_inbound` is a file a customer sent in over WhatsApp — only ever returned to a key that also holds `conversations:read`."
+                            },
+                            "created_at": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "When the asset was created (ISO 8601)."
+                            }
+                          },
+                          "required": [
+                            "slug",
+                            "media_id",
+                            "meta_status",
+                            "meta_uploaded_at",
+                            "mime",
+                            "bytes",
+                            "filename",
+                            "kind",
+                            "caption",
+                            "source",
+                            "created_at"
+                          ]
+                        },
+                        "url": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Signed URL for the bytes, or null when the asset has no stored object."
+                        },
+                        "expires_in": {
+                          "type": "number",
+                          "description": "Seconds the signed URL stays valid."
+                        }
+                      },
+                      "required": [
+                        "asset",
+                        "url",
+                        "expires_in"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteMedia",
+        "tags": [
+          "Media"
+        ],
+        "summary": "Delete a media asset",
+        "description": "Removes the stored original, the generated knowledge document and image variants, the asset record, and regenerates the bot's media manifest.\n\n**Refused while a flow still embeds the asset** (`409 ASSET_EMBEDDED`) — deleting it would leave the published flow pointing at bytes that no longer exist. Remove it from the flow first. Code references are not a blocker: an unresolved slug degrades to a missing id at runtime rather than breaking a flow.\n\nNaturally idempotent by slug: a second call answers `404 ASSET_NOT_FOUND`.\n\n**Required scope:** `media:write`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "media:write"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{0,119}$",
+              "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by."
+            },
+            "required": true,
+            "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by.",
+            "name": "slug",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "slug": {
+                          "type": "string"
+                        },
+                        "deleted": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        }
+                      },
+                      "required": [
+                        "slug",
+                        "deleted"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
@@ -8227,7 +9519,7 @@
         "tags": [
           "Webhooks"
         ],
-        "summary": "Register an outbound webhook (returns the signing secret once)",
+        "summary": "Register an outbound webhook",
         "description": "The `whsec_…` signing secret is returned EXACTLY once. Subscribing to a platform event (`message.received`/`message.status`/`template.approved`/`template.rejected`) also requires the matching `events:*` scope.\n\n**Required scope:** `webhooks:manage`",
         "security": [
           {
@@ -8372,7 +9664,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8833,7 +10125,7 @@
         "tags": [
           "Webhooks"
         ],
-        "summary": "Partial update of a webhook (url / events / is_active)",
+        "summary": "Partial update of a webhook registration",
         "description": "Send only the fields you want to change. **At least one of `url`, `events` or `is_active` is required** — an empty body is `400 invalid_request`, not a no-op (a cross-field rule the schema below cannot express). Unknown fields are rejected. Changing `events`, or flipping `is_active` to true, re-checks the `events:*` scopes for the resulting event set.\n\n**Required scope:** `webhooks:manage`",
         "security": [
           {
@@ -8977,7 +10269,7 @@
             }
           },
           "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `outside_24h_window` is 409). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -9292,6 +10584,16 @@
       "scope": "tables:write",
       "label": "Write project tables",
       "description": "Insert, update and delete rows in the project's own tables. Paige platform tables are excluded, and an update or delete must always be filtered."
+    },
+    {
+      "scope": "media:read",
+      "label": "Read media",
+      "description": "List the project's media assets and mint short-lived signed URLs for their bytes."
+    },
+    {
+      "scope": "media:write",
+      "label": "Upload media",
+      "description": "Upload new media assets and delete existing ones."
     },
     {
       "scope": "webhooks:manage",

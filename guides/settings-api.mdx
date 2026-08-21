@@ -1,10 +1,10 @@
 ---
 title: "API settings"
 sidebarTitle: "API"
-description: "Settings → API is the developer corner of a project — API keys, the MCP server for AI agents, connected agents, webhooks, and a ready-made integration skill."
+description: "Settings → API is the developer corner of a project — API keys, the MCP server for AI agents, connected agents, inbound hooks, webhooks, and a ready-made integration skill."
 ---
 
-**Settings → API** is where you give things *other than you* access to a project: your own code, an AI agent, or an endpoint that wants to be told when something happens.
+**Settings → API** is where you give things *other than you* access to a project: your own code, an AI agent, an endpoint that wants to be told when something happens, or an outside service that wants to tell your bot something happened.
 
 <Note>
   This section is for **owners and admins**. If you're a workspace member without admin access, it doesn't appear in your Settings sidebar at all.
@@ -23,6 +23,9 @@ The cards appear in this order, top to bottom:
   </Card>
   <Card title="Connected agents" icon="plug">
     Every agent connected by sign-in, the projects each one covers, and per-project permissions. Add a project, change permissions, or disconnect.
+  </Card>
+  <Card title="Inbound hooks" icon="inbox">
+    Mint a URL you hand to an outside service — a payment provider, a booking tool, your CRM — so it can call your bot when something happens. Holding the URL is the permission, and it's redisplayable rather than show-once.
   </Card>
   <Card title="Webhooks" icon="webhook">
     Register an HTTPS endpoint and pick the events to deliver to it. The signing secret is shown once when you create it.
@@ -58,10 +61,25 @@ Each card has a page that explains it properly:
 
 - **Building an integration in your own code?** Start at [The Paige API](/api-reference/introduction), then [Authentication](/api-reference/authentication), [Scopes](/api-reference/scopes) and [API conventions](/api-reference/conventions).
 - **Connecting Claude, ChatGPT, Codex, or Cursor?** [Connect an AI agent](/guides/connect-an-agent) covers both the sign-in and paste-a-key routes, and how one connection can cover several projects. [What a connected agent can do](/guides/agent-tools) lists every tool it gets.
+- **Need an outside service to call your bot?** [Inbound hooks](/guides/inbound-hooks) covers minting the URL, pasting it into a provider's console, and writing the handler that verifies the sender.
 - **Want events pushed to you?** [Webhooks](/api-reference/webhooks) covers the payload, signature verification, and retries.
 
+## Three things that sound alike
+
+Inbound hooks, webhooks, and API keys sit next to each other on this page and are easy to confuse. Ask *who starts it*:
+
+| | Which way it goes |
+| --- | --- |
+| **Inbound hook** | Another service calling **in** to your bot |
+| **Webhook** | Paige calling **out** to your server |
+| **API key** | You or an AI agent calling **Paige** |
+
+The deciding question is whether you can hand the other side a key. If you can, issue an API key with only the scopes it needs. If you can't — their console has one field and it says *URL* — that's an [inbound hook](/guides/inbound-hooks).
+
 <Warning>
-  Both secrets on this page — an API key and a webhook signing secret — are shown **once** and never again. Paige stores only what it needs to check them, so nobody can recover one for you. Copy it when the dialog is open.
+  Two secrets on this page — an API key and a webhook signing secret — are shown **once** and never again. Paige stores only what it needs to check them, so nobody can recover one for you. Copy it when the dialog is open.
+
+  An **inbound hook URL** is the exception: **Show URL** brings it back any time. It's still a secret — holding it is what grants access — so if one is ever exposed, **Rotate** is how you invalidate it.
 </Warning>
 
 <Tip>

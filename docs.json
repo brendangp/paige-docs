@@ -158,6 +158,7 @@
               "guides/billing",
               "guides/workspaces",
               "guides/settings-api",
+              "guides/inbound-hooks",
               "guides/connect-an-agent",
               "guides/agent-tools"
             ]

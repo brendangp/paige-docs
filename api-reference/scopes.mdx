@@ -41,6 +41,12 @@ Every endpoint states the scope it needs, both in its description and in the `x-
     | `tables:read` | List your project's own tables and read their columns and rows. |
     | `tables:write` | Insert, update, and delete rows in your project's own tables. |
   </Tab>
+  <Tab title="Media">
+    | Scope | Lets a key |
+    | --- | --- |
+    | `media:read` | List the project's media assets and mint short-lived signed URLs for their bytes. |
+    | `media:write` | Upload new media assets and delete existing ones. |
+  </Tab>
   <Tab title="Webhooks & events">
     | Scope | Lets a key |
     | --- | --- |
@@ -51,7 +57,11 @@ Every endpoint states the scope it needs, both in its description and in the `x-
   </Tab>
 </Tabs>
 
-That's 19 scopes in total.
+That's 21 scopes in total.
+
+<Note>
+  **`media:read` doesn't reach your customers' files.** Media a customer sent in over WhatsApp is returned only when a key holds `conversations:read` as well and explicitly asks for it. A media-only key sees the project's own uploads and nothing else. See [Storage](/guides/storage).
+</Note>
 
 <Warning>
   **The table scopes reach your tables only.** Paige's own platform tables — contacts, conversations, messages, execution logs, and broadcast recipients — are not addressable through `/v1/tables`, whatever scopes the key holds. Read those through their own endpoints instead, where the rules that protect them still apply. A write must also always carry a filter, so there is no way to accidentally update or delete a whole table in one call.
@@ -96,4 +106,5 @@ with HTTP **403**. Fix it by editing the key's scopes in **Settings → API** �
 | A shared inbox or CRM sync | `conversations:read`, `contacts:read`, `contacts:write` |
 | A marketing campaign tool (a human still approves each send) | `broadcasts:manage`, `broadcasts:read`, `templates:read` |
 | An AI agent that edits your bot | `code:read`, `code:write`, `flows:read`, `flows:write` |
+| A catalogue sync that uploads images and documents the bot sends | `media:read`, `media:write` |
 | An event consumer | `webhooks:manage` plus each `events:*` you subscribe to |

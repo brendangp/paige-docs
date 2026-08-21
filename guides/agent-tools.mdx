@@ -1,10 +1,10 @@
 ---
 title: "What a connected agent can do"
 sidebarTitle: "Agent tools"
-description: "The sixteen tools Paige's MCP server gives a connected AI agent — what each one does, the permission it needs, and the one thing it can never do: send a broadcast."
+description: "The twenty-six tools Paige's MCP server gives a connected AI agent — what each one does, the permission it needs, and the one thing it can never do: send a broadcast."
 ---
 
-Once you've [connected an AI agent](/guides/connect-an-agent), it gets a fixed set of **tools** — the specific actions it's allowed to take in Paige. This page lists all sixteen.
+Once you've [connected an AI agent](/guides/connect-an-agent), it gets a fixed set of **tools** — the specific actions it's allowed to take in Paige. This page lists all twenty-six.
 
 Two things shape what an agent can actually do with them:
 
@@ -77,8 +77,16 @@ The reason `build_code` exists is quality. Without it, an outside agent writes P
 
 | Tool | What it does | Scope |
 | --- | --- | --- |
+| `list_flows` | Lists the project's flows, newest first — names, status, categories, whether each one is dynamic. Metadata only; the flow JSON isn't included. | `flows:read` |
+| `get_flow` | Reads one flow by name, including its full JSON definition — screens, components, routing, data model. | `flows:read` |
 | `create_flow` | Builds a new WhatsApp Flow from a description — the form-like screens your customers fill in inside WhatsApp. | `flows:write` |
 | `update_flow` | Changes an existing flow. | `flows:write` |
+
+A well-behaved agent reads before it writes. `update_flow` addresses a flow **by name**, an unknown name is rejected, and `list_flows` returns the only valid names — so an agent that lists first never invents one, and an agent that reads first describes a change to the flow that actually exists rather than to an assumed structure.
+
+<Tip>
+  **Read flows** is a newer permission than **Build flows**. A connection created before it existed may be able to write flows but not read them, which shows up as `insufficient_scope` on `list_flows`. Grant **Read flows** for that project under **Settings → API → Connected agents** — no reconnect needed.
+</Tip>
 
 <Note>
   Every flow change goes through Paige's flows sub-agent. There's no hand-edit path — an agent that tries to edit a flow's JSON as a file is refused. Flow definitions are strict, and a malformed one is rejected by Meta rather than degrading gracefully. See [Flows](/concepts/flows).
@@ -118,6 +126,50 @@ An agent that could send a promotion to four thousand people because it misread 
   **This is a different surface from the Broadcasting Agent.** Paige's own [Broadcasting Agent](/agents/broadcasting-agent), in the chat sidebar of the Broadcasts tab, has its own set of tools including `assemble_campaign` — and it can also draft and submit templates, list button taps, and update segments, which a connected agent can't. The two are separate: `assemble_broadcast` is what an **outside** agent gets over MCP; `assemble_campaign` is what Paige's **built-in** agent uses. Both are held for your approval, and neither can send.
 </Note>
 
+## Your bot's tables
+
+Your bot's own tables — bookings, orders, stock, whatever it keeps — are reachable too. The same data you see in **Tools → [Database](/guides/database-tab)**, read and written programmatically.
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `list_tables` | Lists the tables the bot uses for its own data. | `tables:read` |
+| `get_table_schema` | Reads one table's columns, types, defaults, and primary keys. | `tables:read` |
+| `read_table_rows` | Reads rows, with column projection, filters, ordering, and paging. | `tables:read` |
+| `insert_table_rows` | Inserts up to 50 rows at once and returns them as stored. | `tables:write` |
+| `update_table_rows` | Updates every row matching a filter. | `tables:write` |
+| `delete_table_rows` | Permanently deletes every row matching a filter. | `tables:write` |
+
+<Warning>
+  **A change or a delete must always name the rows it applies to.** There's no "update everything" and no "delete everything" — an unfiltered write is refused rather than run. And "contains"-style matching can find rows but never change or delete them, because a loose match can quietly cover a whole table while looking narrow. Read the rows first, then change them by their id.
+</Warning>
+
+<Note>
+  **This only ever reaches your own tables.** Contacts, conversations, messages, execution logs, and broadcast records are Paige's, not yours to open this way — an agent that tries gets `platform_table_forbidden`. Those have their own permissions, so giving something access to your bookings table never quietly hands it every customer's phone number and chat history.
+
+  Deleting is its own separate tool, so an agent has to ask for it deliberately and you can see it coming. It's permanent — there's no undo.
+</Note>
+
+## Media
+
+| Tool | What it does | Scope |
+| --- | --- | --- |
+| `list_media` | Lists the project's media assets — what the bot can already send, and which slugs are taken. | `media:read` |
+| `upload_media` | Uploads one file and returns its bot-facing **slug**, with no dashboard step at any point. | `media:write` |
+
+An agent uploads by giving Paige a public URL (`source_url`, up to 20 MB) or by sending the bytes inline as base64 (up to 8 MB decoded). The multipart upload the [API](/guides/storage#three-ways-to-send-the-file) offers isn't reachable over MCP, which speaks JSON only.
+
+<Warning>
+  **`upload_media` spends credits on an image.** One AI vision call writes the asset's description. Tell the agent to pass `describe_image: false` when you only want the file stored and sendable — it costs nothing then, and the slug works exactly the same. Non-image files use no AI at all.
+</Warning>
+
+<Note>
+  **The slug is the durable value — never store a `media_id`.** `media_id` is WhatsApp's id for its copy of the file and only a point-in-time snapshot: it expires after about 30 days and Paige replaces it automatically. An agent that writes a `media_id` into one of your table rows has written a value that will quietly stop working. It should store the **slug** and let the bot resolve it at send time. See [Storage](/guides/storage#store-the-slug-not-the-media-id).
+</Note>
+
+<Tip>
+  A slug is never overwritten. Uploading under a name that's taken returns `409 SLUG_EXISTS` rather than replacing a file your live bot is already sending — which is why a good agent calls `list_media` before `upload_media`.
+</Tip>
+
 ## Permissions are per project
 
 <Note>
@@ -134,12 +186,15 @@ An agent that could send a promotion to four thousand people because it misread 
 | Reply to customers | `messages:send` |
 | Read your bot's code without changing it | `code:read` |
 | Build and ship changes to your bot | `code:read`, `code:write` |
-| Build WhatsApp Flows | `flows:write` |
+| Read and build WhatsApp Flows | `flows:read`, `flows:write` |
 | Keep contact tags in sync with another system | `contacts:write` |
+| Read your bot's own tables | `tables:read` |
+| Keep your bot's tables in sync with another system | `tables:read`, `tables:write` |
+| Add images and documents the bot can send | `media:read`, `media:write` |
 | Prepare campaigns for you to approve | `broadcasts:manage`, `broadcasts:read` |
 
 Grant the least that gets the job done. You can change it later without reconnecting anything.
 
 <Tip>
-  Some scopes have no MCP tool behind them — there's no tool for templates, no tool for setting a conversation's state, and no tool for webhooks. Granting `templates:manage` or `webhooks:manage` to a connected agent gives it nothing it can use. Those live in the [API](/api-reference/introduction), for code you write yourself.
+  Some scopes have no MCP tool behind them — there's no tool for templates, no tool for setting a conversation's state, and no tool for webhooks. Granting `templates:manage` or `webhooks:manage` to a connected agent gives it nothing it can use. Those live in the [API](/api-reference/introduction), for code you write yourself. A few tools are one-way too: an agent can upload and list media, but reading an asset's bytes back and deleting one stay API-only.
 </Tip>

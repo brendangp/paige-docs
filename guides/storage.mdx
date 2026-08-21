@@ -64,6 +64,90 @@ WhatsApp keeps its own copy of each file, and that copy expires after about a mo
 
 If a file's badge says **expired**, or a send fails complaining about media, click **Re-register with Meta** to push a fresh copy across.
 
+## Uploading from your own code or an agent
+
+You don't have to be at the dashboard. Media is on the [Paige API](/api-reference/introduction) too, so a catalogue sync, a nightly job, or a [connected AI agent](/guides/agent-tools) can add files and reference them without anyone clicking Upload.
+
+| Endpoint | What it does | Permission |
+| --- | --- | --- |
+| `POST /v1/media` | Upload one file and get its slug back. | `media:write` |
+| `GET /v1/media` | List the project's assets, plus how much storage it's using. | `media:read` |
+| `GET /v1/media/{slug}` | One asset, with a short-lived signed URL for its bytes. | `media:read` |
+| `DELETE /v1/media/{slug}` | Delete an asset. | `media:write` |
+
+### Three ways to send the file
+
+Pick whichever suits the caller — all three end up in the same place.
+
+<Tabs>
+  <Tab title="source_url">
+    Give Paige a **public** `http(s)` URL and it downloads the file itself. Up to **20 MB**, and the easiest option when the file is already hosted somewhere.
+
+    ```bash
+    curl -X POST https://api.paigeme.dev/v1/media \
+      -H "Authorization: Bearer pk_live_…" \
+      -H "Content-Type: application/json" \
+      -d '{"source_url":"https://example.com/menu.pdf","name":"summer-menu"}'
+    ```
+
+    Private, loopback, and link-local addresses are refused, and every redirect hop is re-checked — so a link on your laptop or behind a VPN won't work.
+  </Tab>
+  <Tab title="Base64">
+    Send the bytes inline as `data`, with `filename` and `mime` alongside them. Capped at **8 MB decoded** — lower than the other two on purpose, because base64 inflates by a third and the whole payload is held in memory.
+
+    ```bash
+    curl -X POST https://api.paigeme.dev/v1/media \
+      -H "Authorization: Bearer pk_live_…" \
+      -H "Content-Type: application/json" \
+      -d '{"data":"iVBORw0KG…","filename":"banner.png","mime":"image/png","name":"welcome-banner"}'
+    ```
+
+    Anything bigger comes back `413 file_too_large` — host it and use `source_url` instead.
+  </Tab>
+  <Tab title="multipart/form-data">
+    A normal file upload, with the file in a part named `file`. Up to **20 MB**.
+
+    ```bash
+    curl -X POST https://api.paigeme.dev/v1/media \
+      -H "Authorization: Bearer pk_live_…" \
+      -F "file=@menu.pdf" \
+      -F "name=summer-menu"
+    ```
+
+    This one is REST-only — an AI agent over MCP speaks JSON, so it uses one of the other two.
+  </Tab>
+</Tabs>
+
+<Warning>
+  **Uploading an image spends credits.** One AI vision call writes the asset's description, which is what lets your bot answer questions about it. Pass `describe_image: false` when you only need the slug: the file is still stored, still registered with WhatsApp, and costs nothing. Non-image files — PDF, DOCX, TXT, MD — use no AI at all, whatever you pass.
+</Warning>
+
+<Note>
+  **A slug is never overwritten.** Uploading under a name that's already taken comes back `409 SLUG_EXISTS` rather than silently replacing a file your live bot or a published flow is already sending. Call `GET /v1/media` first to see what's taken.
+</Note>
+
+### Store the slug, not the `media_id`
+
+Each asset comes back with a `slug` and a `media_id`. They are not interchangeable.
+
+- **`slug`** is the durable value. It's yours, it doesn't change, and it's what `sendMedia` looks a file up by. Store this one — in a table column, in your own database, in your code.
+- **`media_id`** is WhatsApp's id for its copy of the file, and it's only a point-in-time snapshot. WhatsApp expires it after about 30 days, and Paige replaces it with a fresh one automatically.
+
+A `media_id` written into a row somewhere is a value that will quietly stop working. Write the slug and let the bot resolve it at send time — which also means a slug uploaded today works in code that was deployed last month.
+
+Alongside it, `meta_status` tells you whether an asset is sendable right now: `registered` means yes, `pending` (with `media_id: null`) means it's stored but not yet registered with WhatsApp — usually because no number is connected yet — and `expired` means the id lapsed and is being refreshed.
+
+### Limits
+
+Two limits apply to API uploads, and only to API uploads — nothing you do in the dashboard is ever refused for either.
+
+| Limit | Default |
+| --- | --- |
+| Total media storage per project | **2 GB** |
+| Upload bytes per API key, per minute | **64 MB** |
+
+Going past the storage ceiling returns `413 storage_limit_exceeded`; going past the byte budget returns `429 rate_limited` with a `Retry-After`. `GET /v1/media` always reports where you stand — `storage.used_bytes`, `storage.limit_bytes`, and `storage.remaining_bytes` — so you can check before you walk into it.
+
 ## Media your customers send you
 
 Storage also holds photos, PDFs, and voice notes that customers send *in* — proof of payment, an ID document, a photo of a broken part. That's off by default; see [Capturing customer media](/guides/media-capture) for how to turn it on and what to weigh up first.
@@ -73,3 +157,5 @@ Anything captured that way shows a green **From WhatsApp** badge, and once you h
 <Note>
   Your bot can't re-send a customer's file with `sendMedia()` — captured media is deliberately excluded. It's there for you to look at, not for the bot to pass around.
 </Note>
+
+Over the API, customer media is held back the same way: `GET /v1/media` returns only your own uploads unless you ask for `include_inbound`, and asking for it needs the `conversations:read` permission on top of `media:read`. A media-only key never sees a customer's file.

@@ -1,0 +1,159 @@
+---
+title: "Let another service tell your bot something happened"
+sidebarTitle: "Inbound hooks"
+description: "An inbound hook is a URL you hand to a payment provider, a booking tool, or your CRM so it can call your bot when something happens. Paige delivers the request untouched — your bot verifies the sender and decides what to do."
+---
+
+Your customer pays on a payment provider, books a slot in a scheduling tool, or submits a form on your website — and you want the bot to react: send the receipt, confirm the booking, mark the order paid.
+
+The problem is that the payment provider has never heard of Paige. It can't sign in, it can't hold an API key, and the only thing its settings screen asks you for is **a web address to notify**.
+
+An **inbound hook** is that address.
+
+## Inbound hook, webhook, or API key?
+
+Three things in **Settings → API** sound alike and do opposite things. The quickest way to choose is to ask *who starts it*:
+
+| | Which way it goes | Use it when |
+| --- | --- | --- |
+| **Inbound hook** | Another service calling **in** to your bot | An outside service needs to tell your bot something happened, and all it will accept from you is a URL — a payment provider, a booking tool, your CRM, a form builder |
+| **Webhook** | Paige calling **out** to your server | You want your own system notified when something happens in Paige — a message arrives, a delivery status changes, a template is approved. See [Webhooks](/api-reference/webhooks) |
+| **API key** | You or an AI agent calling **Paige** | Something you control needs to drive this project — send messages, read conversations, update contacts, edit code. See [Authentication](/api-reference/authentication) |
+
+The deciding question is **whether you can hand the other side a key.** If you can, issue an [API key](/guides/settings-api) with exactly the [scopes](/api-reference/scopes) it needs — you get permissions, rate limits, and revocation. If you can't, because their console has one field and it says *URL*, that's what an inbound hook is for.
+
+## Create a hook
+
+<Steps>
+  <Step title="Open Settings → API">
+    The **Inbound hooks** card sits between **Connected agents** and **Webhooks**. This section is for owners and admins only.
+  </Step>
+  <Step title="Click New hook">
+    Name it after the service that will call it — "Payfast payment notifications", "Calendly", "website order form". The name is how you tell hooks apart afterwards, and your bot sees it too.
+  </Step>
+  <Step title="Copy the URL">
+    Paige mints one and shows it to you straight away. It looks like `https://api.paigeme.dev/hooks/<secret>`.
+  </Step>
+  <Step title="Paste it into the other service">
+    Find its notification, callback, or "webhook" setting and paste the URL in. There are no headers to configure and nothing to sign up for on their side.
+  </Step>
+</Steps>
+
+Give each service its own hook. One project can have several, and separate hooks mean you can rotate or switch one off without touching the others.
+
+<Warning>
+  **The URL is the password.** There is no key to paste alongside it — simply *holding* the URL is what grants permission, because a URL is all these services can manage. Treat it exactly like a password: paste it into the provider's settings and nowhere else. Not into a screenshot, a support ticket, a shared document, or a public repository. Anyone who has the URL can send your bot requests.
+</Warning>
+
+## Copying it again, and switching it off
+
+Unlike an API key or a webhook signing secret, a hook URL is **not** show-once.
+
+- **Show URL** displays and copies it again, any time. Useful when you're setting up a second service or re-entering it after changing providers. The URL doesn't change.
+- **Rotate** is how you invalidate one. You get a fresh URL and the old one stops working the moment you confirm — so paste the new one into the provider afterwards, or their notifications stop arriving.
+- **The on/off switch** pauses a hook without replacing it. While it's off the row reads *Off — requests are refused*, and anything sent to it is turned away until you switch it back on.
+- **Delete** removes it for good.
+
+## Checking that requests are arriving
+
+Each hook shows when it last received something, so "is this working?" is answerable at a glance. Expand **Recent activity** and you'll see the **20 most recent arrivals** — when each one came in, and whether your bot handled it or hit an error.
+
+| Status | What it means |
+| --- | --- |
+| `received` | It arrived, and your bot hasn't reported back yet. |
+| `handled` | Your bot ran and returned without throwing. |
+| `failed` | Your bot ran and threw — the error is shown beside it. This is also what a rejected signature looks like, which is exactly right. |
+| `rejected` | Paige turned the request away at the door, because the hook was being hammered faster than its rate limit allows. |
+
+That's usually enough to tell the two common problems apart: **nothing listed at all** means the other service isn't sending — re-check the URL you pasted on their side, and make sure the hook isn't switched off. **Arrivals that show an error** mean it *is* reaching you and your bot's handling is what needs fixing.
+
+<Note>
+  Recent activity is a rolling troubleshooting view, not a permanent record. Arrivals are cleared out after about a month.
+</Note>
+
+Anything your bot logs while handling a hook shows up in **Tools → [Logs](/guides/logs)**, labelled with the hook's name as `hook:<name>`. That's where to look when arrivals are landing but the bot isn't doing what you expected.
+
+## Handling it in your bot
+
+Paige delivers the request to one file in your project: **`src/routes/inbound.js`**, which exports a function called `handleInbound`. Paige creates that file for you the first time you mint a hook, with a commented scaffold to fill in — and never overwrites it afterwards, because from then on it's your code.
+
+<Warning>
+  This is the **only** way external HTTP traffic reaches your bot code. In Paige your bot isn't a listening web server — adding an Express route somewhere else in the project does nothing, because no public URL routes to it.
+</Warning>
+
+`handleInbound` is called once per request, with everything about it:
+
+```javascript
+async function handleInbound({ label, path, method, headers, rawBody, rawBodyBase64, body }) {
+  // ...
+  return { ok: true };
+}
+
+module.exports = { handleInbound };
+```
+
+| Field | What it is |
+| --- | --- |
+| `label` | The hook's name from Settings, e.g. `"Payfast payment notifications"`. Branch on it when one project has several hooks. |
+| `path` | Everything after the secret in the URL, query string included — `'/'` when there's none. |
+| `method` | `'POST'`. |
+| `headers` | The request's headers, with lower-cased names. |
+| `rawBody` | **The exact bytes the provider sent**, as a byte-exact string. This is the payload of record. |
+| `rawBodyBase64` | The same bytes, base64-encoded — the unambiguous form for a binary or non-UTF-8 callback: `Buffer.from(rawBodyBase64, "base64")`. |
+| `body` | A convenience parse of `rawBody` (JSON, form-encoded, or text), or `null` when it couldn't be parsed. Handy, but never the thing you verify against. |
+
+Whatever you return is recorded on the arrival receipt in Settings. It is **not** what the provider sees — Paige answers them `200` the moment the request is accepted, before your bot runs. **Throwing** marks the receipt `failed` with your error message, which is the outcome you want for a request you've decided not to trust.
+
+Inside the handler you have the whole bot — your services, your database helpers, your message senders — so you can look the customer up, write to a table, and message them on WhatsApp from right there.
+
+<Tip>
+  You don't have to write this by hand. Tell the [Code Agent](/agents/code-agent) which service you're connecting — "verify Payfast ITN callbacks and send the customer a receipt" — and it knows how to do the verification properly for that provider.
+</Tip>
+
+### Your bot decides whether to trust the sender
+
+This is the one thing worth understanding properly.
+
+Paige checks that the URL is valid, logs the arrival, and passes on whatever came in — exactly as it came in — without opening it, changing it, or vouching for who sent it. Paige has no idea whether a request claiming to be a successful payment really came from your payment provider.
+
+<Warning>
+  **Always verify the sender before acting.** Every serious payment provider signs its notifications precisely so you can. Never let your bot act on a payment or an order it hasn't verified — otherwise anyone who learns the URL could tell your bot an order was paid when it wasn't.
+</Warning>
+
+Put the provider's signing secret in **Tools → [Secrets](/guides/secrets)** and read it with `process.env`. Never hard-code it, and never log a secret or the hook URL.
+
+### Verify against `rawBody`, never `JSON.stringify(body)`
+
+<Warning>
+  This is the mistake that quietly breaks every signature check. `body` is a *parse* of what arrived. Re-serialising it reorders keys and changes whitespace, so the bytes you hash are no longer the bytes the provider hashed — and the comparison fails every single time, or worse, is made to pass by weakening it.
+
+  `rawBody` is handed to you byte-exact for exactly this reason. Verify against `rawBody`.
+</Warning>
+
+An HMAC-SHA256 header, which is what Stripe, Shopify, Slack, and GitHub use:
+
+```javascript
+const crypto = require("crypto");
+
+const expected = crypto
+  .createHmac("sha256", process.env.PROVIDER_WEBHOOK_SECRET)
+  .update(rawBody, "utf8")              // rawBody — never JSON.stringify(body)
+  .digest("hex");
+
+if (!timingSafeEqualHex(expected, headers["x-provider-signature"])) {
+  throw new Error("Invalid signature");  // recorded as `failed` in Settings
+}
+```
+
+Compare digests in **constant time**. `timingSafeEqualHex` ships in the scaffold Paige creates for you, so it's already there in the same file. A plain `===` exits at the first differing character, which leaks — over many attempts — how much of a forged signature was correct.
+
+Payfast's ITN is the MD5 variant of the same idea: rebuild the parameter string from the posted fields **in the order they arrived**, drop the `signature` field, URL-encode each value, append your passphrase if you set one, then MD5 it and compare. Rebuilding that string from `rawBody` rather than from a parsed object is what makes it work.
+
+## Good to know
+
+- **Only `POST` requests are delivered.** JSON, form-encoded, and plain-text bodies are all accepted, up to **128 KB**.
+- **Your hook runs your deployed code.** Editing `src/routes/inbound.js` isn't live until you [deploy](/guides/deploy) — until then the live hook keeps running the previously deployed handler.
+- **Sub-paths work.** Anything you add after the secret — `…/hooks/<secret>/payments/success` — arrives as `path`, so one hook can serve several callbacks from the same provider.
+- **Paige always answers `200` on acceptance.** Providers treat anything else as "retry", so an error inside your bot never turns into a retry storm. Your handler's outcome lands on the receipt instead.
+- **Rejections are deliberately uninformative.** An unknown, rotated, or switched-off URL all return the same `404`, so nobody can probe for which is which.
+- **Hooks are rate limited.** A hook being hit far faster than any real provider would sends requests to `rejected` rather than to your bot.
