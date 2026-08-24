@@ -248,6 +248,46 @@
   },
   "redirects": [
     {
+      "source": "/api-reference/endpoints/broadcasts/assemble-a-broadcast-—-always-lands-in-pending_approval-never-sends",
+      "destination": "/api-reference/endpoints/broadcasts/assemble-a-broadcast-for-approval"
+    },
+    {
+      "source": "/api-reference/endpoints/build/authoredit-bot-code-from-a-natural-language-instruction-via-the-code-agent",
+      "destination": "/api-reference/endpoints/build/author-or-edit-bot-code-via-the-code-agent"
+    },
+    {
+      "source": "/api-reference/endpoints/build/editcreate-a-file-via-the-code-agent",
+      "destination": "/api-reference/endpoints/build/create-or-edit-a-file-via-the-code-agent"
+    },
+    {
+      "source": "/api-reference/endpoints/build/promote-dev-→-production",
+      "destination": "/api-reference/endpoints/build/promote-dev-to-production"
+    },
+    {
+      "source": "/api-reference/endpoints/contacts/update-a-contact-name-tags-custom-attributes",
+      "destination": "/api-reference/endpoints/contacts/update-a-contact-name-tags-or-custom-attributes"
+    },
+    {
+      "source": "/api-reference/endpoints/messages/retrieve-the-media-attached-to-a-message-bytes-or-302-redirect",
+      "destination": "/api-reference/endpoints/messages/retrieve-the-media-attached-to-a-message"
+    },
+    {
+      "source": "/api-reference/endpoints/meta/smoke-check-—-echo-the-resolved-project-+-scopes",
+      "destination": "/api-reference/endpoints/meta/smoke-check-echoing-the-resolved-project-and-scopes"
+    },
+    {
+      "source": "/api-reference/endpoints/meta/the-pasteable-\"build-a-paige-integration\"-agent-skill-no-auth",
+      "destination": "/api-reference/endpoints/meta/the-pasteable-paige-integration-agent-skill-no-auth"
+    },
+    {
+      "source": "/api-reference/endpoints/webhooks/partial-update-of-a-webhook-url-events-is_active",
+      "destination": "/api-reference/endpoints/webhooks/partial-update-of-a-webhook-registration"
+    },
+    {
+      "source": "/api-reference/endpoints/webhooks/register-an-outbound-webhook-returns-the-signing-secret-once",
+      "destination": "/api-reference/endpoints/webhooks/register-an-outbound-webhook"
+    },
+    {
       "source": "/guides/flows-builder",
       "destination": "/guides/flows/overview"
     },
