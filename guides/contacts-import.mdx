@@ -29,9 +29,23 @@ Either a bare number, or a name and number separated by a comma.
 
 Whichever you use, click **Validate** first. Nothing is imported until you've seen what Paige made of your list.
 
+## Matching your columns
+
+**Any spreadsheet works — you don't have to rename your columns.** After you choose a CSV, Paige shows you a short mapping step: for each of its own fields — **Number**, **Name**, **Tags**, **Opted in** — you pick which column of your file feeds it, with the first few rows shown underneath so you can check you've got the right ones.
+
+If your file already uses the names `name`, `number`, `tags` or `opted_in`, they're filled in for you and you can go straight on.
+
+A few things this step handles that used to sink an import:
+
+- **Names split across two columns.** If your export has **First Name** and **Last Name**, map one to **Name** and click **Second column** to add the other. Paige joins them with a space.
+- **Columns with no heading, or two columns with the same heading.** They're still listed separately — as *Column 3 (unnamed)* and *Phone (column 5)* — so you can tell them apart.
+- **The wrong file.** **Choose another file** takes you back without starting over.
+
+Only **Number** is required, and **Validate** stays greyed out until you've picked it.
+
 ## CSV format
 
-A header row with any of these columns, in any order:
+You don't need these exact names — the mapping step above handles whatever your file calls them. Use them and Paige matches your columns for you:
 
 | Column | Required | What it does |
 |---|---|---|
@@ -73,7 +87,7 @@ Three numbers:
 Then **Import** does it, and tells you what happened: *Imported 47 contacts, skipped 3 duplicates, 2 invalid*.
 
 <Note>
-  **Duplicates are skipped, never updated.** Re-importing someone with a corrected name or new tags does nothing — they're already there, so the row is ignored. To change an existing contact, edit them in [the database](/guides/database-tab). This also means you can't undo an opt-out by re-importing.
+  **Duplicates are skipped, never updated.** Re-importing someone with a corrected name or new tags does nothing — they're already there, so the row is ignored. To change an existing contact, edit them in [the database](/guides/database-tab). It also means an import never undoes an opt-out: someone who opted out comes back only by replying **START** themselves. See [Opting out and back in](/guides/broadcasts#opting-out-stop-and-back-in-start).
 </Note>
 
 You can import up to 50,000 rows at a time.

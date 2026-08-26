@@ -77,6 +77,17 @@ This is a partial success, not a failure. Your code and table structure went liv
 
 Your pending count drops by however many flows actually published, so a flow that didn't make it keeps its badge. That's deliberate — the badge is telling you something is still not live.
 
+You get the same **Deployed with warnings** message when a **table** couldn't be updated in production. It names the tables and says which half of the job failed:
+
+- **Structure** — a column change didn't make it across, so your bot's code and its table are now out of step. Fix this before you rely on the new column.
+- **Data** — the structure is fine, but the rows you asked to copy didn't transfer.
+
+Deal with the cause, then deploy again.
+
+<Note>
+  A deploy that stops with a **module not allowed** message is a different thing: your bot's code is trying to use a building block that isn't available to bots on Paige. Nothing goes live and nothing is broken. The message names the file and the piece it objected to — ask Paige in the chat sidebar to rewrite that bit using an allowed one, then deploy again.
+</Note>
+
 ## After you deploy
 
 The button flashes **Deployed!** for a few seconds, and you'll get a push notification titled **Build succeeded** (or **Build failed**) if you've turned notifications on for that device in Settings → Notifications. There's no separate deploy report to read — the button and the notification are the confirmation.

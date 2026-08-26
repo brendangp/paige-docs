@@ -54,6 +54,8 @@ Click **New Broadcast** and you'll go through six steps.
   </Step>
   <Step title="Test Send">
     Send the real template to up to three numbers first. It doesn't touch your audience or your daily cap, and it's the only way to see the thing exactly as a customer will. Worth the thirty seconds.
+
+    A test that sends successfully also **shows up in that number's thread in the Conversations tab**, so you can look at exactly what the person received rather than trusting the preview.
   </Step>
   <Step title="Confirm">
     Review it all, including the estimated WhatsApp cost, and save.
@@ -117,8 +119,20 @@ Paige doesn't charge for broadcasts, and they don't use your credits. **Meta bil
 
 The one limit is a **daily message cap on each project**, which starts at **1,000 messages a day** and resets at midnight UTC. It's a per-project setting rather than a fixed platform ceiling, so a project can be raised above the default. There's no self-service control for it — ask the [Help Agent](/agents/help-agent) if 1,000 a day isn't enough for you.
 
+You can see where you stand without doing the arithmetic: the Broadcasts tab always shows how much of today's allowance you've used, and the wizard's **Confirm** step tells you how much is left before you commit. If your audience is bigger than the remainder, you know up front that the overflow goes out the next day.
+
+### When a broadcast hits the cap
+
+A broadcast that runs out of allowance mid-send **pauses visibly and picks up where it left off**. You get a notification, its badge changes from *Sending* to **Paused — daily limit**, and a banner on both the broadcast list and the broadcast itself says how many messages you've used and the exact time the rest will start going out.
+
+Nothing is lost — the held recipients are still queued, and they go out on their own when the allowance resets. There's nothing to click.
+
 <Note>
-  If a broadcast hits the cap mid-send it quietly pauses and picks up where it left off the next day. It'll sit showing **Sending** with a stuck Queued count, and nothing tells you why — so if a large broadcast seems frozen, the cap is the first thing to suspect.
+  The cap is per **project**, not per broadcast. When one broadcast pauses, every other broadcast in that project is waiting too.
+</Note>
+
+<Note>
+  Self-hosted projects don't show the allowance or the forecast. Their sending goes through their own backend, so Paige isn't the one counting.
 </Note>
 
 ## Who actually receives it
@@ -151,9 +165,47 @@ Below that, every recipient is listed with their status. Failures say why in pla
 | **Account paused** | Meta has paused your WhatsApp account. |
 | **Delivery failed** | Something else. Copy the raw reason for the detail. |
 
+## Downloading the recipient list
+
+Next to the filter is a **Download CSV** button. It saves the recipient list as a spreadsheet you can open in Excel or Google Sheets, or feed into another system — each person's name, number, WhatsApp status, failure reason if any, the wave they went out in, how many attempts were made, and the times things happened.
+
+It respects the filter you have on. With **Failed** selected you get only the failures, which is the quickest way to work through bad numbers offline. Phone numbers keep their leading `+` rather than being mangled into plain numbers by the spreadsheet.
+
+The file is a snapshot of that exact moment — deliveries and reads keep arriving from WhatsApp for a while after a send — so the filename carries the date and time, and you can download again later for an updated picture.
+
+<Note>
+  **Download CSV** is shown to the project owner and workspace admins only, because the file contains everyone's contact details. If you're a member and don't see the button, that's why, not a bug.
+</Note>
+
+Two cases where you won't get a file:
+
+- **A broadcast that hasn't started sending.** There's no recipient list yet to export.
+- **A broadcast that failed before it built its list.** You get a short explanation instead. An empty spreadsheet would look like nobody was in your audience, when in fact the send never got started.
+
+Self-hosted projects keep their recipient list on their own backend rather than in Paige, so the download isn't offered there.
+
+## Exporting several broadcasts at once
+
+For a monthly report, you don't need to open each campaign. On the Broadcasts list every row has a tick box: tick the campaigns you want and click **Export**. A window asks what to include.
+
+- **Campaign summary** — one spreadsheet row per campaign with its status, template, audience, every count (total, queued, sent, delivered, read, failed, canceled, held), the estimated cost, and all the timestamps.
+- **Recipient detail** — a ZIP containing one recipient list per campaign (the same file **Download CSV** gives you), plus the summary if you ticked it, plus a short README.
+
+<Warning>
+  Two columns in the summary are named `estimated_credits_by_audience` and `estimated_credits_by_messages_sent`. Despite the name these are **not Paige credits being charged** — they're the same estimate of Meta's messaging fee described under [What it costs](#what-it-costs), one priced against everyone you targeted and one against the messages that actually went out.
+</Warning>
+
+You can tick up to **25 broadcasts** at a time, and there's a ceiling on the total recipients one export may cover. Go over either and the window tells you, so you untick a few.
+
+Campaigns that haven't started sending still appear in the summary but contribute no recipient list, because there is nothing to list. The window names them before you download and the README names them again.
+
+Like the single download, bulk export is owner and workspace-admin only. On a self-hosted project the ZIP arrives with the summary and the README but no recipient files, and the README says so for each campaign — you still get a usable report, it just stops at the campaign level.
+
 ## Cancelling and retrying
 
 **Cancel** appears on a broadcast that is **Scheduled** or **Sending**, and stops it. Anything already sent has left and can't be recalled — cancelling only stops what's still queued, including anyone held back for a later wave. It can't be undone.
+
+You'll be asked to confirm, and the confirmation counts exactly who is affected — the queued recipients plus any held for a later wave. Since cancelling is final, and sending the same campaign again means building a new broadcast, it's worth reading those numbers before you go ahead.
 
 <Note>
   Don't confuse this with **Cancel schedule** in the wave panel, which only clears a pending wave release and leaves the broadcast alone. See [Scheduling a wave for later](#scheduling-a-wave-for-later).
@@ -187,17 +239,25 @@ Three limits worth knowing:
 
 The switch is hidden on self-hosted projects, which manage their own recipient list and so can't be retargeted from Paige.
 
-## Opt-outs and STOP
+## Opting out (STOP) and back in (START)
 
-Your bot handles opt-outs on its own. If someone replies **STOP**, **UNSUBSCRIBE**, or **OPT OUT**, Paige marks them opted out immediately, before the message reaches your bot. They're excluded from every broadcast from then on.
+Your bot handles opt-outs on its own. If someone replies **STOP**, **UNSUBSCRIBE**, **OPT OUT**, or **OPTOUT**, Paige marks them opted out immediately, before the message reaches your bot. They're excluded from every broadcast from then on — including ones you've already scheduled, because the check happens at send time.
 
-The word has to start the message, so "please don't stop messaging me" won't trigger it.
-
-<Warning>
-  **Opting out is one-way.** There's no button to opt someone back in, and re-importing them won't do it — imports skip contacts that already exist rather than updating them. Undoing an opt-out means editing that contact's row directly in [the database](/guides/database-tab), which you should only do if the person has genuinely asked to hear from you again.
-</Warning>
+The match is case-insensitive and forgiving of extra spaces and punctuation, so "stop", " STOP. " and "Unsubscribe" all work. But the word has to *start* the message and stand on its own, so "please don't stop messaging me" won't trigger it.
 
 Your customer gets no confirmation reply when they opt out — they send STOP and hear nothing back. That's worth knowing if someone asks whether it worked.
+
+### Coming back
+
+Someone who opted out by mistake, or who later changes their mind, can **re-subscribe themselves** by replying **START** — or **UNSTOP**, **SUBSCRIBE**, or **OPT IN**. They're marked opted in again, they get a short confirmation reply this time, and they're back in future audiences as normal. The same rules apply: the word has to begin the message and stand alone, so "can we start tomorrow?" and "startup" go to your bot as ordinary messages.
+
+<Note>
+  **Only the contact can do this, by messaging you.** There's deliberately no button for you to opt someone back in on their behalf — someone asking to be re-subscribed should send START themselves, which is simpler for you and the version that keeps you on the right side of WhatsApp's rules.
+</Note>
+
+<Warning>
+  **Re-importing a contact does not opt them back in.** Imports skip numbers you already have and never overwrite an opt-out. See [Import contacts](/guides/contacts-import).
+</Warning>
 
 <Note>
   This applies to bots Paige hosts. If you run your own backend, opt-out handling is yours to implement.

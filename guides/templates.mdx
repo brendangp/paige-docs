@@ -59,6 +59,8 @@ A template is made up of components. The only required component is a BODY. You 
       "text": "Appointment Confirmed"
     }
     ```
+
+    A picture, video or document header needs a **sample file** at the moment you create it — see [Media headers need a sample file](#media-headers-need-a-sample-file).
   </Accordion>
   <Accordion title="FOOTER (optional)" icon="panel-bottom">
     A short line of grey text displayed below the body. Does not support variables.
@@ -151,6 +153,24 @@ Three ways, depending on where you are.
 <Note>
   Templates live under **Settings → Templates**. They didn't move to the Tools tab with the database and the rest — a template belongs to your WhatsApp number rather than your bot's runtime.
 </Note>
+
+### Media headers need a sample file
+
+Choose **Add Header** and then a picture, video or document, and the builder asks you to attach a **sample file**. This isn't optional: Meta won't review a template with a media header unless it can see an example of the kind of file it will carry. Pick something representative — one of your real product photos, a sample invoice PDF — and Paige uploads it as soon as you choose it. The filename appears under the picker once it's done.
+
+The sample is only ever shown to Meta's reviewers. Each message you send later carries its own file, not this one.
+
+| Header type | Formats | Size limit |
+|---|---|---|
+| Picture | JPEG, PNG | 5 MB |
+| Video | MP4, 3GP | 16 MB |
+| Document | PDF, Word, Excel, PowerPoint, plain text | 100 MB |
+
+If the file is too big, the wrong type, or isn't really the kind of file its name suggests, Paige tells you straight away rather than letting Meta reject the whole template. Very occasionally — when a lot of people are uploading at once — Paige asks you to try again in a few seconds. Just pick the file again.
+
+<Warning>
+  **You can create these templates, but you can't send them yet.** Paige has no way to pick the file that goes with each message — not from the Conversations template picker, not from the chat assistant, and not in the Broadcasts wizard. In the Broadcasts wizard they're listed but greyed out, with a note that they need a picture, video or document at send time. A media-header template you just created hasn't gone missing; it simply can't be broadcast yet. Use a text-only template for a broadcast in the meantime.
+</Warning>
 
 ## Template approval
 

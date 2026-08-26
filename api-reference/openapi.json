@@ -1773,6 +1773,291 @@
         }
       }
     },
+    "/v1/templates/header-sample": {
+      "post": {
+        "operationId": "uploadTemplateHeaderSample",
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Upload the sample file a media header needs",
+        "description": "Meta will not review an IMAGE, VIDEO or DOCUMENT header without an EXAMPLE of the media it will carry, so a media-header template cannot be created until you have one of these handles. Upload the sample here, then put the returned `handle` into the header component as `example.header_handle: [\"<handle>\"]` when you call `POST /v1/templates`. Creating a media header without it is `400`, not a Meta error.\n\n**Two transports, pick one.**\n\n- JSON `{ \"format\": \"DOCUMENT\", \"source_url\": \"https://...\" }` — Paige downloads it. Only public http(s) URLs: private, loopback and link-local addresses are refused and redirects are re-checked at every hop. Add `filename` / `mime` to override what the remote server declares.\n- JSON `{ \"format\": \"IMAGE\", \"data\": \"<base64>\", \"filename\": \"...\", \"mime\": \"...\" }` — inline bytes, capped at **5 MB decoded**, lower than the per-format ceilings because the body is buffered whole in memory. A `data:` URI prefix is accepted and stripped.\n\n**Size and type are per FORMAT.** IMAGE takes `image/jpeg` or `image/png` up to 5 MB; VIDEO takes `video/mp4` or `video/3gpp` up to 16 MB; DOCUMENT takes PDF, Word, Excel, PowerPoint or plain text up to 100 MB. Oversize is `413 file_too_large` and a type WhatsApp will not take is `415`.\n\n**The declared mime type is not trusted.** The bytes are checked against their own signature, and a file whose contents disagree with its `mime` is `415` — sending a video as `image/png` to slip past the image size cap does not work.\n\n**A handle is not a media id.** `media_id` from `POST /v1/media` addresses a file Meta can SEND and is useless as a `header_handle`; the reverse is also true. The handle is short-lived and single-purpose: get one, create the template with it, and do not store it.\n\n**Uploads are metered by BYTES as well as by request count**, against the same per-key budget `POST /v1/media` charges. A burst of large samples can therefore return `429 rate_limited` even while you are inside the request-per-minute budget — retry after the window. A `source_url` download is also aborted mid-stream once it passes that budget, so a sample bigger than a whole minute of it can never be fetched.\n\n**Required scope:** `templates:manage`",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "templates:manage"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
+            },
+            "required": false,
+            "name": "X-Paige-Project",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "IMAGE",
+                          "VIDEO",
+                          "DOCUMENT"
+                        ],
+                        "description": "The header format this sample is for. IMAGE takes JPEG/PNG up to 5 MB, VIDEO takes MP4/3GP up to 16 MB, DOCUMENT takes PDF/Office/plain text up to 100 MB. The declared type is checked against the file own magic bytes, so a mislabelled file is refused here rather than forwarded to Meta."
+                      },
+                      "source_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Public http(s) URL Paige downloads the sample from. Private, loopback and link-local addresses are refused and redirects are re-checked at every hop. The download is aborted mid-stream at the smaller of this format ceiling and the API key remaining per-minute upload byte budget, so a sample larger than that budget can never be fetched."
+                      },
+                      "filename": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Overrides the filename derived from the URL."
+                      },
+                      "mime": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Overrides the Content-Type the remote server declares. Use it when the host serves the file as application/octet-stream."
+                      }
+                    },
+                    "required": [
+                      "format",
+                      "source_url"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "IMAGE",
+                          "VIDEO",
+                          "DOCUMENT"
+                        ],
+                        "description": "The header format this sample is for. IMAGE takes JPEG/PNG up to 5 MB, VIDEO takes MP4/3GP up to 16 MB, DOCUMENT takes PDF/Office/plain text up to 100 MB. The declared type is checked against the file own magic bytes, so a mislabelled file is refused here rather than forwarded to Meta."
+                      },
+                      "data": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The sample bytes, base64-encoded. Plain base64 or a data: URI. Capped at 5 MB DECODED, lower than the per-format ceilings because the whole body is buffered in memory. Use source_url for anything larger."
+                      },
+                      "filename": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "Original filename, including its extension."
+                      },
+                      "mime": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "The sample mime type, e.g. image/png. Must be one WhatsApp accepts for this header format."
+                      }
+                    },
+                    "required": [
+                      "format",
+                      "data",
+                      "filename",
+                      "mime"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "handle": {
+                          "type": "string",
+                          "description": "Meta's opaque upload handle. Goes straight into the HEADER component as `example.header_handle: [handle]`."
+                        },
+                        "format": {
+                          "type": "string",
+                          "description": "IMAGE | VIDEO | DOCUMENT — the format the sample was validated against."
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "mime_type": {
+                          "type": "string",
+                          "description": "The mime type Paige verified against the bytes, not necessarily the one you declared."
+                        },
+                        "size": {
+                          "type": "number",
+                          "description": "Decoded size in bytes."
+                        }
+                      },
+                      "required": [
+                        "handle",
+                        "format",
+                        "filename",
+                        "mime_type",
+                        "size"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (`not_found` / `*_not_found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests permitted in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests remaining in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (`server_error`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/templates/{name}": {
       "delete": {
         "operationId": "deleteTemplate",

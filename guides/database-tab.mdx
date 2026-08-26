@@ -75,6 +75,12 @@ SELECT status, COUNT(*) FROM bookings GROUP BY status;
 
 It runs against whichever schema the Preview/Production toggle is on, and the badge above the editor tells you which. Results show up to 500 rows, though the true count is always reported.
 
+**SQL** is a switch, not a one-way door: click it again to leave the editor and land back exactly where you were — the table you were looking at, or the table list if you came from there. Your query and the **Write** setting are kept, so you can pop out to check a table and come straight back to carry on.
+
+<Note>
+  Two things do send you back to the table list instead: switching between Preview and Production, and dropping a table. In both cases the table you were on may not exist any more. Switching schema also turns **Write** back off, so you can't carry write access from Preview into Production without meaning to.
+</Note>
+
 ### Read-only by default
 
 The editor won't change anything until you turn on the **Write** toggle. Try an `UPDATE` without it and you'll be told to enable Write rather than have it run.
