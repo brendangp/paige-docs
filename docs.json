@@ -200,7 +200,8 @@
             "pages": [
               "integrations/index",
               "integrations/airtable",
-              "integrations/slack"
+              "integrations/slack",
+              "integrations/wordpress"
             ]
           }
         ]
