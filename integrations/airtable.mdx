@@ -71,4 +71,4 @@ Airtable errors surface in [your logs](/guides/logs). The usual causes:
 - **Field name doesn't match** — Airtable field names are case-sensitive, and `Order Number` is not `order number`.
 - **Schema is stale** — see above.
 - **Token lost access** — someone changed permissions in Airtable, or the token was revoked.
-- **It's running on a schedule** — integrations don't work in [scheduled tasks](/guides/scheduled-tasks) at all.
+- **Rate limited** — Airtable caps how fast a base can be called; a burst of writes can be rejected and needs retrying.

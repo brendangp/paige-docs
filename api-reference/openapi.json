@@ -4558,7 +4558,7 @@
           "Build"
         ],
         "summary": "Promote dev to production",
-        "description": "Copies the dev working copy to production (dev → production) and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Required scope:** `code:write`",
+        "description": "Copies the dev working copy to production (dev → production) and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**`require_warnings` is advisory, never fatal.** It reports relative `require()` calls in the promoted code that resolve to no file in the project. The deploy still succeeded and the code was promoted exactly as sent — but a warning with `load_time_reachable: true` means the bot worker will throw at init and answer no inbound message at all.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4674,6 +4674,14 @@
                         "flows_failed": {
                           "type": "boolean",
                           "description": "True when `flow_errors` is non-empty."
+                        },
+                        "require_warnings": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Report-only (GRE-667). Each entry names a bot file whose relative `require()` does not resolve to any file in the project — `file`, `line`, `specifier`, `target`, `reason` (`unresolved` | `empty-module`), `load_time_reachable`, `platform_owned`, `platform_restorable` and a human-readable `message`. A non-empty list NEVER means the deploy failed: the code was promoted exactly as sent. `load_time_reachable: true` means the bot worker will throw at init and answer no inbound message at all. `platform_owned: true` means the file is Paige-managed and not yours to write; `platform_restorable` is the narrower question of whether an injector can put it back — `false` there means no automatic repair exists and the `message` escalates instead of naming one."
                         }
                       },
                       "required": [
@@ -4686,7 +4694,8 @@
                         "table_sync_failed",
                         "flows_published",
                         "flow_errors",
-                        "flows_failed"
+                        "flows_failed",
+                        "require_warnings"
                       ]
                     }
                   },
@@ -6318,7 +6327,8 @@
                     "additionalProperties": {}
                   },
                   "schedule": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Optional ISO 8601 datetime to send at. Must be in the future AND land on a 15-minute boundary (minutes 00, 15, 30 or 45, with zero seconds) — scheduled broadcasts are swept every 15 minutes, so a finer time cannot be honoured and anything else is rejected. Round to the nearest quarter hour before sending. Records the intended send time only — nothing sends until a human approves."
                   }
                 },
                 "required": [

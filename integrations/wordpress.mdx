@@ -1,0 +1,121 @@
+---
+title: "Keep your bot in step with your WordPress site"
+sidebarTitle: "WordPress"
+description: "Connect your WordPress site and Paige imports the parts you choose — blog posts, pages, events, products — into a table your bot can search, or into the knowledge it answers from."
+---
+
+You already keep your website up to date. The WordPress integration means your bot does too — pulling your posts, pages or events across on a schedule, so nobody has to remember to tell it that the November workshop moved.
+
+Connect it from **Tools → Connectors**.
+
+## What it does
+
+Paige reads your site the same way a browser does, over its normal public web address, and copies the parts you pick into your project. It refreshes them on a schedule you choose. Content you delete from your site stops appearing; content you edit is updated on the next refresh.
+
+<Note>
+  **There's nothing to install and no password to hand over.** Every other integration asks you to sign in or paste a token. WordPress doesn't — Paige only reads what your site already publishes openly. Which also means this connection **never expires**, so you'll never be asked to reconnect it.
+</Note>
+
+## How to authenticate
+
+There's no authentication step. Instead you go through a short setup:
+
+<Steps>
+  <Step title="Enter your website address">
+    Type it however you'd normally write it — `example.com`, `www.example.com` or `https://example.com` all work. Paige checks it can read the site before letting you continue.
+
+    If it can't, it tells you which problem it hit rather than just failing: the address isn't a WordPress site, the site's content feed has been switched off, or a security plugin is blocking outside visitors. Each one has a different fix, so it's worth reading the message.
+  </Step>
+  <Step title="Pick what to sync">
+    Paige lists the parts of your site it can read — blog posts, pages, and any custom content types your plugins add, such as events or products. Tick what your bot should know about.
+  </Step>
+  <Step title="Choose where it lands">
+    Each part goes to one of two places. This is the decision that matters most — see [Table or knowledge?](#table-or-knowledge) below.
+  </Step>
+  <Step title="Choose how often it refreshes">
+    **Daily**, **weekly** or **monthly**, set separately for each part. A busy blog can refresh daily while your About page checks monthly.
+  </Step>
+  <Step title="Review">
+    Paige shows you what your bot will actually see, so you can catch a wrong choice before it's made.
+  </Step>
+  <Step title="Confirm">
+    Nothing is written until you click the last button. Close the wizard at any earlier point and your site is left exactly as it was — no half-finished setup to clean up.
+  </Step>
+</Steps>
+
+## Table or knowledge?
+
+Both put your website content in front of your bot, but they answer different kinds of question.
+
+<CardGroup cols={2}>
+  <Card title="A table" icon="table">
+    Rows your bot can **look things up in** — and show on a screen. Best for anything with structure and a lot of entries: events with dates, products with prices, a directory of listings.
+  </Card>
+  <Card title="Knowledge" icon="book-open">
+    Text your bot **reads to answer questions**. Best for prose that explains something: your About page, your services, your delivery policy, your FAQs.
+  </Card>
+</CardGroup>
+
+A rough rule: if a customer would ask *"what's on in November?"* you want a table. If they'd ask *"do you deliver to Cape Town?"* you want knowledge.
+
+<Warning>
+  **There's a ceiling on how much knowledge your bot can hold**, and Paige will refuse a sync that would push you over it rather than warn you.
+
+  That's deliberate. Your bot re-reads its entire knowledge on every single message, so an oversized knowledge base doesn't make it slow — it makes it stop replying, with nothing to tell you why. If you hit the limit, sync fewer pages, or send the bulky content to a table instead.
+</Warning>
+
+## Keeping an eye on what's syncing
+
+Once connected, the WordPress card lists everything Paige is pulling from your site: what it is, where it goes, how often it refreshes, and when it last ran.
+
+If something goes wrong you find out here, rather than from a bot that has quietly fallen behind. A part that failed says so **and says why**, in plain language. A part whose table you've since deleted from your database is flagged as needing attention even though its last run finished cleanly — which is exactly the case that would otherwise look healthy right up until a customer asked about it.
+
+## Adding more later
+
+Started with just your blog posts and now want your About and Services pages in your bot's knowledge too? Click **Add content** on the card.
+
+Paige checks your site again **from scratch**, so anything you've published — or any plugin you've installed — since you first connected shows up. Parts you're already syncing are marked, so you can't pick the same thing twice. From there it's the same short set of steps, and again nothing is written until you confirm. Your existing setup is never touched.
+
+## Showing your website content inside a chat
+
+Once part of your site is coming into a table, you can ask the AI chat for a screen that shows it:
+
+> "Let people browse my upcoming events."
+
+> "Show my listings with photos."
+
+You don't need to know anything about tables or images. The chat already knows which parts of your site you've imported, so it builds against the real ones rather than guessing — and if you haven't connected a site yet it says so, instead of building a screen that shows nothing.
+
+Pictures come across from your site too, sized to load quickly inside WhatsApp. If a list would get too heavy, the later entries appear without a photo rather than the whole screen failing.
+
+<Note>
+  A screen is only as current as the schedule you chose, not live to the second. Something you removed from your website stops appearing, and something you changed shows up, after the next refresh.
+</Note>
+
+## How to prompt the coding agent to use it
+
+Ask for the behaviour, not the plumbing:
+
+> "If someone asks what events are coming up, list the next three from my site."
+
+> "Answer questions about delivery using my Shipping page."
+
+<Tip>
+  Sync your FAQ page into knowledge and most "can you..." questions answer themselves — without you rewriting anything you've already written once on your website.
+</Tip>
+
+## Turning it off
+
+**Disconnect** stops the syncing and makes Paige forget which parts of your site it was watching.
+
+**Anything already imported stays put.** The tables and knowledge built from your site aren't deleted, and your bot keeps using them — they simply stop being refreshed. Paige tells you this before you confirm, so it isn't a surprise either way.
+
+## When it breaks
+
+Sync problems show up on the card itself, and anything your bot does with the content shows up in [your logs](/guides/logs):
+
+- **"Not a WordPress site"** — the address resolves, but there's no WordPress behind it. Check for a typo, and that you've given the site's own address rather than a page on it.
+- **"Content feed switched off"** — WordPress can be configured not to publish its content feed. Whoever maintains the site can turn it back on.
+- **Blocked by a security plugin** — some plugins block anything that isn't a person in a browser. The site's maintainer can allow Paige through.
+- **A part is flagged but its last run succeeded** — its destination table was deleted from your [database](/guides/database-tab). Recreate it, or remove that part and add it again.
+- **A knowledge sync is refused** — you're at the knowledge ceiling. See the warning under [Table or knowledge?](#table-or-knowledge).

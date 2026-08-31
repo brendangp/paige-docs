@@ -51,4 +51,4 @@ Slack errors show up in [your logs](/guides/logs):
 - **`not_in_channel`** — the bot hasn't been invited. Run `/invite @paige` in that channel.
 - **`channel_not_found`** — the channel was renamed, archived, or is private and the bot can't see it.
 - **No default channel set** — you connected but never picked one from the dropdown.
-- **It's running on a schedule** — integrations don't work in [scheduled tasks](/guides/scheduled-tasks), so a daily Slack summary won't work today.
+- **`invalid_auth`** — the sign-in expired or the token was revoked. The card shows an amber **Expired** badge; click **Reconnect**.

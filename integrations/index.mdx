@@ -1,12 +1,12 @@
 ---
 title: "Integrations: connect your bot to the systems you already run"
 sidebarTitle: "Overview"
-description: "Integrations link your bot to the tools your business already lives in — Airtable, Slack, and more — so it can read and write there without you handling API keys."
+description: "Integrations link your bot to the tools your business already lives in — Airtable, Slack, WordPress and more — so it can read and write there without you handling API keys."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
 
-Your bot doesn't work in isolation. It might need to log a booking to the spreadsheet your team already lives in, or tell someone in Slack that a customer needs help. **Integrations** connect your bot to the systems you already run, and turn each one into a sign-in rather than a credentials exercise.
+Your bot doesn't work in isolation. It might need to log a booking to the spreadsheet your team already lives in, tell someone in Slack that a customer needs help, or answer from the pages you've already written on your website. **Integrations** connect your bot to the systems you already run, and turn each one into a sign-in rather than a credentials exercise.
 
 You'll find them in **Tools → Connectors**.
 
@@ -41,6 +41,9 @@ Each integration page is laid out the same way, so once you've connected one you
   <Card title="Slack" icon="hash" href="/integrations/slack">
     Post messages to a Slack channel — alert your team when someone needs a human.
   </Card>
+  <Card title="WordPress" icon="globe" href="/integrations/wordpress">
+    Import your site's posts, pages or events on a schedule — so your bot answers from what you've already published.
+  </Card>
 </CardGroup>
 
 ### Conversations
@@ -57,6 +60,14 @@ Each card offers up to two routes:
 - **Or enter an access token manually** — paste a token you've made yourself. Useful when your organisation restricts app installs, or you want to control exactly which permissions the token carries.
 
 Either way Paige checks the credential with the service before saving it, so a typo fails immediately rather than at 3am inside your bot.
+
+Some integrations need no credential at all. [WordPress](/integrations/wordpress) reads your site over its normal public web address, so there's nothing to sign in to and nothing to paste — you enter your address and pick what to sync instead.
+
+### When a sign-in expires
+
+Integrations you connected with a one-click button hand Paige an access pass that runs out after a while. Paige renews it in the background, but if that ever fails the card stops saying **Connected** and shows an amber **Expired** badge with a short note — so you find out on this page rather than from a bot that has quietly stopped working. You don't need to reload: if you're sitting on the Connectors page when a pass runs out, the card updates itself at that moment.
+
+Click **Reconnect** to sign in again and pick up where you left off, or **Disconnect** to remove it. Integrations you set up by pasting a token, and ones that need no credential at all, never expire — their cards are unaffected.
 
 ## Integrations and deploy
 
@@ -76,10 +87,8 @@ Connections are per-project. Two projects in the same workspace connect separate
   Disconnecting doesn't remove the code that used it. Your bot keeps the Airtable or Slack calls the agent wrote, and they'll now fail at runtime with a missing-credential error. If you're removing a service for good, ask the agent to take the code out too — otherwise the failures show up in [your logs](/guides/logs) rather than anywhere obvious.
 </Warning>
 
-## A limitation worth knowing
+[WordPress](/integrations/wordpress) is the exception, because there's no credential to remove. Disconnecting stops the syncing but leaves everything already imported in place, and your bot keeps using it — Paige tells you so before you confirm.
 
-<Warning>
-  **Integrations don't work in [scheduled tasks](/guides/scheduled-tasks).** Code that posts to Slack or writes to Airtable works when triggered by a customer's message, and fails every time the same code runs on a schedule — the credential isn't there.
+## Integrations in scheduled tasks
 
-  That rules out the two most obvious uses, a nightly Airtable sync and a daily Slack summary. If you need one now, generate a real API key, store it as a [secret](/guides/secrets), and have the task use that instead of the integration.
-</Warning>
+Your integrations work in [scheduled tasks](/guides/scheduled-tasks) exactly as they do anywhere else. A nightly Airtable sync or a daily Slack summary is a perfectly good thing to build — a task gets the same connection your bot uses when a customer messages it.

@@ -62,7 +62,7 @@ module.exports = async function () {
 Anything you `console.log` shows up in [Logs](/guides/logs), which is how you check a task did what you expected.
 
 <Note>
-  A scheduled task doesn't get quite the same environment as the rest of your bot. Your [secrets](/guides/secrets) are available, but **Connector credentials aren't** — code that talks to Airtable or Slack through a Connector works when triggered by a message and fails on a schedule. If a task needs a third-party service, give it its own secret with a real API key.
+  A scheduled task runs with the same setup as the rest of your bot. Your [secrets](/guides/secrets) are available, and so are your [integrations](/integrations) — code that talks to Airtable or Slack through an integration works on a schedule exactly as it does when a customer messages you. A nightly Airtable sync or a daily Slack summary is a perfectly good thing to build.
 </Note>
 
 ## Managing your tasks

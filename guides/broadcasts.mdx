@@ -30,6 +30,8 @@ Click **New Broadcast** and you'll go through six steps.
 <Steps>
   <Step title="Template">
     Name the broadcast — for you, not your customers — and pick your template. Only **approved** templates appear here.
+
+    If the template you pick leads with an image, video or document, a picker appears so you can choose the file to send with it. Pick from the media already in your project, or upload something new. Paige fetches the file when the broadcast actually launches rather than when you pick it, so replacing the file in [Storage](/guides/storage) before you send means the newer one goes out.
   </Step>
   <Step title="Variables">
     If your template has `{{1}}`-style placeholders, fill each one. Two choices per placeholder:
@@ -40,12 +42,18 @@ Click **New Broadcast** and you'll go through six steps.
     A contact field is what turns one template into a personal message. The preview below shows how it'll read.
   </Step>
   <Step title="Audience">
-    Either pick a [saved segment](/guides/broadcasts/segments), or build a one-off filter here from tags. The tag box lists the tags your contacts already carry with a count beside each, so you can see what you're about to reach before you pick — see [Tags](/guides/broadcasts/segments#building-one). **Opted in only** is on by default — leave it that way.
+    Either pick one or more [saved segments](/guides/broadcasts/segments), or build a one-off filter here from tags. The tag box lists the tags your contacts already carry with a count beside each, so you can see what you're about to reach before you pick — see [Tags](/guides/broadcasts/segments#building-one). **Opted in only** is on by default — leave it that way.
+
+    Picking several segments reaches **everyone in any of them**, not only the people in all of them. Somebody who sits in two of your segments still receives one message, not two — Paige works out the combined audience for you. There's a limit on how many segments one broadcast can target, and the picker tells you when you've hit it.
 
     A live count tells you how many people you're about to reach. If it says zero, you can't continue.
   </Step>
   <Step title="Schedule">
-    Pick a date and time, or save it as a draft to come back to. Two switches also live here:
+    Pick a date from the calendar and a time from the list, or save it as a draft to come back to.
+
+    Times are offered every fifteen minutes — `09:00`, `09:15`, `09:30`, `09:45`. That's not a rounding of your choice: Paige checks for due broadcasts on a fifteen-minute cycle, so a finer time couldn't be honoured anyway. Slots that have already passed today aren't offered, and neither are the ones your clock skips on the morning the clocks go forward.
+
+    Two switches also live here:
 
     - **Send in batches (waves)** — set how many to **send now** and Paige holds the rest back for you to release later (see [Sending in batches](#sending-in-batches-waves)).
     - **Auto-retarget quality-limit failures** — off by default. Turn it on and Paige automatically tries the recipients WhatsApp quality-blocked again about 24 hours later (see [Auto-retargeting quality-limit failures](#auto-retargeting-quality-limit-failures)).
@@ -186,7 +194,9 @@ Self-hosted projects keep their recipient list on their own backend rather than 
 
 ## Exporting several broadcasts at once
 
-For a monthly report, you don't need to open each campaign. On the Broadcasts list every row has a tick box: tick the campaigns you want and click **Export**. A window asks what to include.
+For a monthly report, you don't need to open each campaign. **Export** sits at the top of the Broadcasts list, next to **New Broadcast**.
+
+Tick boxes aren't cluttering up the rows until you need them — click **Export** (or **Select**) and they appear. Tick the campaigns you want, then confirm. The button stays greyed out until you've picked at least one, and tells you so if you hover it. A window then asks what to include.
 
 - **Campaign summary** — one spreadsheet row per campaign with its status, template, audience, every count (total, queued, sent, delivered, read, failed, canceled, held), the estimated cost, and all the timestamps.
 - **Recipient detail** — a ZIP containing one recipient list per campaign (the same file **Download CSV** gives you), plus the summary if you ticked it, plus a short README.
@@ -212,6 +222,18 @@ You'll be asked to confirm, and the confirmation counts exactly who is affected 
 </Note>
 
 **Retry failures** appears once a broadcast has finished with failures. It re-queues only the ones worth retrying — a rate-limited send, say — and skips the permanent ones like *Not on WhatsApp* or *Template rejected*, since retrying those would just fail again.
+
+## Reusing a broadcast
+
+Sending much the same campaign again — a monthly newsletter, a weekly special — doesn't mean rebuilding it. A finished broadcast has a **Duplicate** action that opens the wizard already filled in with what the original used.
+
+It isn't a blind copy. Paige re-checks everything against today: a template that's since been rejected, a segment that's been deleted, a media file that's gone. Anything that no longer holds up is flagged for you to fix rather than silently carried over — which is the failure mode a plain copy would have.
+
+<Note>
+  **Nothing is saved until you finish the wizard.** Clicking **Duplicate** only prepares the copy and shows you what changed. Close it and there's no half-finished broadcast left behind — so you can never accidentally launch one that's still missing its audience or its media.
+</Note>
+
+Once you do save, the copy is an ordinary **draft**: it needs launching or scheduling like any other, and it counts against the same daily cap and passes the same checks. Clicking **Duplicate** twice by accident won't give you two copies.
 
 ## Auto-retargeting quality-limit failures
 
