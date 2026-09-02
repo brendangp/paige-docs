@@ -73,9 +73,33 @@ If your project doesn't have one yet, the picker offers to create it for you. Me
   Sending a template costs you a Meta conversation charge, and templates are the one message type that can reach someone who hasn't written to you recently. Use them to restart a real conversation, not to broadcast — for that, use [Broadcasts](/guides/broadcasts), which is built for sending to many people at once.
 </Note>
 
+## Tagging a contact while you're talking to them
+
+Tags are labels you put on a contact — `vip`, `interested`, `trial` — and they're what [segments](/guides/broadcasts/segments) and broadcasts use to find people later. You can add or remove them without leaving the conversation.
+
+Open a conversation and click the **tag icon** in the thread header. It shows a number when the contact already has tags. On a phone it opens a panel from the bottom of the screen; on a computer it opens next to the button. Inside you'll find:
+
+- The contact's current tags, each with a small **×** to take it off.
+- A box to type in, and a list of every tag already used on your contacts with how many people carry each. Clicking one is usually what you want — it puts this person into an audience you already use.
+- Anything you type that isn't in the list becomes a new tag.
+
+Each change saves on its own as soon as you make it — there's no Save button. If something goes wrong the tag goes back to how it was and you'll see why. A contact can carry up to 25 tags.
+
+**Capitals don't matter when you type.** Tags are stored in lower case, so `VIP` and `vip` are the same thing to type. Removing isn't fussy about capitals either: taking off `VIP` removes `vip` and `ViP` too, which is how you tidy up older tags.
+
+<Warning>
+  **Older tags with capitals are marked in the list.** If your contacts were tagged before Paige started saving in lower case, you may see a row like `VIP · 12` — a tag with a capital, on 12 contacts. Tags match exactly, so tagging someone from that row would *not* put them in with those 12.
+
+  Paige marks that row in amber, says plainly that it won't join them, and doesn't add it in one click — it drops the name into the box so you can decide. To get everyone into one audience, rename `VIP` to `vip` in **Broadcasts → Contacts → Tags** and Paige moves all 12 across.
+</Warning>
+
+Tags added here work exactly like tags added anywhere else, so a segment built on `vip` picks this contact up straight away and your next broadcast to that segment reaches them.
+
 ## Let the Conversations Agent help
 
 Open this tab and the chat sidebar switches to the **[Conversations Agent](/agents/conversations-agent)** — an assistant that knows your contacts and their history. Ask it to find contacts waiting in handover, summarise a conversation, or draft a reply for you to review and send.
+
+You can also just ask it to tag someone: *"tag them as vip"*, *"mark this person as a lead"*, *"take the trial tag off them"*. It writes the change straight away and the tags in the thread header update as it does — there's no card to approve, because one contact is a small change you can undo with a tap. It handles **one contact at a time**; to tag a whole group, ask the [Broadcasting agent](/agents/broadcasting-agent) instead.
 
 <Card title="Conversations Agent" icon="messages-square" href="/agents/conversations-agent">
   Work through your inbox by chatting — find contacts, read history, and get draft replies. It drafts, but never sends on its own.

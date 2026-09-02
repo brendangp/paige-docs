@@ -56,7 +56,7 @@ Open the **Conversations** tab in the dashboard. The chat sidebar switches to th
 
 ## The tools it uses
 
-The agent has eight built-in tools it uses behind the scenes to complete your requests.
+The agent has nine built-in tools it uses behind the scenes to complete your requests.
 
 <CardGroup cols={2}>
   <Card title="list_contacts" icon="users">
@@ -83,7 +83,22 @@ The agent has eight built-in tools it uses behind the scenes to complete your re
   <Card title="propose_template_create" icon="file-plus">
     Drafts a new template — name, category, body, example values — into an approval card. Submitting it to Meta is your click, not the agent's.
   </Card>
+  <Card title="tag_contacts" icon="tag">
+    Adds or removes tags on **one** contact, and writes the change immediately — no card. Tagging a whole group is the [Broadcasting agent](/agents/broadcasting-agent)'s job.
+  </Card>
 </CardGroup>
+
+### Tagging someone mid-conversation
+
+With a conversation open, just ask: *"tag them as vip"*, *"mark this person as a lead"*, *"take the trial tag off them"*. The tags in the thread header update as it writes.
+
+There's no approval card here, unlike a template send. One contact is a small, obvious change you can undo with a tap in the [tag editor](/guides/conversations-tab), so a card would be ceremony rather than safety.
+
+The limit is structural, not a matter of the agent behaving well: this tool takes **one** contact, never a list, so there is no way for it to tag your whole address book. Tagging a group means going to the Broadcasts tab, where the Broadcasting agent works out who matches, tells you how many people that is, and waits for you to approve.
+
+<Note>
+  It tags people who already exist. If the contact isn't in your list, you get told so — the agent never creates a contact as a side effect of tagging one.
+</Note>
 
 ### Proposals are cards, not actions
 

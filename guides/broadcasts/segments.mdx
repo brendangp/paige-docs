@@ -30,7 +30,9 @@ Click **New Segment** and combine any of these. They narrow together — a conta
     You can still type a tag by hand and click **Add**, which matters because your bot can create tags that don't exist yet when you're building the segment.
 
     <Warning>
-      **Tags are case-sensitive.** `VIP` and `vip` are two different tags, and matching is exact — so a segment built on `VIP` will not pick up contacts tagged `vip`.
+      **Tags are matched exactly — but capitals in what you type no longer matter.** Paige saves every tag in lower case, so typing `VIP` or `vip` lands on the same tag and you don't have to think about it.
+
+      What still matters is older tags made before that changed. If some of your contacts carry `VIP` with a capital, that really is a separate tag with its own count, and a segment built on `vip` will not reach them. You'll see both rows in the tag list. To put everyone together, rename `VIP` to `vip` in **Broadcasts → Contacts → Tags** — Paige moves those contacts across for you.
     </Warning>
 
     If you type something no contact has, Paige tells you rather than letting you build a segment that silently reaches nobody — type `VIPs` and you get: *No contact has "VIPs" — it will match **0 contacts** and won't tag anyone*. If the only difference is capitalisation, it adds a **Did you mean "vip"?** link that swaps in the tag that actually exists.
@@ -44,16 +46,30 @@ Click **New Segment** and combine any of these. They narrow together — a conta
   </Accordion>
   <Accordion title="Added contacts" icon="user-plus">
     Search for specific people and add them by hand. They're included on top of whatever the filters match — handy when a segment is "everyone tagged vip, plus these three".
+
+    What you type in the search box is only used to *find* people. It isn't saved as part of the segment, so you can search, add whoever you want, and clear the box again without changing who the segment reaches.
+
+    **A segment with only hand-picked contacts reaches exactly those people.** Add three contacts by hand and set nothing else — no tags, no name or number filter — and the segment goes to those three and nobody else. The editor tells you so as you build it, and the segment list describes it as "Only 3 hand-picked contacts". This is the way to send to a short, specific list.
   </Accordion>
 </AccordionGroup>
 
 A live count under the form tells you how many contacts match as you build.
+
+Whichever way you build it, anyone who has **opted out**, or whose number isn't reachable on WhatsApp, is always left out — including someone you added by hand.
 
 Click **Create** to save. Names are unique per project, and you can keep up to 100 segments.
 
 ## Using one
 
 In the broadcast wizard's **Audience** step, choose **Saved segment** and pick it. That's the whole thing — the count you see is resolved fresh at that moment.
+
+### If your project sends through your own backend
+
+Most projects send through Paige and none of this applies. But if your broadcasts go out through **your own backend**, a hand-picked-only segment works only if that backend supports it.
+
+The reason is worth knowing, because the failure would be expensive: by default a backend adds hand-picked contacts *on top of* a filter rather than sending to only them — and with no filter set, "on top of nothing" means your entire contact list. So Paige asks your backend first, and only sends if it has said it understands "only these people".
+
+If it hasn't, Paige tells you while you're **choosing the audience**, not after sending. To fix it, ask whoever looks after that backend to add support — they'll know it as the `include_only` capability — then open **Settings → Project** and activate Broadcasts again so Paige picks up the change. Paige only asks your backend what it can do at that moment, so the change won't take effect until you do. In the meantime, add a tag or turn on the name/number filter for that segment, or pick a different one.
 
 ## Editing and deleting
 

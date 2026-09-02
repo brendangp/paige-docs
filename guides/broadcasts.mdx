@@ -8,7 +8,7 @@ import { PageDemo } from "/snippets/page-demo.jsx"
 
 Your bot answers people who message it. **Broadcasts** are the other direction: reaching out to many customers at once with an approved template — a seasonal promotion, a reminder that bookings open Monday, a notice that you're closed next week.
 
-You'll find **Broadcasts** as a tab at the top of your project, next to Conversations.
+You'll find **Broadcasts** as a tab at the top of your project, next to Conversations. Inside it are three sub-tabs: **Broadcasts** lists your campaigns and is where you compose new ones, **Segments** is where you save reusable audiences, and **Contacts** is your address book — everyone you can broadcast to, and where you tag people and manage your tags.
 
 <PageDemo src="/assets/videos/broadcasts.mp4" poster="/assets/videos/broadcasts.poster.jpg" />
 
@@ -260,6 +260,50 @@ Three limits worth knowing:
 - **Paige waits before it looks.** WhatsApp reports quality failures asynchronously — a message that looked sent can flip to failed minutes later — so Paige leaves about **2 hours** after the original completes before working out who to retarget. The follow-up still sends around 24 hours after the original finished.
 
 The switch is hidden on self-hosted projects, which manage their own recipient list and so can't be retargeted from Paige.
+
+## Your contacts and their tags
+
+The **Contacts** sub-tab is your address book: everyone this project can broadcast to. Each person shows their name, their number, the tags they carry, whether they're opted in, and whether WhatsApp has confirmed the number is reachable. Search by name or number at the top, and page through 50 at a time.
+
+Tags are the point of this screen. A tag is just a label — `vip`, `interested`, `trial` — and tags are what [segments](/guides/broadcasts/segments) use to find people later.
+
+### Filtering by tag
+
+Click any tag on a contact to see only the people who carry it. The line above the list tells you how many that is, and that number always matches what the same tag reports in the **Tags** view — it's the same question asked twice. Clear the filter with the **×** on the tag chip.
+
+### Tagging several people at once
+
+Tick the contacts you want, or use **Select all on this page**, then choose **Add tag**. Type a name — or pick one you already use from the list underneath — and it's added to everyone you selected. Their existing tags are kept.
+
+You can tag up to 500 people in one go. For more than that, tag them in batches, or [ask the Broadcasting agent](/agents/broadcasting-agent) to tag a whole audience for you.
+
+<Note>
+  Tagging in bulk is limited to the project owner and workspace admins. Everyone else can still see contacts and tag people one at a time from the [Conversations tab](/guides/conversations-tab).
+</Note>
+
+### Managing your tags
+
+Switch to the **Tags** view to see every tag on this project with how many contacts carry it. Click one to jump straight to those people. The pencil renames a tag everywhere it's used; the trash removes it from every contact that carries it.
+
+Deleting a tag never deletes contacts — but any segment filtering on that tag stops matching them, so check your segments afterwards.
+
+### Two things about tag names
+
+**Tags are matched exactly, but capitals in what you type don't matter.** Paige saves every tag in lower case, so `Newsletter` and `newsletter` land on the same one. A segment looking for `newsletter` matches contacts tagged `newsletter`.
+
+**Older tags with capitals are listed separately.** If contacts were tagged before Paige started saving in lower case, you may see `VIP` and `vip` as two rows with two counts — because that is genuinely how they're stored, and how your segments match them. Paige speaks up when this affects you, showing the count, because tagging the lower-case spelling will *not* join those people.
+
+You can fix it: rename `VIP` to `vip`, and Paige tells you it takes **two steps** — the contacts move to a temporary tag first, then onto `vip` — and does both for you. Nobody loses the tag along the way. If the second step doesn't go through, your contacts are safely on the temporary tag and Paige tells you its name so you can finish from the same place.
+
+### If tagging says the project needs an update
+
+If a message tells you that tagging many contacts at once needs an update for this project, open **Settings → Project** and click **Repair broadcasting**, then try again. Sending broadcasts is unaffected in the meantime.
+
+If tagging stops part-way through, Paige tells you how many contacts were already updated, so you know exactly what changed.
+
+<Tip>
+  There's a shortcut from the other direction: the **Contacts** card in **Settings → Project** has a **Manage contacts →** link straight to this screen. It appears once Broadcasts is switched on.
+</Tip>
 
 ## Opting out (STOP) and back in (START)
 

@@ -3563,7 +3563,7 @@
           "Contacts"
         ],
         "summary": "Update a contact name, tags or custom attributes",
-        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Required scope:** `contacts:write`",
+        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Tag names are normalised at write time**: trimmed, **lower-cased**, and truncated to 64 characters. Tag matching everywhere else (segments, broadcast audiences) is exact and case-sensitive, so `VIP` and `vip` are the SAME tag and are both stored as `vip`. Each tag array is capped at **25** entries; a longer array is `400 invalid_request`.\n\n**Required scope:** `contacts:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -5837,13 +5837,15 @@
                     "type": "object",
                     "properties": {
                       "opted_in": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "description": "When true, only opted-in contacts match."
                       },
                       "tags": {
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
+                        },
+                        "description": "Contacts matching ANY of these tags (max 50)."
                       },
                       "clicked": {
                         "anyOf": [
@@ -5854,13 +5856,16 @@
                             "type": "object",
                             "additionalProperties": {}
                           }
-                        ]
+                        ],
+                        "description": "Contacts who tapped a button/list item, by title/payload/id. String, or { value, since?: ISO date }."
                       },
                       "name_contains": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Case-insensitive substring match on contact name."
                       },
                       "number_contains": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Case-insensitive substring match on contact phone number."
                       },
                       "include_ids": {
                         "type": "array",
@@ -5873,7 +5878,8 @@
                               "type": "string"
                             }
                           ]
-                        }
+                        },
+                        "description": "Hand-picked contact ids (max 500). UNIONed on top of the other criteria — a contact here is targeted even if it matches none of them. IMPORTANT: when include_ids is the ONLY criterion set (no tags, no name_contains/number_contains, no clicked, and opted_in is not false), the audience is EXACTLY these contacts and nothing else. Opted-out and confirmed-not-on-WhatsApp contacts are still excluded either way."
                       }
                     }
                   }
@@ -6085,13 +6091,15 @@
                     "type": "object",
                     "properties": {
                       "opted_in": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "description": "When true, only opted-in contacts match."
                       },
                       "tags": {
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
+                        },
+                        "description": "Contacts matching ANY of these tags (max 50)."
                       },
                       "clicked": {
                         "anyOf": [
@@ -6102,13 +6110,16 @@
                             "type": "object",
                             "additionalProperties": {}
                           }
-                        ]
+                        ],
+                        "description": "Contacts who tapped a button/list item, by title/payload/id. String, or { value, since?: ISO date }."
                       },
                       "name_contains": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Case-insensitive substring match on contact name."
                       },
                       "number_contains": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Case-insensitive substring match on contact phone number."
                       },
                       "include_ids": {
                         "type": "array",
@@ -6121,7 +6132,8 @@
                               "type": "string"
                             }
                           ]
-                        }
+                        },
+                        "description": "Hand-picked contact ids (max 500). UNIONed on top of the other criteria — a contact here is targeted even if it matches none of them. IMPORTANT: when include_ids is the ONLY criterion set (no tags, no name_contains/number_contains, no clicked, and opted_in is not false), the audience is EXACTLY these contacts and nothing else. Opted-out and confirmed-not-on-WhatsApp contacts are still excluded either way."
                       }
                     }
                   }

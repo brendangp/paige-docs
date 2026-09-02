@@ -6,6 +6,23 @@ description: "Release notes and updates for Paige — new features, improvements
 
 Track new features, improvements, and fixes shipped to Paige.
 
+## September 2026
+
+One release, about one idea: **tags**. Paige could already build an audience from a tag, but there was nowhere to actually put tags on people — they arrived from a CSV or from your bot and that was that. Now there's a contact list, a place to manage the tag vocabulary, and three other ways to label someone: while you're talking to them, by asking an assistant, or from your bot's own code.
+
+### New features
+
+- **A Contacts sub-tab under Broadcasts.** Your address book: everyone the project can broadcast to, with their tags, whether they're opted in, and whether WhatsApp says the number is reachable. Search, page through, click a tag to filter to the people who carry it — and the count above the list always agrees with the count that tag reports elsewhere. Tick people and **Add tag** to label up to 500 at once, keeping the tags they already have. A **Tags** view lists every tag with its count, and lets you rename one everywhere or remove it from every contact. See [Your contacts and their tags](/guides/broadcasts#your-contacts-and-their-tags).
+- **Tag a contact without leaving the conversation.** A tag button in the Conversations thread header opens the contact's tags, with every tag you already use listed underneath and how many people carry each — so you're joining an existing audience rather than quietly starting a new one. Each change saves on its own; a contact can hold up to 25 tags. See [Tagging a contact](/guides/conversations-tab#tagging-a-contact-while-youre-talking-to-them).
+- **Capitals no longer split your audiences.** New tags are saved in lower case, so typing `VIP` or `vip` lands on the same tag. Tags made before this are still matched exactly and are listed separately with their own counts — and when that affects what you're about to do, Paige says so with the number of contacts involved instead of letting you build an audience that silently misses them. Renaming `VIP` to `vip` moves those contacts across for you.
+- **Ask an assistant to tag people.** With a conversation open, tell the Conversations assistant — *"tag them as vip"* — and it writes it immediately, because one contact is a small change. For a group, ask on the Broadcasts tab: the Broadcasting assistant works out exactly who matches, shows you a card with the count and precisely which tags go on and come off, and **writes nothing until you press Apply**. That audience deliberately includes people who opted out or aren't on WhatsApp, because a tag is a label, not a message. See [Tagging a whole group](/agents/broadcasting-agent#tagging-a-whole-group).
+- **Your bot can tag a contact itself.** `paige.tag()` lets bot code label someone as it learns something about them — tag a buyer at checkout, tag someone who asked about pricing — and those tags are immediately usable in a segment. It never throws, so a tagging problem can't take down a reply. See [Tagging a contact from your bot](/concepts/bot-code#tagging-a-contact-from-your-bot).
+
+### Changes
+
+- **A segment of only hand-picked contacts now reaches exactly those people.** Previously hand-picked contacts were always added *on top of* the other criteria — which, with no other criteria set, meant the segment matched your whole opted-in list rather than the three people you chose. If you want a short, specific list, this is now the way to build one, and the editor tells you that's what it's doing. See [Building one](/guides/broadcasts/segments#building-one).
+- **Hand-picked-only segments are checked against your own backend first.** If your project sends broadcasts through your own backend rather than Paige's, Paige now asks whether it understands "only these people" before sending, and tells you while you're choosing the audience if it doesn't — rather than handing over a request the backend would read as *everyone*. See [If your project sends through your own backend](/guides/broadcasts/segments#if-your-project-sends-through-your-own-backend).
+
 ## August 2026
 
 Four releases. The first was about reaching a customer after their 24-hour window had closed. The second opened the other direction — letting an outside service reach your bot — and put your media library on the API. The third was about getting your broadcast data back out, and about the moments where Paige was doing the right thing without telling you. The fourth brought your website in, so your bot answers from what you've already published.

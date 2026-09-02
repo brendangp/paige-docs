@@ -80,3 +80,23 @@ Your bot can send any of the following using built-in messaging helpers:
 - Anything in your [Storage](/guides/storage), by name
 
 Some things your bot can **receive but not send**: customers can send you voice notes (transcribed automatically for your bot to read) and videos, but there's no helper to send either back.
+
+## Tagging a contact from your bot
+
+Your bot learns things about people as it talks to them — who bought, who asked about pricing, who abandoned a booking halfway. `paige.tag()` lets it write that down as a [tag](/guides/broadcasts#your-contacts-and-their-tags), which you can then build a segment and a broadcast on.
+
+```js
+await paige.tag(phone, { add: ['bought'], remove: ['cart-abandoned'] });
+```
+
+Pass a phone number (or a BSUID with `identifierType`), and any combination of tags to add and remove. Ask the [Code Agent](/guides/prompting) for it in plain language — *"tag them as bought once the order goes through"* — and it writes this for you.
+
+Three things worth knowing:
+
+- **It never throws.** A tagging problem is logged and the call resolves as unsuccessful, so a tag that fails can't take down the reply your customer is waiting for. That is deliberate: labelling someone is never more important than answering them.
+- **It tags people who already exist.** An unknown number is reported as not found, never created — your contact list doesn't quietly grow from a typo in a tag call.
+- **Tags land immediately.** A contact your bot tags this second is matched by a segment built on that tag, and shows up in the Contacts list and the Conversations thread header without a refresh.
+
+<Note>
+  Bot code written before this used a different, blunter helper that replaced a contact's whole tag list at once. It still works so existing bots keep running, but `paige.tag()` is what you want — it adds and removes individual tags instead of overwriting whatever else the contact had.
+</Note>

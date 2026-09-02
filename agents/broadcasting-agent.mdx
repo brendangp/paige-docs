@@ -41,11 +41,14 @@ It's most useful for the things the forms make tedious:
   <Card title="Enforce opt-in" icon="shield-check">
     Refuses to assemble a marketing campaign to an audience that isn't restricted to opted-in contacts.
   </Card>
+  <Card title="Tag an audience" icon="tag">
+    Works out who matches, then proposes tagging all of them — on a card you approve before anything is written.
+  </Card>
 </CardGroup>
 
 ## The tools it uses
 
-The agent's own system prompt groups its eleven tools into two tiers: tools that only **read** your data, and tools that **write** — creating segments, authoring templates, and staging a campaign. Nothing in either tier ever sends a message.
+The agent's own system prompt groups its twelve tools into two tiers: tools that only **read** your data, and tools that **write** — creating segments, authoring templates, tagging an audience, and staging a campaign. Nothing in either tier ever sends a message.
 
 ### Read
 
@@ -88,6 +91,9 @@ The agent's own system prompt groups its eleven tools into two tiers: tools that
   <Card title="assemble_campaign" icon="layers">
     Stages a complete campaign — audience, template, variables, schedule — and holds it in a **pending approval** state. This never sends and never schedules a real send.
   </Card>
+  <Card title="tag_audience" icon="tag">
+    Works out exactly who an audience covers and **proposes** adding or removing tags on all of them. It counts and proposes only — the write happens when you press Apply.
+  </Card>
 </CardGroup>
 
 ## It never sends anything
@@ -113,6 +119,26 @@ Three buttons:
 </Warning>
 
 If the campaign uses a template Meta hasn't approved yet, the agent still assembles it — the campaign waits, and sends by itself once Meta approves and the scheduled time arrives. If Meta rejects the template instead, the campaign is cancelled and you'll get a **Campaign needs attention** notification.
+
+## Tagging a whole group
+
+The agent can also tag people in bulk. Describe who and what label: *"tag everyone who tapped Book now as interested"*, *"mark my lapsed customers as churn-risk"*, *"rename the vip tag to gold"*, *"get rid of the trial tag"*.
+
+It works out exactly who matches and shows you a **tag approval card** with the number of people it covers, the audience it's describing, and precisely which tags go on and which come off. **Nothing is written until you press Apply tags** — press Discard and nothing happens at all.
+
+Three things worth knowing:
+
+- **This kind of audience deliberately includes people who opted out and people who aren't on WhatsApp.** A tag is just a label, and you should still be able to label someone you can't message. That's the opposite of a broadcast audience, which always excludes them.
+- **If nobody matches, it tells you instead of showing a card.** An Apply button over zero contacts is only an invitation to a pointless request.
+- **It refuses to tag an audience you never specified.** Asking it to "tag my customers" with no filter would match every contact you have, so it asks you to narrow it down rather than proposing a write you'd skim and approve.
+
+Once the tags are applied you'll see them straight away in the **Contacts** sub-tab, in the tag list when building a segment, and on the contact in the Conversations tab — no refresh needed.
+
+<Note>
+  Tagging in bulk is limited to the project owner and workspace admins, and the agent checks before it proposes — if you can't apply the tags, it says so instead of showing you a card you can't use.
+
+  If your project hasn't had a one-off update applied yet, the card says so and points you at **Settings → Project → Repair broadcasting**. That's a one-time thing and it doesn't affect sending broadcasts. If tagging stops part-way through, you're told how many contacts were already updated.
+</Note>
 
 ## Marketing templates and opt-in
 
