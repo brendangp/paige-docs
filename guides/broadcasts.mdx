@@ -173,6 +173,18 @@ Below that, every recipient is listed with their status. Failures say why in pla
 | **Account paused** | Meta has paused your WhatsApp account. |
 | **Delivery failed** | Something else. Copy the raw reason for the detail. |
 
+### When a campaign reached nobody
+
+If a broadcast finishes without matching a single contact, it's marked **Reached nobody** — as a chip on the Broadcasts list and as a banner on its own dashboard.
+
+It's called out explicitly because an empty send otherwise looks exactly like a successful one: a finished campaign, a green tick, no failures. The difference is that nothing happened.
+
+This almost always means the audience didn't select anyone — a tag no contact actually carries, a name or number filter that matches nothing, or everyone who did match having opted out. **Nothing was sent, so nothing was charged and none of your daily WhatsApp allowance was used.** Open the segment, check its filters against your [Contacts](#your-contacts-and-their-tags) list, and send again once it selects the people you expect.
+
+<Note>
+  On a project running its **own backend**, check the **tags** first. Your backend decides who matches, and a tag it stores in a different shape from the way Paige writes it will quietly match nobody.
+</Note>
+
 ## Downloading the recipient list
 
 Next to the filter is a **Download CSV** button. It saves the recipient list as a spreadsheet you can open in Excel or Google Sheets, or feed into another system — each person's name, number, WhatsApp status, failure reason if any, the wave they went out in, how many attempts were made, and the times things happened.

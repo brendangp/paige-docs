@@ -1,0 +1,89 @@
+---
+title: "Let your bot build and send documents"
+sidebarTitle: "Documents"
+description: "Upload a blank quote, contract or booking form and have your bot fill it in for each customer and send it on WhatsApp — analysed once when you build it, then free to send forever."
+---
+
+Your bot can build a **PDF, Word document, spreadsheet or text file** at the moment someone asks for it, fill in that person's details, and send it to them on WhatsApp as an attachment they can open or save.
+
+There are two ways to get there, and they behave differently enough to be worth telling apart:
+
+<CardGroup cols={2}>
+  <Card title="Fill in a template you uploaded" icon="file-pen">
+    You have a blank quote form, contract or booking sheet. Paige reads it once, finds the blanks, and writes code that fills them in for each customer.
+  </Card>
+  <Card title="Build one from scratch" icon="file-plus">
+    No template needed — you describe the document and Paige writes code that builds it from nothing. Good for receipts, summaries and simple statements.
+  </Card>
+</CardGroup>
+
+## Filling in a template
+
+### 1. Upload it as a template
+
+Upload the blank document in **Tools → Storage**, and in the **How should Paige use this?** dropdown choose **Template to fill in**.
+
+This part matters. A document uploaded the normal way becomes part of what your bot *knows* — Paige reads the text out of it so the bot can answer questions from it. For a blank form that's exactly wrong: you'd have a bot that can recite an empty quote, and the form would eat into your knowledge-base space for no benefit. See [Storage](/guides/storage#choosing-what-paige-does-with-a-file).
+
+### 2. Ask Paige to use it
+
+Go to the **Build** tab and ask in plain words:
+
+> Fill my quote template with the customer's name and total, then WhatsApp it to them.
+
+Paige opens the document, reads it **once**, and shows you a card listing the blanks it found — a name for each one, where in the document it sits, and what sort of value it is.
+
+### 3. Check the blanks before any code is written
+
+You're not just clicking OK. On that card you can:
+
+- **Rename** a blank, if Paige's name for it isn't the one you'd use.
+- **Drop** any it found that aren't really fields.
+- **Confirm** the ones you want.
+
+Paige then writes the code against exactly the fields you approved — nothing else. If it finds no blanks at all it says so and asks you which values change from one document to the next, rather than guessing.
+
+<Tip>
+  This card is the moment to be fussy. Everything downstream is built from the list you approve here, so a field renamed now saves a rebuild later.
+</Tip>
+
+### 4. Your customer gets the file
+
+The finished document arrives in the WhatsApp chat as a normal attachment, under the filename your bot chose, ready to tap open or save.
+
+It is **not** added to your Storage tab — each document is generated fresh for that person and sent, because the next one is a different document anyway. Your original blank template stays exactly where it is, untouched.
+
+## What it costs
+
+This is the part worth reading twice, because it is not what people expect.
+
+<Note>
+  **Reading a template costs credits once. Filling it in costs nothing, forever.**
+</Note>
+
+| When | Uses credits? | Why |
+| --- | --- | --- |
+| Paige analyses your template | **Yes, once** | It's ordinary building work — the same as asking Paige to build anything else. It appears in **Settings → Usage** alongside the rest. |
+| Your bot fills in and sends a document | **No — never, however many it sends** | There's no AI involved at that point. Paige already wrote the code; the code simply drops your values into the blanks. |
+
+Analysing a **second** template, or re-analysing one you've changed, costs credits again — that's a new piece of building work.
+
+<Warning>
+  **This is true even if you use your own AI key.** Bringing your own key covers your bot's *conversations* — the AI that talks to your customers. Setting a template up is Paige building something for you, so it uses Paige credits like any other build. See [AI in your bot](/guides/ai-in-your-bot).
+</Warning>
+
+The reason it works this way is deliberate. An AI writing your quote fresh on every send would be slower, would cost on every single document, and — the real problem — could quietly reword a payment term or a clause on one send in fifty, where nobody would ever catch it. These are quotes, contracts and applications. So the thinking happens once, when you build it, and every document after that is the same code filling in the same blanks.
+
+## Building a document from scratch
+
+If you don't have a template, you don't need one. Ask for what you want — "send them a PDF receipt with the line items and total" — and Paige writes code that builds the file from nothing.
+
+Paige can produce **PDFs, Word documents, spreadsheets, and plain text or Markdown files** this way. There's no template to analyse, so there's no analysis cost either.
+
+## If something goes wrong
+
+**Your bot says it sent a document but nothing arrived.** It won't — a failed document send is reported as a failure, never as a success. Check **Tools → Logs** for the send; the error says whether nothing was delivered (safe to try again) or whether it's genuinely unclear (in which case trying again could send the same document twice).
+
+**Testing in Preview.** Document sends aren't simulated in the Preview tab — neither building the file nor sending it — so a document handler will report that it can't complete there. Test it against a real WhatsApp number, using the Paige Dev test number if you don't have your own connected yet. See [Testing your bot](/guides/testing).
+
+**Paige can't find your template.** If Paige says the template doesn't exist, check its designation in **Tools → Storage** before assuming the name is wrong — a file uploaded as knowledge rather than as a template can't be filled in, and Paige deliberately gives the same answer for both cases.

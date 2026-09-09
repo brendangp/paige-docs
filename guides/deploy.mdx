@@ -57,6 +57,24 @@ Nothing is ticked when the dialog opens, and your choices reset every time you o
 
 Only your own tables appear here. Paige's built-in tables — your contacts, conversations, messages, and execution logs — are never touched by a deploy.
 
+### No longer in staging
+
+This section appears **only** when something still exists in production that you've since deleted from staging — a whole table, or a single column.
+
+Deleting a table in the [Database tab](/guides/database-tab) only removes it from staging. This is how you finish the job in production.
+
+<Warning>
+  **Nothing here is ever ticked for you.** Leave it alone and nothing is removed.
+
+  Tick an item and deploy, and it is deleted for good, along with any rows in it. There's no undo — and if your live bot still reads that table or column, it will start failing the next time a customer message reaches that part of it.
+</Warning>
+
+Tables Paige manages for you — contacts, conversations, messages, your broadcast records, and anything [synced from your website](/integrations/wordpress) — are never offered here.
+
+<Note>
+  This is a dashboard-only control, on purpose. Deploying over the [Paige API](/api-reference/introduction) or from a connected AI agent is always additive: it can add tables and columns, and it can never drop one.
+</Note>
+
 ### Flows
 
 Under **Flows**, you pick which flows to publish to your WhatsApp number. Flows with unpublished edits carry an orange **changes pending** tag, so you can see at a glance which ones are waiting.
@@ -81,6 +99,7 @@ You get the same **Deployed with warnings** message when a **table** couldn't be
 
 - **Structure** — a column change didn't make it across, so your bot's code and its table are now out of step. Fix this before you rely on the new column.
 - **Data** — the structure is fine, but the rows you asked to copy didn't transfer.
+- **Removing it from production** — you ticked it under **No longer in staging**, but production still has it. The commonest reason is that another table still points at it; Paige refuses rather than quietly breaking that other table. Deal with the cause and deploy again.
 
 Deal with the cause, then deploy again.
 

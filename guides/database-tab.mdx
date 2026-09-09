@@ -54,6 +54,14 @@ Two more tables live in the database but are deliberately kept out of this tab, 
   Editing system tables by hand can break your bot in ways that are hard to trace. Your bot uses these rows to know who it's talking to and where it got to in a conversation; changing them out from under it is like moving someone's furniture in the dark. Read them freely — but leave the editing to your bot unless you know exactly why you're there.
 </Warning>
 
+### Tables filled by a connected website
+
+If you've connected a website in [Tools → Connectors](/integrations/wordpress), the tables that sync fills up appear here too, marked with a **Synced** badge. You can open them and read everything that came across — that's the quickest way to check your import actually worked.
+
+They're **view-only**. There's no Add Row, no Clear, no Drop Table and no cell editing, because Paige rewrites those tables on every sync and anything you typed would be replaced without warning. Change the content where it lives — in your website — and it updates here on the next sync.
+
+Records your site has deleted are hidden by default, so the row count matches what your bot actually sees. You can still download a synced table like any other, and the download follows the same rule — deleted records are left out of the file too, whether you pick **current view** or **full table**. If you do want to see them, filter the table on the deleted column first; the download then keeps whatever that filter shows.
+
 ## Downloading a table
 
 Click **Download** on any table and pick **CSV**, **Excel**, or **JSON**.
@@ -63,7 +71,15 @@ The switch inside the dropdown decides how much you get:
 - **Full table** (the default) — every row, ignoring whatever filter you have on screen.
 - **Current view** — only the rows matching your filter, in the order you're looking at them.
 
-The file is named after the table and the date — `bookings_2026-07-17.csv`. Large tables are prepared in the background and download on their own when they're ready, so you don't need to wait around on the page.
+The file is named after the table and the date — `bookings_2026-07-17.csv`. Large tables are prepared in the background and download on their own when they're ready, so you don't need to wait around on the page. While one is being prepared the button shows **Preparing**, then **Downloading** — and you can leave the table and come back without losing it.
+
+**One download at a time per project.** Ask for a second while the first is still being prepared and Paige attaches you to the one already running rather than starting another; you get the same file when it's ready.
+
+<Note>
+  **Very large tables.** There's a limit on how big one download can be — not a row count, but the size of the finished file, because a table with a lot of long text or attachments can be enormous even with relatively few rows.
+
+  If your table is over it, Paige tells you rather than handing you a half-finished file. Narrow it down with a filter and use **current view** instead of **full table**, or export it in a few passes. Very slow exports are given up on after about ten minutes for the same reason; you'll see **Export failed** and can try again on a smaller slice.
+</Note>
 
 ## The SQL editor
 

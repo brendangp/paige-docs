@@ -17,7 +17,24 @@ Two ways in:
 - **Click Upload** in Tools → Storage.
 - **Attach it in chat** using the paperclip next to the message box. This is usually the easier one: you can hand the agent a picture and describe what to do with it in the same message.
 
-Paige accepts **PNG, JPEG, PDF, DOCX, TXT, and MD files, up to 20 MB each**.
+Paige accepts **PNG, JPEG, PDF, DOCX, XLSX, TXT, and MD files, up to 20 MB each**.
+
+## Choosing what Paige does with a file
+
+The upload dialog asks **How should Paige use this?** It matters more than it looks, because it decides what happens to the file's *contents*.
+
+By default a document becomes part of what your bot **knows**: Paige reads the text out of it, and your bot can answer questions from it.
+
+That's the wrong thing for a **blank quote form, a contract, or a booking sheet**. You don't want your bot reciting an empty form — you want Paige to fill it in for a particular customer. So choose **Template to fill in** and two things change:
+
+- The document's text is **never** added to your bot's knowledge, and it doesn't use up any of your [knowledge-base space](/guides/prompting).
+- Your bot won't offer to send the blank file to anyone.
+
+Paige keeps the original exactly as you uploaded it, so it can fill it in later. See [Documents your bot builds](/guides/documents).
+
+<Warning>
+  **Choose this at upload time.** You can change a file to **Template to fill in** afterwards from its card, and Paige will clean up the knowledge document it had already written — but by then it has already read the file to produce it. Picking it up front is the cheaper path, and for an image it avoids an AI description you didn't need.
+</Warning>
 
 ## Bot-facing names
 
@@ -44,7 +61,7 @@ Paige works out from the file whether that's an image or a document — you don'
 Each file in the grid has:
 
 - **A caption** you can set, sent alongside the file by default.
-- **An intent tag** — *knowledge*, *flow*, *runtime*, or *multi*. This is a label for your own benefit, to help you keep a large library straight; it doesn't change how the file behaves.
+- **How Paige uses it** — *knowledge*, *flow*, *runtime*, *multi*, or *template*. The first four are labels for your own benefit, to help you keep a large library straight; they don't change how the file behaves. **Template is different** — it's the one that changes what Paige does with the file, as described above.
 - **Download**, to get the original back.
 - **Rename**, to change the bot-facing name.
 - **Delete**.
@@ -152,7 +169,7 @@ Going past the storage ceiling returns `413 storage_limit_exceeded`; going past 
 
 Storage also holds photos, PDFs, and voice notes that customers send *in* — proof of payment, an ID document, a photo of a broken part. That's off by default; see [Capturing customer media](/guides/media-capture) for how to turn it on and what to weigh up first.
 
-Anything captured that way shows a green **From WhatsApp** badge, and once you have some, a **Filter by source** control appears so you can separate your own uploads from customers' files.
+Anything captured that way shows a green **From WhatsApp** badge, and once you have some, a filter appears above the grid so you can separate your own uploads from customers' files. The same control also filters by what a file is *for*, so you can pull up just your templates. Options only show up when you actually have files of that kind.
 
 <Note>
   Your bot can't re-send a customer's file with `sendMedia()` — captured media is deliberately excluded. It's there for you to look at, not for the bot to pass around.

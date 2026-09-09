@@ -80,6 +80,18 @@ Add one by attaching it in chat with the paperclip, or uploading it in **Tools �
 
 Keep these focused. Everything you add is read on every question your bot answers, so a tight FAQ works better than a long brochure — for cost as well as accuracy.
 
+<Note>
+  A document you upload as a **template** deliberately stays out of the knowledge base — see [Documents](/guides/documents). That's the difference between a file your bot *answers from* and one it *fills in*.
+</Note>
+
+### Documents it can fill in and send
+
+If you've uploaded a template, the agent can see it — the slug, the filename, and the format — and will use it rather than inventing a document from scratch.
+
+Ask it to fill one in and it reads the file **once**, then stops and shows you a card listing the blanks it found. You rename, drop, or confirm them, and only then does it write the code — against exactly the fields you approved.
+
+That pause is the point. The list it writes code against is a decision you made, not one it guessed, and the code that comes out fills in the same blanks the same way every time, with no AI at send time. See [Documents](/guides/documents).
+
 ## How a new bot starts
 
 When you ask the Code Agent to build a new bot, it begins from one of two starter templates depending on the kind of bot you want.

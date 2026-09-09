@@ -66,13 +66,25 @@ A rough rule: if a customer would ask *"what's on in November?"* you want a tabl
 
 ## Keeping an eye on what's syncing
 
-Once connected, the WordPress card lists everything Paige is pulling from your site: what it is, where it goes, how often it refreshes, and when it last ran.
+Once connected, the WordPress card sums it up in a line: how many things Paige is syncing from your site, and how many of them need your attention.
 
-If something goes wrong you find out here, rather than from a bot that has quietly fallen behind. A part that failed says so **and says why**, in plain language. A part whose table you've since deleted from your database is flagged as needing attention even though its last run finished cleanly — which is exactly the case that would otherwise look healthy right up until a customer asked about it.
+Click **Manage content** on the card to see the detail — everything Paige is pulling from your site, what it is, where it goes (a table, or your bot's knowledge base), how often it refreshes, and when it last ran.
+
+If something goes wrong you find out on the card straight away, rather than from a bot that has quietly fallen behind. A part that failed says so **and says why**, in plain language. A part whose table you've since deleted from your database is flagged as needing attention even though its last run finished cleanly — which is exactly the case that would otherwise look healthy right up until a customer asked about it.
+
+### If your pages are very heavy
+
+Some themes and page builders produce enormous pages, and a site like that can send Paige more in one batch than it will read at a time.
+
+Paige handles this by itself: it asks your site for fewer records at a time and carries on from exactly where it left off, so everything still gets imported and nothing is skipped. When that happens the part is marked as needing attention and says only part of the content was read this time — **that is Paige being careful, not something being broken.**
+
+What it holds back is *deletions*. After a run like that Paige won't remove anything from your table or knowledge base, because a batch it had to shrink is not proof that a page is really gone. New and changed content still comes through every run.
+
+If a part stays like this and you have deleted pages you expect to disappear, tell us — the fix is on our side, not yours. Very occasionally a page is so large that even the smallest batch is too big; then the part says the website sent more content in one batch than Paige can read, and trimming the content on those pages is what clears it.
 
 ## Adding more later
 
-Started with just your blog posts and now want your About and Services pages in your bot's knowledge too? Click **Add content** on the card.
+Started with just your blog posts and now want your About and Services pages in your bot's knowledge too? Open **Manage content** on the card and click **Add content**.
 
 Paige checks your site again **from scratch**, so anything you've published — or any plugin you've installed — since you first connected shows up. Parts you're already syncing are marked, so you can't pick the same thing twice. From there it's the same short set of steps, and again nothing is written until you confirm. Your existing setup is never touched.
 

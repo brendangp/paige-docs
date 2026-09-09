@@ -144,6 +144,7 @@
               "guides/tools",
               "guides/database-tab",
               "guides/storage",
+              "guides/documents",
               "guides/media-capture",
               "guides/scheduled-tasks",
               "guides/secrets"
