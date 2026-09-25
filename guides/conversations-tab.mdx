@@ -1,7 +1,7 @@
 ---
 title: "The Conversations tab"
 sidebarTitle: "Conversations tab"
-description: "The Conversations tab is your WhatsApp inbox — every contact, their message history, and the state each conversation is in. Read what the green circle means, how to take a conversation over from your bot, and how the 24-hour window affects replying."
+description: "The Conversations tab is your WhatsApp inbox — every contact, their message history, and the state each conversation is in. Read what the green circle means, how to take a conversation over from your bot, how to send a template or a file, and how the 24-hour window affects replying."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
@@ -49,9 +49,24 @@ To hand back, click **Handover ON** and pick the [state](/concepts/conversations
 
 If the 24-hour window has expired, the handover button reads **24h expired** and the reply box shows *24-hour messaging window has expired*. Your only way to reach the contact after that is an approved [message template](/guides/templates) — and you can send one without leaving this tab.
 
+## The reply box
+
+Everything you can do in a conversation sits inside the reply box at the bottom of the thread: the place you type, a **send arrow** on the right, and a small **chevron on the left** that opens the rest.
+
+Click the chevron and two round buttons appear above it:
+
+- **Send template** — the template picker, covered below.
+- **Attach files** — the paperclip, for sending a picture, video, voice note or document.
+
+They're tucked away on purpose. A long message stays full width instead of being squeezed between buttons, and the same two actions sit in the same place on a phone as on a computer. Click the chevron again — or pick an action — to close it.
+
+<Note>
+  **Attach files is greyed out when the reply box is locked.** Hover it and it tells you why — the same reason the box itself gives: handover isn't on, or the 24-hour window has closed. **Send template** stays available either way.
+</Note>
+
 ## Sending a template
 
-Click the **Send template** button in the composer to open the picker. It works whether or not the window is open, and whether or not handover is on — unlike the reply box, it isn't gated, because a template is exactly what you need when everything else is unavailable.
+Open the chevron in the reply box and click **Send template** to open the picker. It works whether or not the window is open, and whether or not handover is on — unlike the reply box, it isn't gated, because a template is exactly what you need when everything else is unavailable.
 
 The picker shows the templates Meta has already approved for your number. Pick one and you'll see it exactly as the customer will.
 
@@ -71,6 +86,66 @@ If your project doesn't have one yet, the picker offers to create it for you. Me
 
 <Note>
   Sending a template costs you a Meta conversation charge, and templates are the one message type that can reach someone who hasn't written to you recently. Use them to restart a real conversation, not to broadcast — for that, use [Broadcasts](/guides/broadcasts), which is built for sending to many people at once.
+</Note>
+
+## Sending a file
+
+You can send a customer a picture, a video, a voice note or a document straight from the conversation — a photo of the part they asked about, a signed quote, a menu. Open the chevron in the reply box, click **Attach files**, and pick one or more files from your computer or phone.
+
+Each file appears on its own row above the box, with its name and size. Take one off again with the **×** at the end of its row, or click **Attach files** again to add more. Nothing is sent until you press send.
+
+### What you can send
+
+| Kind | Formats | Largest file |
+|---|---|---|
+| Images | JPEG, PNG | 5 MB |
+| Videos | MP4, 3GP | 16 MB |
+| Audio | AAC, AMR, MP3, M4A, OGG | 16 MB |
+| Documents | PDF, Word, Excel, PowerPoint, plain text | 50 MB |
+
+Anything else is refused as you pick it, with the reason, before it's uploaded — so you find out immediately rather than after a failed send. These are WhatsApp's limits, not Paige's.
+
+### Two rules that decide whether you can send at all
+
+<Warning>
+  **You must have taken the conversation over.** Attachments only go out while **handover** is on. Paige will not turn handover on for you — it refuses the send and tells you to take the conversation over first, because switching your bot off is your decision, not something that should happen as a side effect of attaching a file.
+</Warning>
+
+**The 24-hour window applies too.** If the contact hasn't messaged you in the last 24 hours, the file won't go — Meta doesn't allow it. Send an approved [template](#sending-a-template) instead; once they reply, the window reopens and you can attach files again.
+
+Both rules are enforced when you press send, not just in the buttons, so a stale page can't slip a file past them.
+
+### Captions
+
+Every file can carry its own caption — you're not limited to one line for the whole batch. On a computer the caption box sits under each file; on a phone, tap **Add caption** on its row to open it.
+
+**Audio is the exception.** WhatsApp has no caption on a voice note, so audio files have no caption box. Put the explanation in your typed message instead.
+
+### Sending several at once
+
+You can attach up to **10 files** in one send. Paige sends them one after another, in the order you attached them, and each row shows its own progress — *Uploading*, *Sending*, then *Sent*.
+
+**Anything you type is sent last, after the files.** That's so *"see attached"* never arrives before the thing it refers to. And if a file doesn't go out, your typed message is held back rather than sent on its own — fix or remove the file first, then send.
+
+### When something doesn't go through
+
+Paige is deliberately precise about the difference between *didn't send* and *don't know*:
+
+| The row says | What happened | What to do |
+|---|---|---|
+| **Not sent** | Nothing was delivered. The reason is written under the file. | A **Retry** button sends just that file again. If the file itself is the problem — too big, wrong format — replace it. |
+| **Not confirmed** | The send may or may not have gone through. WhatsApp (or your own backend) didn't confirm it. | There's **no Retry**, on purpose. Check the conversation first — retrying could send the file twice. |
+
+If the problem is with the conversation rather than the file — handover off, window closed, no number connected — Paige stops the batch there instead of failing each remaining file the same way.
+
+### Files you've sent are kept
+
+A file you send is stored by Paige permanently and stays viewable in the thread, so you can scroll back months later and still open the quote you sent. That's deliberate: WhatsApp drops media after about 30 days, which would otherwise leave you with a record of a conversation whose attachments had vanished.
+
+Resetting a project doesn't remove them. Deleting the project does.
+
+<Note>
+  **If your project sends through your own backend** rather than Paige's, your server receives each file as its own send instruction with a link to fetch it. A server that hasn't been updated to handle picture, video, audio or document messages should refuse them — see your integration guide. The composer behaves the same either way.
 </Note>
 
 ## Tagging a contact while you're talking to them
