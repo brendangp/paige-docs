@@ -4,6 +4,8 @@ sidebarTitle: "Agent tools"
 description: "The twenty-six tools Paige's MCP server gives a connected AI agent — what each one does, the permission it needs, and the one thing it can never do: send a broadcast."
 ---
 
+import RequestAFeature from "/snippets/request-a-feature.mdx"
+
 Once you've [connected an AI agent](/guides/connect-an-agent), it gets a fixed set of **tools** — the specific actions it's allowed to take in Paige. This page lists all twenty-six.
 
 Two things shape what an agent can actually do with them:
@@ -198,3 +200,5 @@ Grant the least that gets the job done. You can change it later without reconnec
 <Tip>
   Some scopes have no MCP tool behind them — there's no tool for templates, no tool for setting a conversation's state, and no tool for webhooks. Granting `templates:manage` or `webhooks:manage` to a connected agent gives it nothing it can use. Those live in the [API](/api-reference/introduction), for code you write yourself. A few tools are one-way too: an agent can upload and list media, but reading an asset's bytes back and deleting one stay API-only.
 </Tip>
+
+<RequestAFeature />
