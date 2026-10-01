@@ -38,6 +38,7 @@ Key facts:
 
 ## Learn
 - [WhatsApp platform](https://howto.paigeme.dev/learn): why WhatsApp, which product to use, message types, templates, and thinking in flows.
+- [What Paige cannot do today](https://howto.paigeme.dev/guides/limits): the limits, stated plainly, so an agent stops inventing a workaround for something unsupported. There is no public roadmap, so nothing here is a timeline.
 - [Changelog](https://howto.paigeme.dev/changelog): what shipped, month by month.
 
 ## Missing a feature?
