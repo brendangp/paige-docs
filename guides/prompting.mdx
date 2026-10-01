@@ -1,7 +1,7 @@
 ---
 title: "Prompting the Code Agent well"
 sidebarTitle: "Prompting tips"
-description: "Get better results from the Code Agent by describing outcomes, iterating in small steps, and knowing when it edits code directly versus building a WhatsApp Flow. Includes why a brand-new project behaves differently from an existing one."
+description: "Get better results from the Code Agent with worked weak-versus-strong examples, the capabilities you can ask for but may not know exist, what to do when the agent can't find what you mean, and whether asking it to test costs credits."
 ---
 
 The [Code Agent](/agents/code-agent) builds and edits your bot from plain-language instructions. How well it does that depends a lot on how you ask. This page collects the habits that get good results, and explains a couple of things about how the agent behaves that are worth understanding before you start.
@@ -78,7 +78,7 @@ You don't have to use the word "Flow." Describe the outcome — *"collect the cu
 
 **Describe the outcome, not the implementation.** Say what should happen from the customer's point of view — *"after they pick 'Book a demo', ask for their name and email, then save both and confirm"* — and let the agent decide which files and tools to touch. You don't need to know your bot's file structure.
 
-**Be specific about behavior.** "Add a contact form" leaves too much open. "Ask for name and email in one form, save them to a `leads` table, and reply with a thank-you message" tells the agent exactly what done looks like.
+**Be specific about behavior.** "Add a contact form" leaves too much open. "Ask for name and email in one form, save them to a `leads` table, and reply with a thank-you message" tells the agent exactly what done looks like. There's a lot packed into that habit — [the next section](#what-be-specific-about-behavior-means) unpacks it.
 
 **Iterate in small steps.** A large feature lands more reliably as a sequence of small requests — build the menu first, then each option's handler, then the edge cases — than as one long instruction. You also get to check each piece as it's built.
 
@@ -96,13 +96,204 @@ You don't have to use the word "Flow." Describe the outcome — *"collect the cu
   </Step>
 </Steps>
 
-### Ask it to test after a change
+## What "be specific about behavior" means
 
-The agent can test its own work. Add *"then test it"* to an instruction and it sends a message through your bot in preview and shows you the result — no need to pick up your phone. This is the fastest way to catch a mistake before it reaches a customer.
+"Be specific" is easy to agree with and hard to act on. In practice, a specific request answers four questions. Answer all four and the agent has nothing left to guess.
 
-If you've linked [Paige Dev](/guides/testing), "test it" runs a fuller automated pass; if you haven't, it sends a single preview message. You ask the same way either way.
+| Question | What it pins down |
+|---|---|
+| **When does this happen?** | The trigger — the message, the button tap, or the moment in the conversation that starts it. |
+| **What does the customer see?** | The actual words, buttons, or form your bot sends back. |
+| **What does Paige keep?** | Whether anything is saved, and where — a [table](/guides/database-tab), a tag, a file. |
+| **How will you know it worked?** | The check you would run yourself to call it finished. |
 
-### Let it read the logs when something breaks
+The third question is the one most people skip, usually because they don't realise it's on the menu. Every Paige project comes with a database, and the agent can create a table and write to it in the same request that builds the message. If you never say *"save it"*, you get a bot that asks a good question and then forgets the answer.
+
+### The same request, two ways
+
+<Columns cols={2}>
+  <Card title="Underspecified" icon="ban">
+    "Let people book a table."
+  </Card>
+  <Card title="Specific" icon="check-check">
+    "When someone taps **Book a table**, ask for their name, the date, the time, and how many people in one form. Save each booking to a `bookings` table. Reply *'Thanks Sam, you're booked for Friday at 7pm for four.'* Don't change the welcome menu. It's done when a test booking shows up as a row in `bookings`."
+  </Card>
+</Columns>
+
+Both requests get you a booking feature. The difference is how many rounds it takes to get the one you wanted.
+
+The underspecified version leaves the agent to invent the fields, decide whether to store anything at all, and write its own confirmation wording. The specific version answers all four questions: the trigger is the button tap, the customer sees a form and a named confirmation, the data lands in `bookings`, and "done" is a row you can go and look at.
+
+<Tip>
+  The "it's done when…" sentence is the highest-value habit on this page. It gives the agent something to aim at — and it's exactly what it checks against when you add *"then test it"*.
+</Tip>
+
+{/* TODO: screenshot of the Code Agent chat sidebar mid-build, showing a specific prompt and the agent's tool activity below it */}
+
+## Three worked examples
+
+The same four questions, applied to the three kinds of request you'll make most often.
+
+<AccordionGroup>
+  <Accordion title="Adding a menu option that remembers something" icon="list-plus">
+    **The goal:** a **Join our mailing list** option that captures the customer's details so you can broadcast to them later.
+
+    **A weak ask**
+
+    > "Add a mailing list option."
+
+    You'll get a menu item and a reply. Whether anything is recorded, and what it records, is the agent's guess — and quite possibly it records nothing at all.
+
+    **A strong ask**
+
+    > "Add a **Join our mailing list** option to the main menu. When someone taps it, ask for their name and email in one form. Save both to a `subscribers` table along with the date they joined, and tag the contact as `newsletter`. Reply *'You're on the list — thanks!'* It's done when a test signup appears in `subscribers` and the contact carries the `newsletter` tag."
+
+    **Why it's better:** it names the table *and* the [tag](/concepts/bot-code#tagging-a-contact-from-your-bot), which is what turns a signup into an audience you can [broadcast](/guides/broadcasts) to. The weak version gets you a polite bot that collects nothing you can use.
+  </Accordion>
+
+  <Accordion title="Changing something that already exists" icon="pencil">
+    **The goal:** the opening message is too formal and too long.
+
+    **A weak ask**
+
+    > "Make the greeting friendlier."
+
+    "Friendlier" is a judgement call, and you've just handed it to the agent. You also haven't said which message you mean — a bot usually has several that could be called a greeting.
+
+    **A strong ask**
+
+    > "Change the first message a new contact gets — the one that currently reads *'Good day. You have reached Sunrise Dental. Please select an option below.'* — to two short, warm sentences that still offer the same three menu options. Keep the button labels exactly as they are. Don't touch anything that happens after they tap."
+
+    **Why it's better:** it quotes the message, so there's no ambiguity about which one to change. It also says what to preserve — the button labels and everything downstream — which is what stops a small copy edit from quietly rewriting your menu logic.
+  </Accordion>
+
+  <Accordion title="Something that happens without a customer involved" icon="clock">
+    **The goal:** you want yesterday's bookings sent to you every morning.
+
+    **A weak ask**
+
+    > "Send me a daily summary."
+
+    Send it where? At what time? Containing what? That's three guesses, plus a good chance the agent builds something triggered by a customer message rather than by the clock.
+
+    **A strong ask**
+
+    > "Every weekday at 07:00 South African time, send a WhatsApp message to +27 82 555 0100 listing yesterday's rows from the `bookings` table — name, time, and party size — with a count at the top. If there were no bookings, send *'No bookings yesterday.'* rather than an empty message."
+
+    **Why it's better:** it describes a [scheduled task](/guides/scheduled-tasks), which is a capability you'd never think to ask for if you didn't know it existed. It also names the empty case, which is the one that usually breaks.
+  </Accordion>
+</AccordionGroup>
+
+## Things you can ask for that you may not know exist
+
+The hardest part of prompting Paige isn't phrasing — it's knowing what's there to ask for. You can't request a table if you don't know your project has a database.
+
+Everything in this list is something the Code Agent can build from a single plain-language instruction.
+
+| What you want | What Paige actually builds | A prompt that gets it |
+|---|---|---|
+| To remember an answer for later | A [database table](/guides/database-tab) | *"Save their name and number to a `leads` table."* |
+| Several details collected in one go | A [WhatsApp Flow](/guides/flows/overview) | *"Ask for name, date, and party size in one form."* |
+| To label a customer so you can message them later | A [contact tag](/concepts/bot-code#tagging-a-contact-from-your-bot) | *"Tag anyone who asks about pricing as `pricing-interest`."* |
+| Something that happens on a timetable | A [scheduled task](/guides/scheduled-tasks) | *"Every Monday at 08:00, send me last week's signups."* |
+| Answers drawn from your own material | The [knowledge base](/agents/code-agent#the-knowledge-base) | Attach your menu as a PDF: *"Answer questions about this."* |
+| A filled-in quote, contract, or form | A [document template](/guides/documents) | *"Fill in this quote template for the customer and send it."* |
+| To send a picture, menu, or price list | A file in [Storage](/guides/storage) | *"Send the menu photo when someone asks what we serve."* |
+| To keep the photos customers send you | [Media capture](/guides/media-capture) | *"Save any proof of payment someone sends."* |
+| An API key your bot needs, kept private | A [secret](/guides/secrets) | *"Store this key as a secret and use it for the AI replies."* |
+
+<Tip>
+  Not sure whether something is possible at all? Ask the [Help Agent](/agents/help-agent). It's free, it never touches your credit balance, and "can Paige do X?" is exactly what it's for.
+</Tip>
+
+## When the agent can't find what you mean
+
+"Reference behavior, not files" works most of the time. Sometimes it doesn't: you describe a moment and the agent edits the wrong message, or tells you it can't find what you're describing. That's a normal thing to hit, not a dead end. Escalate in this order, and stop as soon as one step works.
+
+<Steps>
+  <Step title="Quote the exact words">
+    The most reliable handle on a message is the message itself. Paste the text your bot really sends — *"change the message that reads 'Welcome! What can I help you with today?'"* — and the agent can search your code for that exact string.
+  </Step>
+  <Step title="Describe the step before it">
+    If the wording changes from customer to customer, or you can't remember it, place the moment in the conversation instead: *"the message that comes after someone taps **Support**"*. The agent can follow the conversation states to get there.
+  </Step>
+  <Step title="Reproduce it, then point at the logs">
+    Trigger the problem yourself in the [preview](/guides/preview-tab) or on [Paige Dev](/guides/testing), then say *"I just sent 'hi' and got the wrong reply — read the logs and fix it."* The agent reads the same [execution logs](/guides/logs) you can, so it works from what actually happened rather than from your description of it.
+  </Step>
+  <Step title="Name the file or the table">
+    Only now is naming things worth doing. If you know the table is `bookings`, or you've seen the handler in the **Bot** tab, say so. You lose nothing by being explicit once the vaguer version has already failed.
+  </Step>
+  <Step title="Undo, then re-ask in one clean instruction">
+    If several rounds have left your bot worse than it started, stop patching. Restore the last good version from [version history](/guides/version-history#restore-a-previous-version), then ask again — once — with everything you learned folded into a single specific request.
+  </Step>
+</Steps>
+
+<Warning>
+  Resist the urge to stack corrections onto a thread that has already gone sideways. Every failed attempt stays in the conversation and competes for the agent's attention. A restore plus one fresh, complete request is usually faster than a sixth correction — see [When to start fresh](/learn/foundations/context-and-prompting#when-to-start-fresh).
+</Warning>
+
+## Ask it to test after a change
+
+The agent can test its own work. Add *"then test it"* to an instruction and it runs a message through your bot and shows you what came back — no need to pick up your phone. This is the fastest way to catch a mistake before it reaches a customer.
+
+What "test it" does depends on whether [Paige Dev](/guides/testing) is linked. You ask the same way either way.
+
+<Columns cols={2}>
+  <Card title="Paige Dev not linked" icon="monitor">
+    The agent sends a single message through your bot in the [preview](/guides/preview-tab) and reports the reply.
+  </Card>
+  <Card title="Paige Dev linked" icon="smartphone">
+    "Test it" runs a fuller automated pass — the agent drives a scenario through your bot and can iterate on the code from what it finds. See [Programmatic testing](/guides/testing#programmatic-testing-with-the-code-agent).
+  </Card>
+</Columns>
+
+Either way, the messages run against your **preview** copy. Your live bot and your real customers are never involved.
+
+### Give the test something to check
+
+"Test it" on its own gets you a message and a reply. Naming the scenario gets you an actual test:
+
+<Columns cols={2}>
+  <Card title="Vague" icon="ban">
+    "Add the booking option, then test it."
+  </Card>
+  <Card title="Worth running" icon="check-check">
+    "Add the booking option, then test it: send 'hi', tap **Book a table**, fill the form in as Sam for Friday at 7pm for four people, and check that a row appears in `bookings`."
+  </Card>
+</Columns>
+
+The second version fails loudly when the row doesn't appear. The first can pass while the thing you actually cared about is broken.
+
+<Tip>
+  Ask for the same scenario again after your next change and you have a regression check: *"re-run the booking test."*
+</Tip>
+
+### Does asking it to test cost credits?
+
+Yes — but not as a charge of its own. There is no per-test, per-message, or per-test-run price anywhere in Paige. [Credits](/guides/billing#ai-credits) are metered on the AI work a billable agent does in answering your request, and a test the agent runs is part of the same [Code Agent](/agents/code-agent) turn that made the change.
+
+So *"add the booking option, then test it"* uses more of your balance than *"add the booking option"* on its own — not because testing has a price, but because you asked the agent to do more in one turn. There's no fixed figure to budget for: bigger requests cost more. Your spend is itemised per agent in **Settings → Usage**.
+
+Two things testing does **not** cost you:
+
+<Columns cols={2}>
+  <Card title="Testing it yourself is free" icon="monitor">
+    Sending a message in the [preview](/guides/preview-tab), or messaging your bot from your phone on [Paige Dev](/guides/testing), doesn't deduct credits — no builder agent is involved. The **Try now** test template has a rate limit rather than a price: five per number per rolling 24 hours.
+  </Card>
+  <Card title="A preview run has no WhatsApp fee" icon="banknote">
+    A preview test never reaches WhatsApp. Paige captures what your bot tries to send instead of delivering it, so Meta has nothing to charge you for.
+  </Card>
+</Columns>
+
+<Note>
+  Credits only ever pay for Paige's builder agents. Your bot talking to customers, deploys, and WhatsApp's own message fees aren't credit costs — see [Billing](/guides/billing#ai-credits). If your bot uses AI to write its replies, that runs on your own OpenAI key and is billed by OpenAI, not by Paige: see [AI in your bot](/guides/ai-in-your-bot).
+</Note>
+
+<Tip>
+  The [Help Agent](/agents/help-agent) is free and never touches your balance, so *"how should I test this?"* costs you nothing to ask.
+</Tip>
+
+## Let it read the logs when something breaks
 
 When a change misbehaves, you don't have to diagnose it yourself. Describe the symptom and point the agent at the [logs](/guides/logs):
 
@@ -124,5 +315,7 @@ In an existing project the agent can read the same [execution logs](/guides/logs
 | A recurring notification or report | A [scheduled task](/guides/scheduled-tasks) |
 | To store or look up data | A table — the agent creates it before wiring it up |
 | To find out why something failed | *"Check the logs and fix it"* |
+| To check a change before a customer sees it | *"…then test it"* — name the scenario you want run |
+| To get back to a version that worked | A [restore](/guides/version-history#restore-a-previous-version) from version history |
 
 For the full reference on what the Code Agent is and how it fits together, see the [Code Agent page](/agents/code-agent).

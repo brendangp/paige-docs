@@ -82,7 +82,11 @@ To trigger a programmatic test, describe the scenario you want to test in the ch
 
 > "Test what happens when a user sends 'hello' as their first message."
 
-The agent will run the test, show you the result, and can iterate on your code based on what it finds.
+The agent will run the test, show you the result, and can iterate on your code based on what it finds. Describing the scenario in detail gets you a far better test than *"test it"* on its own — see [Give the test something to check](/guides/prompting#give-the-test-something-to-check).
+
+<Note>
+  **A test the agent runs has no price of its own.** It's part of the same Code Agent request that made the change, and the Code Agent bills against your [credits](/guides/billing#ai-credits) like any other build — so a build-and-test request uses more of your balance than a build alone. Testing yourself, in the preview or from your phone on Paige Dev, costs no credits at all. See [Does asking it to test cost credits?](/guides/prompting#does-asking-it-to-test-cost-credits)
+</Note>
 
 <Tip>
   Programmatic testing is especially useful for regression checks — ask the agent to re-run the same test after making code changes to confirm nothing broke.
