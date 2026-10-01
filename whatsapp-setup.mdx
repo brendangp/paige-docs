@@ -290,6 +290,48 @@ Once you have your own number connected, the card gets **Connected** and **Paige
   **Download PNG** and the **Share** row are hidden on the **Paige Dev** tab — they only appear for your own connected number. The QR code, the wa.me link, and the pre-filled message all still work there. That Paige Dev QR is for testing only; don't put it in front of customers.
 </Note>
 
+## Changing your WhatsApp number
+
+Connected the wrong number, or want to move your bot to a different one? You can disconnect the number on a project and connect another one straight away. You need to be the **project owner** or a **workspace admin** to do it.
+
+<Steps>
+  <Step title="Open the Danger Zone">
+    Go to **Settings → WhatsApp** and scroll to the **Danger Zone** at the bottom of the section.
+
+    {/* TODO: screenshot of Paige Settings → WhatsApp — the Danger Zone at the bottom of the section, showing the Disconnect button. Capturable by the automated capture kit; NOT blocked on GRE-434. */}
+  </Step>
+
+  <Step title="Click Disconnect and type the confirmation phrase">
+    Click **Disconnect**. A confirm dialog opens and asks you to **type a confirmation phrase** before the button becomes available — it's there so a disconnect is never one stray click. Read the dialog before you type it: this is where Paige shows you your two-step verification PIN.
+
+    {/* TODO: screenshot of the Paige disconnect confirm dialog — the two-step verification PIN and the confirmation-phrase box. Capturable by the automated capture kit; NOT blocked on GRE-434. */}
+  </Step>
+
+  <Step title="Connect a different number">
+    Once the number is off the project, the WhatsApp tab goes back to its not-connected state. Click **Connect WhatsApp** and run Meta's embedded signup again, exactly as on a new project — see [Connect your number](/whatsapp-setup#connect-your-number).
+  </Step>
+</Steps>
+
+<Warning>
+  **Save the PIN Paige shows you.** Before you confirm, Paige displays your number's six-digit **two-step verification PIN** and emails you a copy. This is the only time you'll see it in Paige. WhatsApp has no way to switch two-step verification off automatically, so if you ever want to use that number again — on Paige or anywhere else — you'll need this PIN to turn two-step verification off yourself in WhatsApp Manager (**Account tools → Phone numbers → the gear icon → Turn off two-step verification**). Keep the email. If you're finished with the number, you can ignore it.
+</Warning>
+
+### What disconnecting does and doesn't do
+
+- **Does** — remove the number from your project and deregister it with Meta, so it can be used elsewhere.
+- **Doesn't** — delete the number from your WhatsApp Business Account, and doesn't free it up for personal WhatsApp. Deleting it entirely is done in WhatsApp Manager.
+- **Keeps** — all your conversations, contacts, messages, and code.
+- **Resets** — your [scheduled tasks](/guides/scheduled-tasks) are paused. Re-enable them in **Tools → Scheduled Tasks** once a new number is connected. Your flows and uploaded media are re-published to the new number the next time you deploy.
+
+### What will stop you disconnecting
+
+- **A broadcast is still running or scheduled.** Wait for it to finish, or cancel it in the [Broadcasts](/guides/broadcasts) tab, then try again.
+- **Meta refuses the request.** You'll see the reason Meta gave. It's usually a rate limit: WhatsApp allows only **10 register/deregister requests per number in any 72-hour window**. You can wait it out, or confirm a second time to **Disconnect anyway**, which removes the number from Paige even though it stays registered with Meta.
+
+<Note>
+  **Disconnect anyway** leaves the number registered on Meta's side. Until that registration is cleared, connecting the same number to another Paige project — or to anything else — will fail. Use it when you want the project free now and you'll deal with Meta later.
+</Note>
+
 ## Troubleshooting
 
 **The Meta popup closes without completing** — This usually means a browser extension (such as an ad blocker or popup blocker) interrupted the flow. Disable extensions for the Paige domain and try again.
