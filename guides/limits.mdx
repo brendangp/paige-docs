@@ -36,6 +36,11 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | Raising your project's daily message cap yourself. It starts at **1,000 messages a day** per project and resets at midnight UTC. | Ask the [Help agent](/agents/help-agent). The cap is a per-project setting, not a platform ceiling. |
 | Broadcasting a template with a **media header** — a picture, video or document at the top. You can create the template; the Broadcasts wizard lists it greyed out. | Use a text-only template for the broadcast. See [Templates](/guides/templates). |
 | A broadcast variable anywhere except the template **body**. A variable in the header or in a URL button makes the template unusable in a broadcast. | Put every placeholder in the body. |
+| A send time that isn't on a **15-minute boundary**. 14:07 is refused; 14:00 and 14:15 are fine. The time is an absolute UTC instant, with no timezone argument. | Round to the nearest quarter hour. |
+| A body variable that is anything other than a fixed value or one **contact column**. There are no computed values and no table lookups at send time. | Write the value onto the contact first — your bot can do that — then reference that column. |
+| A media header that differs per recipient. One file goes to the whole audience. | Split the audience into one broadcast per file. |
+| An audience filtered on your own tables. A segment filters on opted-in status, tags, name, number, a button someone tapped, or an explicit list of contacts. | [Tag](/guides/broadcasts#your-contacts-and-their-tags) the people your query finds, then build the segment on that tag. |
+| More than **100 saved segments** on a project. | Delete ones you no longer use. |
 
 <Warning>
   **Do not build anything that expects the API to send a broadcast.** `POST /v1/broadcasts` always lands the campaign in `pending_approval`, whatever scopes the credential holds, and there is no send, launch, approve or retry endpoint. See [Scopes](/api-reference/scopes).
@@ -50,6 +55,27 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 
 [Bot code](/concepts/bot-code) has the full list of what your bot *can* send.
 
+## Writing bot code
+
+Your bot is CommonJS JavaScript running in a locked-down Node worker. There is no TypeScript, Python or other runtime.
+
+<Warning>
+  **You cannot add an npm dependency.** The sandbox has a fixed allowlist, and `package.json` is a protected file. A `require` of anything outside the list throws at worker start, which stops your bot replying at all. Build with what is there.
+</Warning>
+
+| Not supported yet | Workaround |
+| --- | --- |
+| Installing a package. The allowlist is Node's own `fs`, `path`, `crypto`, `url`, `querystring`, `util`, `stream`, `events` and `buffer`, plus `express`, `body-parser`, `dotenv`, `@supabase/supabase-js`, `axios`, `node-fetch`, `openai`, `form-data`, `pdf-lib`, `docxtemplater`, `pizzip` and `exceljs`. | Use an allowlisted equivalent. Outbound HTTP goes through `axios` or `node-fetch`; documents through `pdf-lib`, `docxtemplater` or `exceljs`. |
+| `child_process`, `cluster`, `worker_threads`, `vm`, `net`, `dgram` and `tls`. These are blocked outright, so your bot cannot spawn a process or open a raw socket. | None. Call an HTTP API instead. |
+| Raw SQL from bot code. There is no Postgres driver in the sandbox. | Use the Supabase client your project is wired to. For one-off queries, use the SQL editor in the Database tab. |
+| Writing to disk. There is no filesystem — `fs` write calls are silent no-ops that neither save anything nor raise an error. | Keep state in your tables, or in [Storage](/guides/storage). |
+| A long-running job. Bot code gets about **30 seconds** per inbound message and **64 MB** of heap by default. | Acknowledge the message, then finish the work in a [scheduled task](/guides/scheduled-tasks). |
+| Driving a browser, or sending email directly. `puppeteer` and `nodemailer` are not installed. | Call a hosted API for it with `axios`. |
+
+<Note>
+  **Preview is not a full sandbox.** In Preview, `axios` is mocked, so calls made through it do not reach the network — but `fetch`, `node-fetch` and `openai` are **not** mocked and do make real calls. Bear that in mind before testing anything that charges money or sends a message. See [Preview](/guides/preview-tab).
+</Note>
+
 ## Flows
 
 | Not supported yet | Workaround |
@@ -57,6 +83,11 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | Hand-editing a flow's JSON. An agent that tries to edit flow JSON as a file is refused. | Describe the change and let the flows agent write it. `get_flow` reads the JSON, so you can reason about the real structure first. |
 | Un-deprecating a flow. Deprecating is a one-way door in Paige. | None. Build a new flow, and reach for **Deprecate** only when you are genuinely retiring one. |
 | Hard-deleting a **published** flow. *(WhatsApp's rule.)* Meta refuses, so Paige deprecates it instead and tells you it did. | None. |
+| A flow over **10 screens**, or a screen over **50 components**. A screen also takes at most 2 embedded links, 5 opt-ins and 3 images. | Split the journey across two flows, or move questions onto fewer screens. |
+| A component outside the supported set. Flows are built from a closed vocabulary of 24 component types. | Ask for the behaviour you want and let the flows agent pick from what exists. See [Screens and components](/guides/flows/screens-and-components). |
+| Backwards navigation you design yourself. Routes are forward-only. | None needed — WhatsApp draws its own back button. |
+| A footer button that opens a link. Footers navigate, submit or fetch data; they do not open URLs. | Use an `EmbeddedLink` component. |
+| Publishing or deleting a flow over the API or MCP. Both can create and update a flow, and neither can publish or delete one. | Publish from the **Flows** tab. |
 | Publishing any flow before Meta's **business verification** clears. *(WhatsApp's rule.)* A deploy still puts your code and tables live, saves each flow as a draft, and names verification as the reason. | Finish verification. See [Verifying your business](/whatsapp-setup#verifying-your-business). |
 
 <Note>
@@ -100,6 +131,9 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | An unfiltered table update or delete. There is no "update everything" and no "delete everything", and a `like`/`ilike` match can find rows but never change or delete them. | Read the rows first, then change them by id. |
 | More than **60 requests a minute** per credential. The limit is flat — it does not vary by plan or by endpoint. | Watch the `RateLimit-Remaining` header and slow down. Batch your reads. See [Rate limits](/api-reference/rate-limits). |
 | An "all events" webhook subscription. Nothing is delivered unless you subscribed to that exact event name. | Subscribe to each event you want. |
+| A platform event other than `message.received`, `message.status`, `template.approved` and `template.rejected`. There is no broadcast, contact or deploy event. | Have your bot code call your own endpoint at the moment you care about. Custom events your bot emits need only `webhooks:manage`. |
+| Listing contacts, or creating one, over the API. `/v1` reads one contact's messages and updates one contact by id. | Reach contacts through the conversations endpoints, or tag them and work from segments. |
+| Reading more than **50 rows** per table page, or inserting more than **50** at a time. | Page through with `offset`, and insert in batches. |
 | Replaying a webhook. After five failed attempts the event is dropped, and there is no dead-letter queue. | Answer `2xx` as soon as you have durably stored the event, then do your processing. |
 | Reading a webhook's signing secret back, or rotating it. It is shown once, on create. | Delete the webhook and register a new one. |
 
@@ -108,6 +142,9 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | Not supported yet | Workaround |
 | --- | --- |
 | A timezone on a scheduled task. Schedules run in **UTC**, there is no timezone setting, and a task that fired at the wrong local hour still reports success. | Do the arithmetic in the cron expression. For 9am in South Africa (UTC+2), write `0 7 * * *`. Remember daylight saving if your country observes it. See [Scheduled tasks](/guides/scheduled-tasks). |
+| More than **5 scheduled tasks** on a project. | Combine related work into one task. |
+| Anything more often than **once a minute**. Six-field cron expressions, which would allow seconds, are rejected. | None. One minute is the floor. |
+| Pointing a task at a file you have not deployed. | Deploy first, then create the task. |
 
 ## Your data
 
@@ -117,6 +154,11 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | Changing a table that a connected website fills. Synced tables are view-only, because Paige rewrites them on every sync. | Change the content where it lives, on your site. It updates here on the next sync. |
 | Bringing your own Supabase or your own Postgres to a Paige-hosted project. | Run the project self-hosted with your own database, or let Paige provision one. See [Billing](/guides/billing). |
 | Migrating a database into or out of Paige. There is no copy path between two databases. | Move the data yourself. The Database tab downloads any table as CSV or Excel — see [Downloading a table](/guides/database-tab#downloading-a-table). |
+| Importing a file into one of your tables. Export exists; import does not. CSV import is for **contacts** only. | Read the file and insert the rows — from bot code, or over the API 50 rows at a time. |
+| A foreign key, an index, a unique constraint or a check constraint. Table creation emits `PRIMARY KEY` and `NOT NULL` and nothing else, from 11 column types. | Enforce the rule in your bot code before you write the row. |
+| Changing a table's shape over the API. `/v1/tables` reads and writes rows; it cannot create a table, add a column or drop one. | Ask the Code agent, or use the Database tab. |
+| A `JOIN`, or any multi-table query, over the API. Each call reads one table. | Read both tables and join in your own code, or use the SQL editor in the Database tab. |
+| Writing SQL that isn't a read, unless you deliberately switch to write mode. The editor is read-only by default, caps a statement at 20,000 characters, times out at 8 seconds, and returns at most 500 rows to the browser. | Export the table if you need every row. |
 
 ## Projects and workspaces
 
@@ -128,7 +170,7 @@ This page says what Paige **cannot** do. Read it before you design a workaround.
 | More than **5 members** in a workspace, including you. | None self-serve. |
 | More than **25 tags** on one contact. | Remove a tag before adding another. |
 | Tagging more than **500 contacts** at a time in the Contacts list — or tagging in bulk at all, if you are a workspace **member** rather than an owner or admin. | Tag in batches, or ask the Broadcasting agent to tag a whole audience. |
-| Exporting your contact list from the dashboard. | Read contacts through the API with `contacts:read`. A broadcast's **recipient** list does download as CSV. |
+| Exporting your contact list — from the dashboard or the API. There is no endpoint that lists contacts; `/v1` can read one contact's messages and update one contact, and that is all. | Download a broadcast's **recipient** CSV, which covers everyone that broadcast targeted. See [Downloading the recipient list](/guides/broadcasts#downloading-the-recipient-list). |
 | SAML single sign-on, or two-factor authentication on a Paige password account. Sign-in is email and password, or **Continue with Google**. | Sign in with Google and let Google enforce two-factor for you. |
 
 ## Billing
@@ -152,9 +194,21 @@ The connectors Paige ships are **Airtable**, **Slack** and **WordPress**, plus *
 
 | Not supported yet | Workaround |
 | --- | --- |
-| Uploading a file type other than **PNG, JPEG, PDF, DOCX, XLSX, TXT or MD**, or a file over **20 MB**. | Convert it, or compress it. |
+| Uploading a file type other than **PNG, JPEG, PDF, DOCX, XLSX, TXT or MD**, or a file over **20 MB**. Images, video and audio of other kinds are accepted for *sending*, but nothing else is. | Convert it, or compress it. |
+| Searching or answering from a video or an audio file. Both are stored and sendable, and neither is transcribed or indexed. | Upload a transcript as a text file alongside it. |
+| More than **2 GB** of stored media on a project, by default. | Delete what the bot no longer sends. `GET /v1/media` reports where you stand. |
+| A knowledge base over **25,000 tokens**, by default. This is a hard block, not a warning. | Trim the documents, or keep only what the bot actually answers from. |
+| Sending a GIF, WebP or SVG as a conversation attachment. Images there are JPEG or PNG only. | Convert it to PNG or JPEG. |
 | A warning before you delete a media asset your **bot code** still sends. A file embedded in a **flow** is protected; one referenced only from code is not. | Check the usage chips on the file's card first. See [Storage](/guides/storage). |
 | Renaming a secret's key. | Add it under the new key, then delete the old one. |
+
+## Language and time
+
+| Not supported yet | Workaround |
+| --- | --- |
+| The Paige dashboard in a language other than English. There is no language setting. | None. Your **bot** can speak any language — that is your code and your copy, and it is unaffected. |
+| A right-to-left dashboard layout. | None. |
+| A timezone on a project. Everything time-based runs in **UTC**: the daily message cap resets at UTC midnight, a broadcast schedule is an absolute UTC instant, and scheduled tasks run on UTC. | Convert to UTC yourself wherever you pick a time. |
 
 ## Limits that come from WhatsApp, not Paige
 
