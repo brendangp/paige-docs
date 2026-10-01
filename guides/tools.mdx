@@ -1,10 +1,10 @@
 ---
 title: "The Tools tab — your bot's building blocks"
 sidebarTitle: "Tools overview"
-description: "The Tools tab holds the six pieces of infrastructure behind your bot: its database, its media, scheduled tasks, secrets, connectors, and logs. Everything your bot needs at runtime lives here."
+description: "The Tools tab holds the six pieces of infrastructure behind your bot: its database, its media, scheduled tasks, secrets, connectors, and logs. Message Costs sits alongside them and prices what your bot sends."
 ---
 
-Your bot is more than its code. It needs somewhere to keep data, somewhere to keep images, a way to run on a schedule, credentials for the services it talks to, and a record of what it did. All six of those live in the **Tools** tab.
+Your bot is more than its code. It needs somewhere to keep data, somewhere to keep images, a way to run on a schedule, credentials for the services it talks to, and a record of what it did. All six of those live in the **Tools** tab — alongside **Message Costs**, which tells you what WhatsApp charges for the messages your bot sends.
 
 <Note>
   If you've used Paige before, or followed an older guide, these used to live under Settings. They moved to their own tab — Settings is now just for configuring your project, while Tools is for the machinery your bot actually runs on.
@@ -31,11 +31,14 @@ Your bot is more than its code. It needs somewhere to keep data, somewhere to ke
   <Card title="Logs" icon="scroll-text" href="/guides/logs">
     What your bot printed while it ran. The first place to look when something misbehaves.
   </Card>
+  <Card title="Message Costs" icon="calculator" href="/guides/message-costs">
+    What WhatsApp charges you for the messages your bot sends, before and after Meta’s 1 October 2026 pricing change — plus an audit that finds places to send fewer.
+  </Card>
 </CardGroup>
 
 ## How Tools relates to Deploy
 
-This trips people up, so it's worth being explicit — the six sections don't all behave the same way when you [deploy](/guides/deploy).
+This trips people up, so it's worth being explicit — the six infrastructure sections don't all behave the same way when you [deploy](/guides/deploy).
 
 | Section | Preview and live are… |
 |---|---|
@@ -45,6 +48,10 @@ This trips people up, so it's worth being explicit — the six sections don't al
 | **Secrets** | **Shared.** One value, used by both. No deploy needed. |
 | **Connectors** | **Shared.** Connect once and both use it. |
 | **Scheduled Tasks** | **Live only.** Tasks always run your deployed code — you can't schedule a file you haven't deployed. |
+
+<Note>
+  **Message Costs** isn't in the table because there's nothing to deploy. It only reads — your messages, your flows and your bot's code — and reports. The one exception is its **Send fewer messages** audit, which edits your *preview* bot and then waits for you to deploy like any other change.
+</Note>
 
 <Tip>
   You don't have to visit this tab to use most of what's in it. Ask in chat and the Code agent will create tables, write scheduled tasks, and use your stored media for you. Tools is where you go to look at what it did — or to do something by hand.
