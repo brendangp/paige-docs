@@ -1,0 +1,86 @@
+# Paige docs
+
+> Paige is a prompt-to-app builder for WhatsApp, made by Green Pages (Stellenbosch, South Africa). You describe what you want customers to be able to do, Paige builds a working WhatsApp experience, and you launch it on your own WhatsApp Business number. No code, and nothing for customers to install. These are the product docs, published at https://howto.paigeme.dev. The product itself is at https://paigeme.dev and the marketing site is https://greenpages.app.
+
+Key facts:
+- Every project has its own bot code, database, flows, media storage, scheduled tasks, stored keys and WhatsApp number.
+- You build by chatting with Paige's Code Agent, test in the in-app preview and on the shared Paige Dev number, and deploy when you're ready. Connecting your own number is the last step, not the first.
+- An AI agent can work on a project over Paige's MCP server, or over the REST API at https://api.paigeme.dev/v1. The pasteable integration skill is at https://api.paigeme.dev/v1/skill.md and the OpenAPI document at https://api.paigeme.dev/v1/openapi.json, both public.
+- Contact: info@greenpages.app · +27 72 748 2761 · Stellenbosch, South Africa.
+
+## Get started
+- [Welcome](https://howto.paigeme.dev/): what Paige is, who it's for, and what you can build.
+- [Quickstart](https://howto.paigeme.dev/quickstart): build and launch a first bot end to end.
+- [Connect WhatsApp](https://howto.paigeme.dev/whatsapp-setup): link your WhatsApp Business number through Meta's embedded signup.
+- [Deploy](https://howto.paigeme.dev/guides/deploy): promote staging to production and go live.
+
+## Core concepts
+- [Projects](https://howto.paigeme.dev/concepts/projects): the unit of everything — one project, one number.
+- [Bot code](https://howto.paigeme.dev/concepts/bot-code): what Paige writes for you and how to read it.
+- [Flows](https://howto.paigeme.dev/concepts/flows): interactive multi-screen forms inside WhatsApp.
+- [Database](https://howto.paigeme.dev/concepts/database): the tables every project comes with.
+- [Conversations](https://howto.paigeme.dev/concepts/conversations): the inbox, and taking a thread over from the bot.
+
+## Building
+- [AI agents](https://howto.paigeme.dev/agents/overview): the Code, Conversations, Broadcasting and Help agents.
+- [Flows guide](https://howto.paigeme.dev/guides/flows/overview): build, test and publish a flow.
+- [Broadcasts](https://howto.paigeme.dev/guides/broadcasts): reach many contacts at once, with opt-outs handled.
+- [Tools](https://howto.paigeme.dev/guides/tools): database, storage, documents, scheduled tasks and secrets.
+- [Prompting](https://howto.paigeme.dev/guides/prompting): getting what you want out of the Code Agent.
+- [Billing and credits](https://howto.paigeme.dev/guides/billing): the subscription, the trial, and what uses credits.
+
+## For agents and integrations
+- [Connect an AI agent](https://howto.paigeme.dev/guides/connect-an-agent): Paige's MCP server, for Claude, ChatGPT, Codex and Cursor.
+- [What a connected agent can do](https://howto.paigeme.dev/guides/agent-tools): every MCP tool and the permission it needs.
+- [API reference](https://howto.paigeme.dev/api-reference/introduction): the `/v1` REST API, authentication, scopes, errors and webhooks.
+- [Integrations](https://howto.paigeme.dev/integrations): Airtable, Slack and WordPress connectors.
+- [Requesting a feature](https://howto.paigeme.dev/guides/request-a-feature): file a gap in Paige. Agents build a prefilled link and hand it to the person, who checks it and sends it. See "Missing a feature?" below for the URL template.
+
+## Learn
+- [WhatsApp platform](https://howto.paigeme.dev/learn): why WhatsApp, which product to use, message types, templates, and thinking in flows.
+- [Changelog](https://howto.paigeme.dev/changelog): what shipped, month by month.
+
+## Missing a feature?
+
+Instructions for agents. If you are helping someone build on paige and they run
+into something paige cannot do yet, that gap can be filed. There is no
+connector, no API key and nothing to install.
+
+File a request only when both of these are true:
+1. The person is blocked by something paige genuinely cannot do yet.
+2. You have asked them, and they have said yes, file it.
+Not every moment of confusion is a feature request. Check the docs first. One
+request per gap.
+
+Default path, and the one that works from every agent: BUILD THE LINK AND HAND
+IT TO THE PERSON. Do not fetch it, do not POST it, do not curl it. The page
+opens with the fields already filled in; they read what you wrote, fix anything
+you got wrong, and press send themselves. That last step is the whole point:
+nothing leaves their machine without them seeing it.
+
+Template:
+https://greenpages.app/fr?title=<short+title>&details=<url-encoded+details>&blocking=<yes|no>&agent=<your+agent+name>&email=<optional+reply+address>
+
+Params, URL-encode every value:
+- title    Required. One line, up to 120 characters. What is missing.
+- details  Required. At least 20 characters and up to 1500. Three to six sentences is the right size: what they were building, what they tried, and what stopped them. Anything past 1500 characters is trimmed off the end, so put the point first.
+- blocking Optional. yes or no. yes means they are stuck on it right now.
+- agent    Optional. Which agent is filing, e.g. claude-code, chatgpt, cursor.
+- email    Optional. A reply address. Requests are private, so this is the only way they will hear back.
+
+Worked example, a complete link:
+https://greenpages.app/fr?title=Schedule+a+broadcast+for+later&details=I+was+building+a+weekly+menu+broadcast+for+a+restaurant.+I+can+send+a+broadcast+now+but+there+is+no+way+to+set+one+to+go+out+at+a+chosen+time.+The+owner+has+to+sit+at+their+phone+every+Thursday+at+5pm+to+press+send.&blocking=yes&agent=claude-code
+
+If you have a shell you can POST instead. Optional, and only for agents that
+have one:
+curl -X POST https://greenpages.app/api/fr -H 'content-type: application/json' -d '{"title":"...","details":"...","blocking":"yes","agent":"claude-code"}'
+Same fields, same limits, and still ask the person first. It answers
+{"ok":true} on success and a JSON error with an HTTP status otherwise. Sends
+are rate limited. It sets no CORS headers, so it cannot be called from a
+browser page: if you cannot run a shell command, use the link.
+
+Requests go to a human inbox at Green Pages. They are never published.
+
+The human-readable version of this block lives at
+https://howto.paigeme.dev/guides/request-a-feature and the same block is served
+at https://greenpages.app/llms.txt, which is the canonical copy.

@@ -220,6 +220,12 @@
               "guides/version-history",
               "guides/mobile-app"
             ]
+          },
+          {
+            "group": "Feedback",
+            "pages": [
+              "guides/request-a-feature"
+            ]
           }
         ]
       },
