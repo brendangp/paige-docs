@@ -159,7 +159,8 @@
               "guides/documents",
               "guides/media-capture",
               "guides/scheduled-tasks",
-              "guides/secrets"
+              "guides/secrets",
+              "guides/message-costs"
             ]
           },
           {

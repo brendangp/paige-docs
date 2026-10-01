@@ -144,9 +144,33 @@ You can change the state of your subscription at any time from the **Billing** s
   </Step>
 </Steps>
 
+## Who your invoices are made out to
+
+**Billing details** is where you tell Paige who your invoices should be made out to:
+
+- A **legal name** — your company’s registered name, or your own name.
+- Your **address** — street, suburb, city and postal code.
+- The **invoice email** invoices should go to.
+
+The first time you open it, Paige fills in what it already knows — your workspace’s business name and address, or your own name for a personal project, and the email it already bills — so check it over and click **Save billing details**. The legal name and invoice email are required, and the form tells you straight away if the email doesn’t look right.
+
+<Note>
+  **These details belong to whoever pays, not to one project.** Every project in the same [workspace](/guides/workspaces), or every project you own personally, shares them — so you only enter them once.
+</Note>
+
+They’re kept separately from your workspace settings, so transferring workspace ownership never changes the invoice email you typed.
+
+<Warning>
+  Changes apply to **future invoices only**. An invoice that has already been issued keeps the details it was issued with — so fix your billing details *before* your next renewal, not after.
+</Warning>
+
+Paige does not charge VAT, so there is no VAT number field. Only the project owner or a workspace admin can change billing details.
+
+{/* TODO: screenshot of the Billing details card in Settings → Billing */}
+
 ## Payment history
 
-Scroll to the bottom of **Settings → Billing** and you'll find **Payment History** — every charge on the project, with the date, what it was for (a subscription renewal or a credit purchase), the amount in rand, and whether it went through.
+Scroll to the bottom of **Settings → Billing** and you'll find **Payment History** — every charge on the project, with the date, what it was for (a subscription renewal or a credit purchase), the amount in rand, and whether it went through. Each successful charge also carries a **Download** button for its [invoice](#your-invoices).
 
 <Note>
   The section only appears once you've actually paid for something. On a project still in its trial there's nothing there — not an empty table, but no heading at all. That's expected rather than a fault.
@@ -157,3 +181,33 @@ Payment history is per project, so check each project's Billing section separate
 <Warning>
   If a payment fails, your project may be paused automatically. Update your payment method and reactivate your subscription from the **Billing** section to restore your bot.
 </Warning>
+
+## Your invoices
+
+Every successful payment gets its own **numbered invoice** — for example `PAIGE-2026-0012`. You get it two ways: by email when you’re charged, and as a download whenever you want it.
+
+### Invoices by email
+
+Paige emails your invoice every time you’re charged — when you subscribe, when your monthly subscription renews automatically, when you reactivate a paused project, and when you buy credits.
+
+It goes to the **invoice email** in your billing details. If you haven’t set one, it goes to the email Paige already bills: the project owner’s, or your workspace owner’s.
+
+The email comes from Paige with the subject **Your Paige invoice** and the invoice number, shows the amount, the date and the project, and has the invoice attached as a **PDF**. Replying to it reaches the Green Pages team.
+
+<Note>
+  You get **one email per payment**, never duplicates. Invoices from before this feature started aren’t sent — download those instead.
+</Note>
+
+### Downloading an invoice
+
+In **Payment History**, click **Download** next to a payment. The invoice saves to your computer or phone as a PDF named after its invoice number. On a phone each payment is its own card, with the **Download** button underneath.
+
+You can download the same invoice as many times as you like — it always shows the details it was issued with.
+
+- A payment that is still **pending**, **failed** or was **cancelled** has no invoice, so it has no Download button.
+- A payment that has only just gone through may take a few minutes before its invoice appears.
+- If a download doesn’t work, Paige shows a message at the bottom of the screen. Wait a moment and try again, and contact support if it keeps failing.
+
+<Note>
+  Didn’t get the email? Check your spam folder first — then download the same invoice here. This is separate from any receipt your card provider or Paystack sends you.
+</Note>
