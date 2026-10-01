@@ -18,6 +18,7 @@ The **WhatsApp** section of the [Settings tab](/guides/settings-project) is wher
 - **Quality rating and messaging limits** — Meta's health signals for your number: your current quality rating, your throughput, and how many unique customers you can start conversations with in a rolling 24 hours.
 - **Business verification** — whether Meta has verified your business, and a **Get verified** button when it hasn't. Meta only lets verified businesses publish flows.
 - **Payment method** — a reminder, with a **Check payment method** button, that Meta needs a payment method before it can charge for a broadcast.
+- **Danger Zone** — **Disconnect** the number so the project can connect a different one. See [Changing your WhatsApp number](/whatsapp-setup#changing-your-whatsapp-number).
 
 <Card title="Connect your WhatsApp number" icon="message-circle" href="/whatsapp-setup">
   Step-by-step: linking a WhatsApp Business number through Meta embedded signup and setting your display name.
@@ -47,6 +48,20 @@ Most names go for review and the status shows **Pending review** until WhatsApp 
 <Warning>
   WhatsApp allows **10 display-name changes every 30 days**, and a request **cannot be withdrawn** — sending a second name does not cancel the first. Check the spelling before you click.
 </Warning>
+
+## Disconnecting your number
+
+The **Danger Zone** at the bottom of the section holds one action: **Disconnect**. It takes the number off the project and deregisters it with Meta, so the project can connect a different one. You need to be the **project owner** or a **workspace admin**.
+
+Click **Disconnect**, type the confirmation phrase in the dialog, then confirm. Your conversations, contacts, messages, and code are kept. Your [scheduled tasks](/guides/scheduled-tasks) are paused until a new number is connected.
+
+<Warning>
+  **Save the two-step verification PIN the dialog shows you before you confirm.** Paige emails you a copy, and that's the only time you see it. Without that PIN nobody can re-register the number — WhatsApp has no way to switch two-step verification off automatically, so you'd have to turn it off yourself in WhatsApp Manager (**Account tools → Phone numbers → the gear icon → Turn off two-step verification**).
+</Warning>
+
+<Card title="Changing your WhatsApp number" icon="phone" href="/whatsapp-setup#changing-your-whatsapp-number">
+  The full walkthrough: what disconnecting keeps, what it resets, and what stops you — including Meta's 72-hour rate limit and **Disconnect anyway**.
+</Card>
 
 <Note>
   On a phone, Settings sits behind the **☰** menu and each section is its own screen. See [Use Paige on your phone](/guides/mobile-app).
