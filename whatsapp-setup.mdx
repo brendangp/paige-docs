@@ -1,12 +1,12 @@
 ---
 title: "How to connect your WhatsApp Business number to Paige"
 sidebarTitle: "WhatsApp Setup"
-description: "Set up Meta Business Suite, verify your business, and link a WhatsApp Business phone number to your Paige project through Meta embedded signup — from what you need on hand to a live number."
+description: "Set up Meta Business Suite, verify your business, add a Meta payment method, and link a WhatsApp Business phone number to your Paige project through Meta embedded signup — from what you need on hand to a live number."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
 
-Connecting a WhatsApp Business number is the step that takes your bot live. It runs through Meta — the company that owns WhatsApp — so most of this page is about Meta's side of the process: what Meta Business Suite is, how business verification works, and what you'll see as you click through Meta's signup. Paige launches that signup from inside your dashboard and handles the technical wiring (the API token and webhooks) for you, so you never leave Paige and never touch code.
+Connecting a WhatsApp Business number is the step that takes your bot live. It runs through Meta — the company that owns WhatsApp — so most of this page is about Meta's side of the process: what Meta Business Suite is, how business verification works, why Meta needs a payment method from you, and what you'll see as you click through Meta's signup. Paige launches that signup from inside your dashboard and handles the technical wiring (the API token and webhooks) for you, so you never leave Paige and never touch code.
 
 <Note>
   New to the WhatsApp Business Platform? Read [Which WhatsApp product, and when](/learn/whatsapp-products) first. It explains why the Platform — the programmable version Paige builds on — needs a Meta business account and a dedicated number in the first place. This page assumes you've decided the Platform is right for you.
@@ -35,9 +35,11 @@ You don't need to set any of this up in advance. Meta's embedded signup — the 
 
 ## Verifying your business
 
-Meta wants to know a real business is behind a number before it grants full sending power. That's **business verification**, and it's done in Meta Business Suite, separately from connecting your number.
+Meta wants to know a real business is behind a number. **Business verification** is Meta confirming that your business exists, using documents such as a company registration certificate or a utility bill. You do it in Meta Business Manager, separately from connecting your number.
 
-**You can connect and start messaging before you're verified.** An unverified number works — it just runs under tighter limits (a lower cap on how many new people you can message a day, and a stricter path to a custom display name). Verification lifts those limits. So the usual order is: connect your number now, start testing and going live, and submit for verification in parallel.
+**Verification is what lets you publish WhatsApp Flows.** Meta only allows verified businesses to publish [flows](/guides/flows/overview) — the interactive forms and menus your bot sends. An unverified business can create and edit flows in Paige and test them on Paige Dev, but those flows won't go live on your own number. Verification also lifts the tighter limits an unverified number runs under: a lower cap on how many new people you can message a day, and a stricter path to a custom display name.
+
+**You can connect your number and start messaging before you're verified.** An unverified number sends and receives ordinary messages. So the usual order is: connect your number now, start building and testing, and submit for verification in parallel — well before you need your first flow live.
 
 <Accordion title="What Meta asks for" icon="file-check">
   Verification confirms your business's legal name, address, and phone number against official records, so what you enter must match your paperwork exactly. The shape of the request is always the same: a document that proves the legal entity exists, and a document that proves its address.
@@ -46,12 +48,58 @@ Meta wants to know a real business is behind a number before it grants full send
 </Accordion>
 
 <Accordion title="How long it takes" icon="clock">
-  Meta usually reviews verification within a few business days, though it can be faster or slower depending on your documents and region. You submit once and wait for Meta's decision — there's nothing to do in Paige while it's in review.
+  Meta usually takes a few days to review your verification, though it can be faster or slower depending on your documents and region. You submit once and wait for Meta's decision — there's nothing to do in Paige while it's in review.
 </Accordion>
 
 <Accordion title="What you can and can't do while waiting" icon="hourglass">
-  You **can** connect your number, build, test on [Paige Dev](/quickstart), deploy, and message customers within the daily limit of an unverified number. You **can't** raise those limits or lock in a fully custom display name until verification clears. Nothing you build is wasted — verification only widens what an already-working number can do.
+  You **can** connect your number, build, test your flows on [Paige Dev](/quickstart), deploy your code and tables, and message customers within the daily limit of an unverified number. You **can't** publish a flow to your own number, raise those limits, or lock in a fully custom display name until verification clears.
+
+  Nothing you build is wasted. Your flows are saved as drafts on your WhatsApp account while you wait, and they go live the next time you deploy after verification comes through.
 </Accordion>
+
+### Starting verification from Paige
+
+Paige shows your **Business Verification** status in **Settings → WhatsApp**, under your number. When Meta reports that your business isn't verified, a **Get verified** button appears next to the status. It opens Meta Business Manager in a new tab, where you start or finish verification.
+
+In Meta Business Manager, verification sits under your business portfolio's **Business settings → Security Centre**. Meta moves and renames these screens from time to time, so follow what's on screen rather than this exact path.
+
+{/* TODO: screenshot of Meta Business Manager — Business settings → Security Centre, showing the Start verification button. Meta's own UI — needs a human with a Meta account (GRE-434). */}
+
+{/* TODO: screenshot of Paige Settings → WhatsApp showing an unverified Business Verification status with the Get verified button next to it. Capturable by the automated capture kit; NOT blocked on GRE-434. */}
+
+<Note>
+  If Paige can't tell whether you're verified — because Meta didn't answer, for example — it shows no **Get verified** button and doesn't say you're unverified. A missing button means Paige has nothing to report, not that something is wrong.
+</Note>
+
+Fixed something in Meta? Click **Recheck** on the WhatsApp tab to refresh the status right away instead of waiting a few minutes.
+
+### When verification holds your flows back
+
+A deploy doesn't fail because your business isn't verified. It does everything it can, then tells you what it couldn't:
+
+- Your **code and tables go live** as normal.
+- Each flow is still **saved as a draft** on your WhatsApp account. Paige skips the publish step and tells you verification is the reason, rather than failing with a confusing error.
+- A flow that was **already live stays on its current live version**. Nothing is taken off the air.
+- You get **one warning** — "flows waiting on business verification" — listing the flows it held back. It stays on screen until you close it, and its **Get verified** button takes you to **Settings → WhatsApp**.
+- It still counts as your **first deploy** in the getting-started checklist, because the rest of the deploy did go live.
+
+Clicking **Publish** on a flow in the Flows tab tells you the same thing.
+
+Deploying again won't change the result until verification is done. Finish business verification in Meta Business Manager, then click **Deploy** again — Paige doesn't publish for you the moment verification comes through. In the meantime you can keep testing your flows on the Paige Dev number, which isn't affected.
+
+## Adding a payment method on Meta
+
+Meta charges for some conversations: [broadcasts](/guides/broadcasts), and other messages your business starts. Those messages fail to send if no payment method is attached to your business in Meta. The charges are Meta's, billed against your own connected number — they're separate from what you pay for Paige, and nothing comes out of your Paige credits. See [Billing](/guides/billing) for the Paige side.
+
+You add the payment method in Meta Business Suite, under your WhatsApp Business Account's payment settings. Paige gives you a short cut: **Settings → WhatsApp** shows a payment-method reminder with a **Check payment method** button that opens your Meta payment settings in a new tab.
+
+<Note>
+  **Seeing that reminder doesn't mean anything is wrong.** Meta gives Paige no reliable way to check whether a card is on file, so rather than guess, Paige shows the reminder either way. It's there so you can confirm it yourself.
+</Note>
+
+{/* TODO: screenshot of Meta Business Suite — Billing & payments → Payment settings for a WhatsApp Business Account, showing where a payment method is added. Meta's own UI — needs a human with a Meta account (GRE-434). */}
+
+{/* TODO: screenshot of Paige Settings → WhatsApp showing the payment-method reminder and its Check payment method button. Capturable by the automated capture kit; NOT blocked on GRE-434. */}
 
 ## Your business info: display name and category
 
@@ -122,6 +170,21 @@ You connect WhatsApp from inside your project. Open your project, go to **Settin
   </Step>
 </Steps>
 
+### You'll get a confirmation email
+
+The first time a number is connected to a project, Paige emails the project owner — or the workspace owner, for a workspace project — to confirm the connection and to flag the two things on Meta's side that can hold you up later.
+
+- If Meta reports your business **isn't verified** yet, the email tells you to start business verification, because Meta won't let you publish flows until it's done and it usually takes a few days.
+- If your business is **already verified**, the email says so.
+- If Paige **couldn't check**, the email explains that flows need verification and where to look.
+- Either way, it reminds you to make sure a **payment method** is attached to your WhatsApp Business Account, because Meta charges for broadcasts.
+
+Every link in the email takes you to **Settings → WhatsApp**.
+
+<Note>
+  You only get this email once per number. Disconnect a number and connect the same one again and no second copy arrives — but connecting a different number sends a new one.
+</Note>
+
 <Note>
   Connecting a WhatsApp number is available during your free trial **and** after it ends — you can finish setup whenever you're ready. Once a number is connected, your bot runs on it while you have an active subscription or an unexpired trial. See [Billing](/guides/billing) for what the trial includes.
 </Note>
@@ -132,7 +195,7 @@ Once connected, the WhatsApp tab shows what Meta reports about your account. Und
 
 - **Account Name** — the name on your WhatsApp Business Account.
 - **Status** — the account's standing with Meta.
-- **Business Verification** — whether Meta has verified your business (see [Verifying your business](/whatsapp-setup#verifying-your-business)).
+- **Business Verification** — whether Meta has verified your business. Your flows only publish to this number once it says verified (see [Verifying your business](/whatsapp-setup#verifying-your-business)).
 - **Currency** and **Timezone** — the account's billing currency and time zone, set from your Meta business settings.
 
 The technical identifiers behind the scenes — your WABA ID, phone number ID, and access token — are handled by Paige and kept securely on the server. You don't need them for day-to-day use, and Paige manages token storage and refresh automatically.
@@ -156,11 +219,13 @@ Below those, four numbers Meta reports about your number. They're worth glancing
 | **Quality Rating** | How customers are reacting to your messages. **Green** is healthy; **yellow** means Meta has noticed blocks or reports; **red** means your sending is at risk. |
 | **Throughput** | How fast you can send — Standard is 80 messages a second, High is 1,000. |
 | **Messaging Limit** | How many *different* customers you can start a conversation with in 24 hours. Starts at 1,000 and rises as your quality stays good. Relevant when planning a [broadcast](/guides/broadcasts). |
-| **Business Verification** | Whether Meta has verified your business. Unverified numbers face tighter limits. |
+| **Business Verification** | Whether Meta has verified your business. Unverified numbers face tighter limits, and their flows won't publish. A **Get verified** button sits next to it when Meta reports you're not verified. |
 
 <Tip>
   A yellow or red quality rating is a signal to slow down and look at what you're sending. Ratings fall when people block or report you — usually after a broadcast to an audience that didn't expect it. Left alone, it costs you your messaging limit and eventually your ability to send.
 </Tip>
+
+Underneath those four, you'll also see a **payment-method reminder** with a **Check payment method** button. It appears whether or not a card is on file, so it isn't a fault report — see [Adding a payment method on Meta](/whatsapp-setup#adding-a-payment-method-on-meta).
 
 ### On the right: your business profile
 

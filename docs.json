@@ -119,6 +119,18 @@
             ]
           },
           {
+            "group": "Flow templates",
+            "pages": [
+              "templates/overview",
+              "templates/lead-capture",
+              "templates/appointment-booking",
+              "templates/contact-form",
+              "templates/customer-feedback",
+              "templates/support-ticket",
+              "templates/survey"
+            ]
+          },
+          {
             "group": "Broadcasts",
             "pages": [
               "guides/broadcasts",
@@ -330,34 +342,6 @@
     {
       "source": "/guides/broadcasts/broadcasting-assistant",
       "destination": "/agents/broadcasting-agent"
-    },
-    {
-      "source": "/templates/overview",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/appointment-booking",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/lead-capture",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/contact-form",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/customer-feedback",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/support-ticket",
-      "destination": "/"
-    },
-    {
-      "source": "/templates/survey",
-      "destination": "/"
     }
   ]
 }

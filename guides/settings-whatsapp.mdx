@@ -1,13 +1,13 @@
 ---
 title: "WhatsApp settings"
 sidebarTitle: "WhatsApp"
-description: "The WhatsApp section of the Settings tab is where a project's number is connected and, once connected, where you manage your profile, display name, username, business details, quality rating, and messaging limits."
+description: "The WhatsApp section of the Settings tab is where a project's number is connected and, once connected, where you manage your profile, display name, username, business details, quality rating, messaging limits, business verification, and your Meta payment method."
 ---
 
 The **WhatsApp** section of the [Settings tab](/guides/settings-project) is where a project's number is connected and managed.
 
 - **Not connected yet?** You'll confirm you have a Meta Business account and a number that can receive an OTP, then run Meta's embedded signup. The full step-by-step is on [Connect your WhatsApp number](/whatsapp-setup) — this section links you straight into it rather than repeating it.
-- **Already connected?** You'll see your profile photo, phone number, display name, and username, along with your quality rating, throughput, and messaging limit — plus a business profile form.
+- **Already connected?** You'll see your profile photo, phone number, display name, and username, along with your quality rating, throughput, messaging limit, and business verification status — plus a business profile form and a reminder about your Meta payment method.
 
 ## What you can manage here
 
@@ -16,9 +16,24 @@ The **WhatsApp** section of the [Settings tab](/guides/settings-project) is wher
 - **Username** — claim an `@handle` so customers can find you without knowing your number. See [Claim a WhatsApp username](/whatsapp-setup#claim-a-whatsapp-username).
 - **Business details** — the industry category sent to Meta, and the rest of your public business information.
 - **Quality rating and messaging limits** — Meta's health signals for your number: your current quality rating, your throughput, and how many unique customers you can start conversations with in a rolling 24 hours.
+- **Business verification** — whether Meta has verified your business, and a **Get verified** button when it hasn't. Meta only lets verified businesses publish flows.
+- **Payment method** — a reminder, with a **Check payment method** button, that Meta needs a payment method before it can charge for a broadcast.
 
 <Card title="Connect your WhatsApp number" icon="message-circle" href="/whatsapp-setup">
   Step-by-step: linking a WhatsApp Business number through Meta embedded signup and setting your display name.
+</Card>
+
+## Business verification and your Meta payment method
+
+Two things on Meta's side decide what your number can actually do, and this section is where Paige surfaces both.
+
+- **Business Verification** — Meta confirming your business is real, from documents such as a registration certificate or a utility bill. Meta only lets verified businesses publish [flows](/guides/flows/overview), so an unverified business can build and test flows but can't take them live on its own number. When Meta reports you're not verified, a **Get verified** button appears next to the status and opens Meta Business Manager in a new tab. If Paige can't tell either way, you see no button and no claim that you're unverified.
+- **Payment method** — Meta charges for [broadcasts](/guides/broadcasts) and other messages your business starts, and those messages fail to send if no payment method is attached to your business in Meta. A reminder with a **Check payment method** button opens your Meta payment settings. Seeing the reminder doesn't mean anything is wrong: Meta gives Paige no reliable way to check, so the reminder shows either way.
+
+Fixed something in Meta? Click **Recheck** to refresh the status right away instead of waiting a few minutes.
+
+<Card title="Business verification and Meta payments" icon="shield-check" href="/whatsapp-setup#verifying-your-business">
+  What verification unlocks, where to start it in Meta, how long it takes, and what a deploy does with your flows while you wait.
 </Card>
 
 ## Changing your display name
