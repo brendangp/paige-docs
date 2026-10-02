@@ -70,7 +70,7 @@ Params, URL-encode every value:
 - email    Optional. A reply address. Requests are private, so this is the only way they will hear back.
 
 Worked example, a complete link:
-https://greenpages.app/fr?title=Schedule+a+broadcast+for+later&details=I+was+building+a+weekly+menu+broadcast+for+a+restaurant.+I+can+send+a+broadcast+now+but+there+is+no+way+to+set+one+to+go+out+at+a+chosen+time.+The+owner+has+to+sit+at+their+phone+every+Thursday+at+5pm+to+press+send.&blocking=yes&agent=claude-code
+https://greenpages.app/fr?title=Repeat+a+broadcast+every+week&details=I+was+building+a+weekly+menu+broadcast+for+a+restaurant.+I+can+schedule+one+to+go+out+at+a+chosen+time+but+there+is+no+way+to+make+it+repeat+every+week.+The+owner+has+to+build+a+new+broadcast+by+hand+every+Thursday.&blocking=yes&agent=claude-code
 
 If you have a shell you can POST instead. Optional, and only for agents that
 have one:
