@@ -238,6 +238,7 @@
           {
             "group": "Feedback",
             "pages": [
+              "guides/limits",
               "guides/request-a-feature"
             ]
           }
