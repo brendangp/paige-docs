@@ -4,6 +4,8 @@ sidebarTitle: "Introduction"
 description: "A REST API for your Paige project — send WhatsApp messages, read conversations, manage templates and contacts, assemble broadcasts, edit your bot's code and flows, and receive signed webhooks."
 ---
 
+import RequestAFeature from "/snippets/request-a-feature.mdx"
+
 The **Paige API** is a plain REST API over HTTPS: send a WhatsApp message, read a conversation, update a contact's tags, create a template, assemble a broadcast, read and edit your bot's code and flows, deploy, or register a webhook.
 
 It covers the day-to-day operational surface rather than every screen in the dashboard. Project setup and account administration stay in the app — there are no endpoints for the database tab, secrets, logs, storage uploads, scheduled tasks, or billing, and broadcasts are assembled by API but approved and sent from the dashboard on purpose.
@@ -136,3 +138,5 @@ https://api.paigeme.dev/v1/skill.md
 ```
 
 It points the agent at the live OpenAPI document — `https://api.paigeme.dev/v1/openapi.json`, public and unauthenticated — as its source of truth, and gives it working recipes for the common tasks. You'll find the same file in the app under **Settings → API → Integration skill**, with copy and download buttons.
+
+<RequestAFeature />

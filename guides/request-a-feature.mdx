@@ -1,0 +1,95 @@
+---
+title: "Requesting a feature"
+sidebarTitle: "Request a feature"
+description: "File a gap in Paige. What to write, the exact link an AI agent builds for you, and why the agent hands you the link instead of sending it itself."
+---
+
+Paige can't do everything yet. When you hit a gap, you can file it, and it reaches a human at Green Pages. There's nothing to install, no key to create, and no account you need beyond the one you already have.
+
+A request is a single page with a form on it, at [greenpages.app/fr](https://greenpages.app/fr).
+
+<Note>
+  **Reading this as an AI agent?** [Filing a request as an agent](#filing-a-request-as-an-agent) is written for you. Build the prefilled link, hand it to the person, and let them press send.
+</Note>
+
+## When to file one
+
+File a request when Paige genuinely can't do the thing you need — not when something is merely hard to find. Check the docs first. A lot of what looks missing is somewhere you haven't looked yet, so try the search box at the top of this page, or ask the in-app [Help agent](/agents/help-agent).
+
+File one request per gap. Two unrelated gaps are two requests.
+
+## What to write
+
+Two fields do the work:
+
+- **Title.** One line. What is missing, in the plainest words you have. Up to 120 characters.
+- **Details.** Three to six sentences: what you were building, what you tried, and what stopped you. At least 20 characters and up to 1500. Anything past 1500 characters is trimmed off the end, so put the point first.
+
+Concrete beats abstract. "I need to send the weekly menu every Thursday at 5pm and there's no way to schedule it" tells us more than "scheduling would be nice".
+
+You can add a reply address. Requests are private and never published, so an email address is the only way you'll hear back about one.
+
+## Filing a request as an agent
+
+This section is instructions for AI agents working on someone's Paige project. If you're a person reading the docs, you can just use [greenpages.app/fr](https://greenpages.app/fr).
+
+### Ask the person first
+
+File a request only when both of these are true:
+
+1. The person is blocked by something Paige genuinely cannot do yet.
+2. You have asked them, and they have said yes, file it.
+
+Not every moment of confusion is a feature request. Check the docs first. One request per gap.
+
+### Build the link and hand it over
+
+<Warning>
+  **Build the link and hand it to the person. Do not fetch it, do not POST it, do not curl it.**
+</Warning>
+
+The page opens with the fields already filled in. The person reads what you wrote, fixes anything you got wrong, and presses send themselves. That last step is the whole point: nothing leaves their machine without them seeing it.
+
+This is the default path, and the one that works from every agent, with or without a shell.
+
+### The link
+
+```
+https://greenpages.app/fr?title=<short+title>&details=<url-encoded+details>&blocking=<yes|no>&agent=<your+agent+name>&email=<optional+reply+address>
+```
+
+URL-encode every value.
+
+| Parameter | Required | What goes in it |
+| --- | --- | --- |
+| `title` | Required | One line, up to 120 characters. What is missing. |
+| `details` | Required | At least 20 characters and up to 1500. Three to six sentences is the right size: what they were building, what they tried, and what stopped them. Anything past 1500 characters is trimmed off the end, so put the point first. |
+| `blocking` | Optional | `yes` or `no`. `yes` means they are stuck on it right now. |
+| `agent` | Optional | Which agent is filing, for example `claude-code`, `chatgpt`, `cursor`. |
+| `email` | Optional | A reply address. Requests are private, so this is the only way they will hear back. |
+
+### A worked example
+
+A complete link, ready to hand over:
+
+```
+https://greenpages.app/fr?title=Repeat+a+broadcast+every+week&details=I+was+building+a+weekly+menu+broadcast+for+a+restaurant.+I+can+schedule+one+to+go+out+at+a+chosen+time+but+there+is+no+way+to+make+it+repeat+every+week.+The+owner+has+to+build+a+new+broadcast+by+hand+every+Thursday.&blocking=yes&agent=claude-code
+```
+
+### If you have a shell
+
+Optional, and only for agents that have one. You can POST instead of building a link:
+
+```bash
+curl -X POST https://greenpages.app/api/fr -H 'content-type: application/json' -d '{"title":"...","details":"...","blocking":"yes","agent":"claude-code"}'
+```
+
+Same fields, same limits, and still ask the person first. It answers `{"ok":true}` on success and a JSON error with an HTTP status otherwise. Sends are rate limited. It sets no CORS headers, so it can't be called from a browser page: if you can't run a shell command, use the link.
+
+## What happens to your request
+
+Requests go to a human inbox at Green Pages. They are never published, and there's no public list of what has been asked for or what is planned. If you left an email address, that's where any reply goes.
+
+<Note>
+  The same instructions are served as plain text at [howto.paigeme.dev/llms.txt](https://howto.paigeme.dev/llms.txt), for agents that read a site's `llms.txt` before anything else.
+</Note>

@@ -1,0 +1,217 @@
+---
+title: "Fix a bot the agent broke or got stuck on"
+sidebarTitle: "Troubleshooting"
+description: "What to do when the Code agent writes something that doesn't work, stalls mid-task, or goes round in circles — how to get back to a working bot, read the logs yourself, and what each attempt costs in credits."
+---
+
+import RequestAFeature from "/snippets/request-a-feature.mdx"
+
+The agent got something wrong. This page gets you back to a working bot, then helps you work out what happened.
+
+Read the first two sections before you do anything else. They are the fastest route out, and they cover the thing most people get wrong in the first thirty seconds: assuming your customers are already seeing the breakage.
+
+## Start here
+
+| What's happening | Your first move |
+| --- | --- |
+| The bot is misbehaving and you don't know why | Check whether it's broken **live** or only in your working copy — see below |
+| A change broke something that used to work | [Restore the last good version](/guides/version-history#restore-a-previous-version) |
+| The agent is still typing and clearly going wrong | Press **Stop**, then re-ask with a narrower instruction |
+| The agent finished but the bot doesn't work | Tell it what went wrong and ask it to check the logs |
+| The agent keeps trying the same failing thing | Restore, then break the request into smaller steps |
+| A deploy came back with warnings | [Read what the warning named](/guides/deploy#deployed-with-warnings) — it's a partial success |
+| You're not sure if it's Paige or Meta | [Use the table below](#is-it-paige-or-is-it-meta) |
+
+## Your live bot is probably still fine
+
+Paige keeps two copies of your bot, and the agent only ever touches one of them.
+
+- Your **working copy** is what the agent edits. Every save lands here, and nowhere else.
+- Your **live bot** is what your customers talk to on your own WhatsApp number. It changes only when you press **Deploy**.
+
+So if you haven't deployed since the agent broke something, your customers are still talking to the last version you deployed. Nothing has reached them. You have as long as you need to fix it.
+
+<Note>
+  This is also why [Deploy is not a save button](/guides/deploy). Your work is saved as you go. Leaving a broken change undeployed costs you nothing, and it buys you room to experiment.
+</Note>
+
+To confirm which bot is actually broken, send a test message to each one:
+
+- **Working copy** — message your bot through [Paige Dev](/guides/testing), or use the [Preview tab](/guides/preview-tab).
+- **Live bot** — message your own connected WhatsApp number.
+
+If Paige Dev is broken and your own number is fine, the breakage has not shipped.
+
+{/* TODO: screenshot of the Deploy button showing the orange pending-changes dot. Capture kit, not hand-shot; NOT part of GRE-434. */}
+
+## Get back to a working bot
+
+Paige commits your bot code every time the agent saves, so there is always a known-good version to go back to. The commit message is the request you typed, which makes the history read like a list of what you asked for — find the last one that worked and restore it.
+
+<Card title="Restore a previous version" icon="history" href="/guides/version-history#restore-a-previous-version">
+  Open the **History** icon in the header, pick the commit, and click **Restore this version**. See [Version history](/guides/version-history) for the full walkthrough.
+</Card>
+
+Three things worth knowing before you reach for it:
+
+- **Restoring is safe.** It rewrites your working copy only. Your live bot keeps running untouched until you deploy.
+- **You can't lose work by restoring.** Your history is never rewritten. The restore is recorded as a new commit on top, so the version you restored *away* from is still there if you want it back.
+- **Restoring costs no credits.** Neither does deploying. See [what this costs you in credits](#what-this-costs-you-in-credits).
+
+<Tip>
+  Restore first, then diagnose. Getting back to something that works takes the pressure off, and you can investigate the broken version from the history panel at your own pace.
+</Tip>
+
+## The agent wrote code that doesn't work
+
+You don't have to find the bug yourself. The agent can read the same [execution logs](/guides/logs) you can, and it can change the code in the same conversation — so describing the symptom is usually faster than diagnosing the cause.
+
+Tell it what went wrong in plain terms, and point it at the logs:
+
+> "The booking confirmation never arrives after someone picks a date. Check the logs and fix it."
+
+Two habits make this work much better:
+
+- **Describe the symptom, not your theory.** Say what you did, what you expected, and what happened instead. A wrong theory sends the agent off in the wrong direction.
+- **Ask it to test afterwards.** Add *"then test it"* and the agent sends a message through your bot and shows you the result. If you've linked [Paige Dev](/guides/testing), that runs a fuller pass.
+
+<Warning>
+  Asking the agent to fix its own mistake is a **new request**, and it uses credits like any other. If the same fix fails twice, stop asking and restore instead — a third attempt on a bad starting point usually costs more than going back.
+</Warning>
+
+## The agent is stuck or going round in circles
+
+"Stuck" means two quite different things, and they have different fixes. Work out which one you're looking at first.
+
+<AccordionGroup>
+  <Accordion title="The agent is stuck in the chat" icon="loader-circle">
+    The agent is still working, or it keeps attempting the same thing and failing.
+
+    1. **Press Stop.** While the agent is streaming, the send button becomes a stop control. Pressing it ends the turn.
+    2. **Check what it actually changed.** Open the **History** panel. A half-finished turn still commits whatever it saved before you stopped it.
+    3. **Restore if the half-finished state is worse than where you started.** [Restoring](/guides/version-history#restore-a-previous-version) puts you back on firm ground.
+    4. **Re-ask, smaller.** A large request lands more reliably as a sequence of small ones. Build the menu, then one option's handler, then the edge cases — checking each piece as it's built. See [Prompting tips](/guides/prompting#prompting-habits-that-work).
+
+    If the agent is looping on one specific thing — the same tool, the same error, the same file — say so explicitly in your next message. Naming the thing that keeps failing is often enough to get it to try another route.
+  </Accordion>
+  <Accordion title="Your bot is stuck at runtime" icon="refresh-cw">
+    The agent finished fine, but your bot now repeats itself, replies twice, or stops responding mid-conversation.
+
+    This is a bug in the code, not a stuck agent, and the [logs](/guides/logs) show it clearly. Look for **the same log entry repeating in rapid succession** — that usually means your bot is re-triggering itself.
+
+    A conversation that stops dead partway through is normally a state that both sends a message and handles the reply. Those are always meant to be two separate states. Describe where the conversation stalls and the agent will find it.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Pressing **Stop** also stops further credits accruing on that turn. You are charged for the AI work done up to that point, and nothing after it.
+</Note>
+
+## Read the logs yourself
+
+When you want to look before you ask, the logs are where everything your bot did is written down. They live in **Tools → Logs**.
+
+<Steps>
+  <Step title="Check which bot you're reading">
+    The **Preview** and **Production** toggle at the top decides which set of logs you see, and it defaults to **Preview**. If a customer reported the problem and your logs look empty, this is almost always why — the failure happened in Production.
+  </Step>
+  <Step title="Filter to errors">
+    Set the level filter to **Error**. This cuts the noise to the things that actually failed.
+  </Step>
+  <Step title="Work backwards from the error">
+    Read upwards from the error entry to see what your bot was doing just before it failed — which branch ran, and what data it was holding.
+  </Step>
+  <Step title="Reproduce it with the log open">
+    Turn on **Auto: On**, then send yourself a test message through [Paige Dev](/guides/testing). You get a direct line between what you did and what your bot logged.
+  </Step>
+</Steps>
+
+Four error patterns cover most of what you'll find:
+
+- **`TypeError: Cannot read properties of undefined`** — a database record or an API response wasn't the shape your code expected.
+- **No log at all where you expected one** — the code never ran, so look earlier in the conversation, not at the line you suspect.
+- **The same entry over and over** — your bot is re-triggering itself.
+- **An error that names an external service** — the failure is outside Paige. Check the service, and check any [secret](/guides/secrets) it needs.
+
+[Logs](/guides/logs) has the full reference, including the error patterns in detail and what the agent sees when it reads them for you.
+
+<Info>
+  A single run records at most 500 log entries. If you see `Log limit reached (500). Remaining logs truncated.`, the rest of that run's output was dropped — so an absent log line isn't proof the code didn't run.
+</Info>
+
+## A deploy went wrong
+
+A deploy rarely fails outright. Far more often it half-succeeds, and the message tells you which half.
+
+- **Deployed with warnings** — your code and table structure went live, but something named in the message didn't. Usually a flow Meta rejected, or a table change that couldn't be applied. Your live bot is running; the named part is just not updated. See [Deployed with warnings](/guides/deploy#deployed-with-warnings).
+- **Module not allowed** — your bot's code uses a building block that bots on Paige can't use. Nothing goes live and nothing is broken. The message names the file and the piece it objected to. Ask the agent to rewrite that bit with an allowed one, then deploy again.
+- **Deployed cleanly, but the live bot misbehaves** — switch your [logs](/guides/logs) to **Production**. That's your live bot's own account of what it did. If the new version is worse than the old one, [restore](/guides/version-history#restore-a-previous-version) and deploy again.
+
+<Warning>
+  A table **structure** warning is the one to act on quickly. It means your bot's code expects a column that production doesn't have, so the code and the table are out of step. Fix that before you rely on the new column.
+</Warning>
+
+## Is it Paige or is it Meta?
+
+Some failures aren't Paige's to fix, and knowing which is which saves you a lot of time. WhatsApp itself is Meta's, and Meta blocks certain things until your account is set up.
+
+| What you're seeing | Whose problem | What to do |
+| --- | --- | --- |
+| Your bot replies wrongly, or not at all, in Preview | Paige | Check your [logs](/guides/logs), then ask the agent to fix it |
+| A flow didn't publish on deploy | Meta | Meta validates and can reject flows. See [Deployed with warnings](/guides/deploy#deployed-with-warnings) |
+| Flows save as drafts and never go live | Meta | Your business isn't verified yet. See [Verifying your business](/whatsapp-setup#verifying-your-business) |
+| A broadcast won't actually send | Meta | Your business needs a payment method on Meta. See [Adding a payment method on Meta](/whatsapp-setup#adding-a-payment-method-on-meta) |
+| "Could not load account details" | Meta | Your number is connected; Paige just couldn't read the account back. Check the WhatsApp Business Account in Meta Business Suite, then reload |
+| A verification code never arrives | Meta | See [Troubleshooting](/whatsapp-setup#troubleshooting) in the WhatsApp setup guide |
+| Your bot works in Preview but not on your real number | Paige | You probably haven't deployed. Check the **Deploy** button for the orange dot |
+
+<Tip>
+  A quick test that separates the two: message your bot through [Paige Dev](/guides/testing). Paige Dev doesn't depend on your own WhatsApp number or your Meta account at all. If the bot behaves correctly there, your code is fine and the problem is on the Meta side of the connection.
+</Tip>
+
+## What this costs you in credits
+
+This is the question most people arrive with, so here is the plain answer.
+
+Credits meter **AI usage**, not actions. A longer or larger request uses more; a request that stops early uses less. Your balance is checked before a request starts and debited after it finishes — nothing is reserved up front.
+
+<Warning>
+  **A request that fails is still charged for the AI work it did before failing.** There is no refund. If the agent errors out halfway through a change, the part it had already done is billed.
+</Warning>
+
+What that means in practice:
+
+- **Asking the agent to fix its own mistake is a new, separately charged request.** There's no free retry.
+- **Pressing Stop stops further charges on that turn.** You pay for what it did, not for what it would have gone on to do. This is the one control you have over the cost of a run that's going wrong.
+- **Restoring a version costs nothing.** No AI is involved. Going back to a working version is always free.
+- **Deploying costs nothing.** Deploys come out of your subscription, not your credits.
+- **The [Help agent](/agents/help-agent) is free and always will be.** It bypasses your balance entirely, so it still answers when your credits have run out.
+
+Put together, those add up to one practical rule: **when a fix isn't working, restore instead of re-asking.** Restoring is free and immediate. A third attempt from a broken starting point is neither.
+
+<Note>
+  If your balance hits zero mid-problem, the Code and Conversations agents stop accepting new requests — a request already running is allowed to finish. The Help agent keeps working. See [Low-credit warning and zero-balance gating](/guides/billing#low-credit-warning-and-zero-balance-gating).
+</Note>
+
+## Work out what to do next
+
+Not everything that doesn't work is a bug, and the right channel depends on which of these it is.
+
+<CardGroup cols={2}>
+  <Card title="Ask the Help agent" icon="circle-help" href="/agents/help-agent">
+    When you're not sure how Paige itself works, or where a setting lives. It's free, so there's no reason not to ask first.
+  </Card>
+  <Card title="Ask the Code agent" icon="wrench" href="/agents/code-agent">
+    When your bot's behaviour is wrong. It can read your logs and change your code in the same conversation.
+  </Card>
+  <Card title="Report a bug" icon="bug">
+    When Paige does something it clearly shouldn't — a button that errors, a deploy that reports success wrongly. Use the **Feedback** button in the header, and say what you did and what happened.
+  </Card>
+  <Card title="Request a feature" icon="lightbulb" href="/guides/request-a-feature">
+    When Paige simply can't do the thing yet, and no amount of prompting will get you there. See [Requesting a feature](/guides/request-a-feature).
+  </Card>
+</CardGroup>
+
+The line between the last two is worth getting right, because it decides how fast you get an answer. **A bug is Paige doing something wrong.** **A feature request is Paige not doing something at all.** If you can't get the agent to build it because the capability isn't there, that's a request, not a bug.
+
+<RequestAFeature />
