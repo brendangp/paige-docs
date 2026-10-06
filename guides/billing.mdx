@@ -104,6 +104,21 @@ Your balance, a breakdown of which agent spent what, and your full history are i
 
 Credits don't pay for your bot talking to customers, deploys, or WhatsApp's own message costs. Those come from your subscription and from Meta respectively — [Message Costs](/guides/message-costs) prices what Meta charges you.
 
+### Message Costs: two checks that read your bot
+
+Looking at **Tools → Message Costs** is free. Two buttons in it use credits, because Paige reads your bot with AI to answer them:
+
+- **Estimate from my bot**, on the calculator's **Your bot** tab.
+- **Find savings in my bot**, on the **Send fewer messages** card — and **Apply**, when you let Paige make the changes it found.
+
+Each one tells you roughly how many credits it will use **before** you click, and shows how many it **actually used** afterwards. The savings check is switched off, with the reason, when the project doesn't have enough credits. All of them are charged even on a bring-your-own-key project, since your own key only covers your bot's replies.
+
+The results are saved for the project and shared with your team, so nobody pays again just to look at them. See [The Your bot tab](/guides/message-costs#the-your-bot-tab) and [Send fewer messages](/guides/message-costs#send-fewer-messages).
+
+<Note>
+  **Why isn't the rand figure in Message Costs worked out at R19?** R19 is what Paige charges for a credit. Message Costs shows **Meta's** charge, which Meta bills in US dollars, so it converts at the day's market exchange rate instead, with nothing added. See [Rand or dollars](/guides/message-costs#rand-or-dollars).
+</Note>
+
 <Warning>
   **A request that fails is still charged for the AI work it did before it failed**, and asking the agent again is a new request. [Troubleshooting](/guides/troubleshooting#what-this-costs-you-in-credits) covers what that means in practice and how to keep a run that's going wrong from costing more.
 </Warning>
@@ -238,6 +253,8 @@ The email comes from Paige with the subject **Your Paige invoice** and the invoi
 In **Payment History**, click **Download** next to a payment. The invoice saves to your computer or phone as a PDF named after its invoice number. On a phone each payment is its own card, with the **Download** button underneath.
 
 You can download the same invoice as many times as you like — it always shows the details it was issued with.
+
+A very long legal name, address or project name is shortened with an ellipsis (**…**) on the PDF so it fits the invoice. Your billing details themselves are saved in full.
 
 - A payment that is still **pending**, **failed** or was **cancelled** has no invoice, so it has no Download button.
 - A payment that has only just gone through may take a few minutes before its invoice appears.

@@ -144,6 +144,7 @@ Four error patterns cover most of what you'll find:
 A deploy rarely fails outright. Far more often it half-succeeds, and the message tells you which half.
 
 - **Deployed with warnings** — your code and table structure went live, but something named in the message didn't. Usually a flow Meta rejected, or a table change that couldn't be applied. Your live bot is running; the named part is just not updated. See [Deployed with warnings](/guides/deploy#deployed-with-warnings).
+- **Flows waiting on business verification** — your code and tables went live, but Meta won't publish flows until your business is verified. New flows were saved as drafts and flows that were already live keep their current version. If the warning says a flow was **taken offline** instead, customers can't open that flow until you're verified and deploy again. See [Flows waiting on business verification](/guides/deploy#flows-waiting-on-business-verification).
 - **Module not allowed** — your bot's code uses a building block that bots on Paige can't use. Nothing goes live and nothing is broken. The message names the file and the piece it objected to. Ask the agent to rewrite that bit with an allowed one, then deploy again.
 - **Deployed cleanly, but the live bot misbehaves** — switch your [logs](/guides/logs) to **Production**. That's your live bot's own account of what it did. If the new version is worse than the old one, [restore](/guides/version-history#restore-a-previous-version) and deploy again.
 
@@ -168,6 +169,20 @@ Some failures aren't Paige's to fix, and knowing which is which saves you a lot 
 <Tip>
   A quick test that separates the two: message your bot through [Paige Dev](/guides/testing). Paige Dev doesn't depend on your own WhatsApp number or your Meta account at all. If the bot behaves correctly there, your code is fine and the problem is on the Meta side of the connection.
 </Tip>
+
+## Questions about Message Costs
+
+<AccordionGroup>
+  <Accordion title="Is the Message Costs report my exact bill?" icon="receipt">
+    No. It's an **estimate** Paige works out from your message history, and Meta's invoice is the bill. It tends to come out a little high — Click-to-WhatsApp ad conversations are free for 72 hours and Paige can't see that, for example. See [The report is an estimate, not your bill](/guides/message-costs#the-report-is-an-estimate-not-your-bill).
+  </Accordion>
+  <Accordion title="Why is the rand figure different from R19 to the dollar?" icon="banknote">
+    R19 is what Paige charges for a credit. Message Costs shows Meta's charge, so it converts at the current market exchange rate, refreshed once a day, with nothing added. The rate it used is shown under the **USD / ZAR** switch. Your bank may still add its own fees when it pays a dollar bill. See [Rand or dollars](/guides/message-costs#rand-or-dollars).
+  </Accordion>
+  <Accordion title="Apply says Paige is already applying changes" icon="hourglass">
+    Only one Apply runs on a project at a time, across your whole team. Wait for the one that's running to finish, then try again — including when a teammate has just re-run the audit and you're looking at fresh suggestions. See [Your findings are saved with the project](/guides/message-costs#your-findings-are-saved-with-the-project).
+  </Accordion>
+</AccordionGroup>
 
 ## What this costs you in credits
 

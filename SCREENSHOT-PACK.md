@@ -246,7 +246,7 @@ a capture-kit ticket instead:
 | Multi-select consent screen | `guides/connect-an-agent.mdx` |
 | Connected agents card | `guides/connect-an-agent.mdx` |
 | **Tools → Message Costs** as it opens | `guides/message-costs.mdx` |
-| The real-traffic cost report headline | `guides/message-costs.mdx` |
+| The real-traffic cost report headline (month switch, free-messages lines, Broadcasts / Running your bot) | `guides/message-costs.mdx` |
 | Code Agent sidebar mid-build | `guides/prompting.mdx` |
 | **Deploy** with the pending-changes dot | `guides/troubleshooting.mdx` |
 | **Forgot password?** on the sign-in page | `quickstart.mdx` |
