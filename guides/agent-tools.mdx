@@ -50,7 +50,7 @@ This is the group that lets an agent change your bot.
 | `read_file` | Reads one file's contents. | `code:read` |
 | `edit_file` | Makes an exact, known edit to one file — replacing its contents, or swapping one specific string for another. | `code:write` |
 | `build_code` | Takes a plain-English description of a change and hands it to **Paige's own Code Agent**, which works out the edit and writes it. Costs credits. | `code:write` |
-| `deploy` | Promotes the current code to production, so the changes go live on your WhatsApp number. | `code:write` |
+| `deploy` | Promotes the current code to production, so the changes go live on your WhatsApp number. If a flow couldn't be published because your business isn't verified with Meta, the result says so per flow, including whether a flow that was live is [now offline](/guides/deploy#flows-waiting-on-business-verification). | `code:write` |
 
 ### `build_code` versus `edit_file`
 

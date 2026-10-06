@@ -35,7 +35,7 @@ Two WhatsApp numbers are involved in every flow, and knowing which does what exp
 
 **Paige Dev** is a WhatsApp number Paige shares with everyone. Every flow you create or change is published to it automatically, which is what makes a flow testable on day one. It's also the validation gate: Meta checks the flow when it lands on Paige Dev, so an invalid flow is caught there and never reaches your own number.
 
-**Your own number** is where customers meet the flow. A flow only gets there when you deploy it, and only your number can send it to a real customer.
+**Your own number** is where customers meet the flow. A flow only gets there when you deploy it — and Meta only publishes it once your [business is verified](#publishing-needs-a-verified-business) — and only your number can send it to a real customer.
 
 You'll see this reflected in the detail pane:
 
@@ -59,7 +59,7 @@ What you can check on each number differs:
     Every screen, every input, the branching, and the data your bot receives on submit. This is enough to sign off the flow itself. Messages run against your **preview** copy, so nothing touches live data.
   </Card>
   <Card title="On your own number" icon="badge-check">
-    The real thing, end to end: the flow arriving from your own business number, in a real customer conversation, writing to your live data. Only available after you deploy.
+    The real thing, end to end: the flow arriving from your own business number, in a real customer conversation, writing to your live data. Only available after you deploy, and only once your business is verified with Meta.
   </Card>
 </Columns>
 
@@ -68,6 +68,18 @@ What you can check on each number differs:
 **[Deploy](/guides/deploy) is how you publish.** Tick the flow in the deploy dialog and Paige registers it on your WhatsApp number and publishes it in one step — that's the path for a brand-new flow and for pushing changes to a live one. Deploy works out what needs doing from where the flow currently stands, so there's nothing else to choose.
 
 The **Publish** button in the Flows tab is narrower than it looks. It only appears for a flow that's already on your number and sitting in draft. A LOCAL flow has no **Publish** button, because there's nothing on your number to publish yet.
+
+### Publishing needs a verified business
+
+**Your business must be verified with Meta before flows can go live on your own number.** WhatsApp lets an unverified business create and edit flows, but it won't *publish* them.
+
+If your business isn't verified yet, Deploy still puts your code and tables live and still saves each flow as a draft on your WhatsApp account. It skips only the publish step, and tells you verification is the reason. A flow that was already live stays on its current live version rather than being taken offline. Clicking **Publish** on a flow in the Flows tab tells you the same thing.
+
+Deploy shows one warning — **flows waiting on business verification** — listing the flows it held back, with a **Get verified** button. Deploying again won't change the result until verification is done, and Paige doesn't publish automatically when it comes through: you click **Deploy** again.
+
+Testing on Paige Dev isn't affected, so you can keep building and testing while you wait.
+
+See [Verifying your business](/whatsapp-setup#verifying-your-business) for how to get verified, and [Flows waiting on business verification](/guides/deploy#flows-waiting-on-business-verification) for the one case where a refused update takes a live flow offline.
 
 <Note>
   A flow with validation errors won't publish. The errors are listed in the flow's detail pane — ask Paige in the chat to fix them and it will re-run the flow through Meta's validation.

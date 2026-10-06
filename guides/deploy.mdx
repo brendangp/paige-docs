@@ -87,13 +87,52 @@ Anything you leave unticked is left exactly as it is on your live number. You do
 
 If your project has no tables and no flows, the dialog says so and deploying just updates your code, files, and table structure.
 
+### Flows need a verified business
+
+**Your business must be verified with Meta before flows can go live on your own number.** WhatsApp lets an unverified business create and edit flows, but it won't *publish* them.
+
+A deploy doesn't fail because of that. It does everything it can, then tells you what it couldn't:
+
+- Your **code and tables go live** as normal.
+- Each flow you ticked is still **saved as a draft** on your WhatsApp account. Paige skips the publish step and tells you verification is the reason, rather than failing with a confusing error.
+- A flow that was **already live stays on its current live version** rather than being taken offline.
+- It still counts as your **first deploy** in the getting-started checklist, because the rest of the deploy did go live.
+
+Deploying again won't change the result until verification is done. Finish business verification in Meta Business Manager — it can take a few days — then click **Deploy** again. Paige doesn't publish automatically when verification comes through. In the meantime you can keep testing your flows on the [Paige Dev](/guides/testing) number, which isn't affected.
+
+How to get verified, and where to check your status, is covered in [Verifying your business](/whatsapp-setup#verifying-your-business).
+
 ## Deployed with warnings
 
 Publishing a flow means handing it to Meta for validation, and Meta can reject it. When that happens you'll get a red **Deployed with warnings — 1 flow didn't publish** message naming the flow and the reason.
 
-This is a partial success, not a failure. Your code and table structure went live; the named flows didn't. The most common causes are a flow that breaks one of Meta's structural rules, or selecting flows to publish before your WhatsApp number is connected.
+This is a partial success, not a failure. Your code and table structure went live; the named flows didn't. The most common causes are a flow that breaks one of Meta's structural rules, or selecting flows to publish before your WhatsApp number is connected. A business that isn't verified with Meta yet is reported differently — see [Flows waiting on business verification](#flows-waiting-on-business-verification).
 
 Your pending count drops by however many flows actually published, so a flow that didn't make it keeps its badge. That's deliberate — the badge is telling you something is still not live.
+
+### Flows waiting on business verification
+
+Flows held back because your business isn't verified get their own warning instead: **flows waiting on business verification**, listing the flows Paige held back. It stays on screen until you close it, and its **Get verified** button takes you to **Settings → WhatsApp**, where the **Get verified** button next to your Business Verification status opens Meta Business Manager.
+
+Nothing is broken when you see it. Your code and tables deployed, new flows were saved as drafts, and flows that were already live keep their current version. See [Flows need a verified business](#flows-need-a-verified-business).
+
+<Warning>
+  **One case does take a live flow offline.** If Paige couldn't confirm your verification status when you deployed, it goes ahead and sends your update to a live flow — and if Meta then refuses to publish it, that flow is left as a draft. The warning reads **flow taken offline: business not verified** and names the flow under **Offline**. Customers can't open it until your business is verified and you deploy again.
+
+  A deploy that takes a live flow offline doesn't count as your first deploy in the getting-started checklist.
+</Warning>
+
+If you deploy over the [Paige API](/api-reference/introduction) or from a connected AI agent, the same thing is reported per flow in the deploy response: each held-back flow carries the code `BUSINESS_UNVERIFIED` and a `state` saying what that flow is on your number now.
+
+| `state` | What it means |
+|---|---|
+| `draft` | A flow that wasn't live yet. It was saved as a draft and customers can't open it until it's published. |
+| `live_unchanged` | A live flow whose update was skipped. Its current live version keeps serving customers. |
+| `live_offline` | A flow that **was** live and no longer is. The update reached Meta, the publish was refused, and customers can't open the flow until your business is verified and you deploy again. |
+
+Deploying again won't help until the business is verified, so don't retry in a loop.
+
+### Tables
 
 You get the same **Deployed with warnings** message when a **table** couldn't be updated in production. It names the tables and says which half of the job failed:
 
