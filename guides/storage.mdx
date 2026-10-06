@@ -32,8 +32,16 @@ That's the wrong thing for a **blank quote form, a contract, or a booking sheet*
 
 Paige keeps the original exactly as you uploaded it, so it can fill it in later. See [Documents your bot builds](/guides/documents).
 
+### Files your bot only sends
+
+Choose **Sent by the bot** for a file you only ever want to send — a brochure, a menu, an event pack. Paige stores it and registers it with WhatsApp so it can be sent, but doesn't add its contents to what your bot knows, so it takes up no knowledge-base space.
+
+**Files you upload as a [broadcast header](/guides/broadcasts#building-a-broadcast) are saved this way automatically.** A picture, video or PDF you attach in the broadcast wizard is send-only, and never becomes part of your bot's knowledge.
+
+If you want a file sent **and** used as knowledge, choose **More than one of these** instead.
+
 <Warning>
-  **Choose this at upload time.** You can change a file to **Template to fill in** afterwards from its card, and Paige will clean up the knowledge document it had already written — but by then it has already read the file to produce it. Picking it up front is the cheaper path, and for an image it avoids an AI description you didn't need.
+  **Choose this at upload time.** Switching an existing file to **Sent by the bot** later doesn't remove what your bot already learned from it. You can change a file to **Template to fill in** afterwards from its card, and Paige will clean up the knowledge document it had already written — but by then it has already read the file to produce it. Picking it up front is the cheaper path, and for an image it avoids an AI description you didn't need.
 </Warning>
 
 ## Bot-facing names
@@ -61,7 +69,7 @@ Paige works out from the file whether that's an image or a document — you don'
 Each file in the grid has:
 
 - **A caption** you can set, sent alongside the file by default.
-- **How Paige uses it** — *knowledge*, *flow*, *runtime*, *multi*, or *template*. The first four are labels for your own benefit, to help you keep a large library straight; they don't change how the file behaves. **Template is different** — it's the one that changes what Paige does with the file, as described above.
+- **How Paige uses it** — *knowledge*, *flow*, *runtime*, *multi*, or *template*. Two of them change what Paige does with the file's contents, as described above: **template** (a document Paige fills in) and **runtime** (a file your bot only sends). Neither is added to what your bot knows. The others help you keep a large library straight.
 - **Download**, to get the original back.
 - **Rename**, to change the bot-facing name.
 - **Delete**.
