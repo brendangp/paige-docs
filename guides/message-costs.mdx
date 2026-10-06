@@ -1,0 +1,202 @@
+---
+title: "What WhatsApp charges you for the messages your bot sends"
+sidebarTitle: "Message Costs"
+description: "Tools → Message Costs shows Meta's per-message fee on your own traffic, before and after the 1 October 2026 pricing change — a calculator that works with no history, an estimate read from your bot, a report from your real messages, and an audit that finds places to send fewer."
+---
+
+**Tools → Message Costs** answers one question: what does WhatsApp cost you, and what will it cost you from **1 October 2026**?
+
+This is **Meta's** charge for sending WhatsApp messages, billed by Meta directly to your own connected number. It is separate from your [Paige subscription and your credits](/guides/billing), and Paige doesn't add anything on top of it.
+
+<Note>
+  Messages your customers send **to** you are always free. Meta charges for messages your business sends.
+</Note>
+
+{/* TODO: Tools → Message Costs as it first opens on a project with no message history — the calculator, with the Estimate from my bot button above it. The real-traffic before/after headline is a separate slot further down this page. Capture kit, not hand-shot; NOT part of GRE-434. */}
+
+## What changes on 1 October 2026
+
+Two things, and they affect almost every bot.
+
+<Steps>
+  <Step title="Replies inside an open chat start costing money">
+    When a customer messages you, you have 24 hours to reply freely. Meta calls those replies **service messages**. Until 1 October they are free. From 1 October they are charged — except that every WhatsApp number gets **1,000 free service messages a month**.
+
+    The allowance resets on the 1st of each month, unused messages **don't roll over**, and it only covers service messages.
+  </Step>
+  <Step title="Utility templates lose their free pass">
+    **Utility** templates — order updates, reminders, receipts — used to be free when sent while a chat was open. From 1 October they're charged like any other utility template.
+
+    The 1,000 free service messages **don't** cover them.
+  </Step>
+</Steps>
+
+In a few countries the per-message rates move as well. Most countries' template rates don't change at all. See [Rates for your market](#rates-for-your-market) for the figures that apply to you.
+
+## Your cost grows with messages, not with customers
+
+This is the most useful thing to understand, because it's the part you can change.
+
+Meta charges for **each message your bot sends**, not for each person you talk to. Two bots with the same customers can have very different bills if one sends three messages where one would do.
+
+<Tip>
+  That's exactly what the **Send fewer messages** card is for — see [Send fewer messages](#send-fewer-messages).
+</Tip>
+
+## Using the calculator
+
+The calculator needs no connected number and no message history. It works for every project, including self-hosted ones.
+
+Pick where your customers are, then fill in a few numbers:
+
+- How many people you message each month.
+- How many conversations each person has.
+- How many messages your bot sends per conversation.
+- How many of those are templates.
+- What share of your templates are marketing.
+- What share of your utility templates go out while the chat is open.
+
+The result shows your monthly bill **on the old rates next to the new ones**, broken down into marketing, utility and service messages. It also tells you whether the 1,000 free service messages cover you, and at roughly how many people a month they run out.
+
+<Note>
+  A small bot can come out at **R0**. That's a real answer, not a mistake.
+</Note>
+
+## Estimate from your bot, before you go live
+
+If your bot hasn't sent any messages yet there's nothing to measure — and *"how many messages does my bot send per conversation?"* isn't a question you can easily answer yourself. So above the calculator, Paige offers to work it out for you.
+
+Click **Estimate from my bot**. Paige reads your [flows](/guides/flows/overview) first, then your bot's code, and lists each **journey** a customer can take — for example *"Book an appointment: 4 messages per person"* — split into template messages and service messages. Each figure says which file it came from, so you can check it.
+
+Then you move **one slider**: how many people message you each month. By default people are split evenly across the journeys. Change a journey's **Share of people** if you expect most people to take one path, or press **Split evenly** to go back.
+
+<Warning>
+  Running the estimate uses a small amount of your [Paige credits](/guides/billing#ai-credits), because Paige reads your bot with AI. The button tells you roughly how much before you click. It's charged even on a bring-your-own-key project, since your own key is only for your bot's replies.
+</Warning>
+
+It only reads your bot — it never changes anything. The estimate is kept on this device, so you can come back to it without paying again; click **Estimate again** after you change your bot.
+
+If your project has no flows and no bot code yet, or Paige can't find a path that sends messages, it says so and points you to the calculator instead of guessing. It never shows a made-up R0.
+
+<Note>
+  Once your bot has real messages this estimate is no longer shown for that project, because real usage is a better guide.
+</Note>
+
+## Your costs from real traffic
+
+When your bot has sent or received messages, the estimate is replaced by a report worked out from your **own** message history. It can take a few seconds to appear, because Paige reads every message from the last three months.
+
+At the top is a single month — the last full month, or this month so far if your bot has already sent more messages this month. It's shown as what those messages cost under the rules in force that month, next to what the **same** messages would cost under the rules from 1 October 2026, with the difference in brackets.
+
+{/* TODO: screenshot of the cost report headline showing this month's cost beside the 1 October cost. Capture kit, not hand-shot; NOT part of GRE-434. */}
+
+Underneath you'll find:
+
+| What it shows you | Why it's there |
+|---|---|
+| **Messages free today, charged from 1 October** | The change, counted in your own traffic: service replies past the 1,000 free a month, and utility templates sent while a chat was open. |
+| **Service messages against the free allowance** | Whether your replies fit inside the 1,000 free service messages. If they do, it says so, and those replies cost R0. |
+| **By type of message** | How many marketing, utility, authentication and service messages you sent. Marketing templates usually cost several times more than utility ones. |
+| **By country you message** | Meta charges on the country of the person you message, so if you message across borders this shows where the money goes. |
+| **Last three months** | Each month's cost today next to the same month on the new rules, so you can see whether that month was typical. The current month is marked **so far**. |
+
+### The report is an estimate, not your bill
+
+It's labelled **Estimate** because Paige works it out from your messages. It isn't Meta's invoice.
+
+It will come out **high** if you run Click-to-WhatsApp ads, because messages that start from those ads are free for 72 hours and Paige can't see that from your history. Meta also skips some charges without saying why, which pushes it high too.
+
+- If Paige can't tell what kind of template a message was — a template that isn't in your template list any more, for instance — it counts it as **unclassified**, lists it by name where it can, and shows the range it *could* add. **That range is never included in the totals.** The same goes for messages sent outside an open chat.
+- Where Meta's own pricing data is available for some messages, those are shown separately as **measured by Meta**, next to the part Paige worked out.
+- If the report says it's **incomplete**, your history was too big to read in one go and the real figures are **higher** than shown.
+- If your template list couldn't be loaded, templates show as unclassified until you refresh.
+
+**Refresh** re-reads your history. Refresh a lot in a few minutes and Paige asks you to wait before trying again.
+
+<Note>
+  This report isn't available for self-hosted projects, because your messages are stored in your own database. Use the calculator instead.
+</Note>
+
+## Send fewer messages
+
+The **Send fewer messages** card finds the places your bot sends more messages than it needs to — two messages in a row that could be one, or a *"One moment please…"* that tells the customer nothing.
+
+Click **Find savings in my bot** and Paige reads your bot and lists what it found. Each item says what your bot does now, what Paige suggests instead, how many fewer messages each person would get, and the exact file and line it's about. If your bot is already lean, Paige says so rather than inventing changes.
+
+<Steps>
+  <Step title="Tick the changes you agree with">
+    Up to five at a time, then press **Apply**.
+  </Step>
+  <Step title="Read the confirmation">
+    It lists exactly what will change and tells you roughly how many credits it will use.
+  </Step>
+  <Step title="Review and deploy">
+    Press **Review the changes** to open the Code tab and check them, then [deploy](/guides/deploy) when you're happy.
+  </Step>
+</Steps>
+
+<Warning>
+  **Paige only edits your preview bot.** Your live bot doesn't change until you look over the edits and deploy as usual. Finding savings and applying them both use your Paige credits, including on bring-your-own-key projects.
+</Warning>
+
+Paige never removes information your customers need — a price, a booking reference, a payment link, an opt-out instruction. It only merges it into another message.
+
+Afterwards you see what happened to **each** change: **Applied**, **Skipped** or **Failed**. Some being skipped is normal — you may have edited that part of your bot since the audit ran (run it again for fresh suggestions), or Paige looked and decided the change wasn't safe to make.
+
+<Note>
+  Suggestions to turn a question-by-question conversation into a [WhatsApp Flow](/guides/flows/overview) are shown as advice only and can't be ticked yet. Ask for that change in the chat if you want it.
+</Note>
+
+## Rates for your market
+
+Below the calculator is the per-message price for each kind of message **in the country you picked**, before and after 1 October 2026.
+
+Those in-app figures are the ones to go by: they come from Meta's published rate card and are updated without waiting on a Paige release. Rates are charged on **the country of the person you message**, not yours.
+
+As a worked example, here is Meta's rate card for **South Africa**, in US dollars per message delivered:
+
+| Kind of message | Before 1 Oct 2026 | From 1 Oct 2026 |
+|---|---|---|
+| Marketing | $0.0379 | $0.0379 |
+| Utility | $0.0076 | $0.0095 |
+| Authentication | $0.0076 | $0.0095 |
+| Authentication — international | $0.02 | $0.02 |
+| Service | Not charged | $0.0095 |
+
+<Warning>
+  **Those figures are South Africa's, on that rate card, and nothing else.** They are an example of the shape of the change — utility and authentication up 25%, marketing flat, service priced for the first time — not a universal rate. Check your own market in the app before you plan around a number.
+</Warning>
+
+Two things the table doesn't show:
+
+- **Not available in this market** means Meta doesn't offer that kind of message there. That is different from it being free.
+- **Not charged** is what service messages show before 1 October, because they were genuinely free until then.
+
+### Volume discounts
+
+Very large senders get a volume discount from Meta on **utility and authentication** messages from 1 October, and the figures in the app take it into account. In South Africa the utility discount starts at **100,000 utility messages a month**; the threshold differs by country and by kind of message. Marketing and service messages have **no** volume discount.
+
+<Note>
+  Which is why consolidating your support traffic is the one lever a high-volume sender has — service messages stay at full list price however many you send.
+</Note>
+
+## Rand or dollars
+
+Use the **USD / ZAR** switch at the top of the section. Meta bills in US dollars; the rand figures are estimates at a fixed **R19 to $1** — the rate Paige bills at — so they won't match the day's exchange rate exactly.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Usage & billing" icon="credit-card" href="/guides/billing">
+    What you pay Paige: the subscription, AI credits, and your invoices. Separate from everything on this page.
+  </Card>
+  <Card title="Broadcasts" icon="megaphone" href="/guides/broadcasts">
+    Free to run on Paige. The cost shown in the wizard is Meta's messaging fee on your own number.
+  </Card>
+  <Card title="Message types" icon="message-circle" href="/learn/message-types">
+    What marketing, utility, authentication and service messages actually are, and when each one applies.
+  </Card>
+  <Card title="Adding a payment method on Meta" icon="shield-check" href="/whatsapp-setup#adding-a-payment-method-on-meta">
+    Meta charges your business directly, so it needs a payment method before those messages can send.
+  </Card>
+</CardGroup>

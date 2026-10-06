@@ -78,7 +78,7 @@ Produce concrete `Edit` operations for each affected page. Surgical, not rewrite
 
 - **User-facing voice.** Present tense, second person ("you can …"), no implementation jargon ("the service", "the route handler", "JSON column").
 - **Match heading hierarchy.** If the page uses `## Section` then `### Subsection`, mirror that depth. Don't introduce a new H1 mid-page.
-- **Screenshot placeholders.** Mark missing images as `<!-- TODO: screenshot of <what> -->` rather than inventing image paths. The user can fill them in later.
+- **Screenshot placeholders.** Mark missing images as `{/* TODO: screenshot of <what> */}` rather than inventing image paths. The user can fill them in later. **Always the MDX comment form `{/* … */}`, never an HTML comment `<!-- … -->`** — HTML comments break the Mintlify build.
 - **Examples grounded in the diff.** Code samples must reflect the actual API/UI shape after the parent PR. No speculative parameters.
 - **Append a one-liner to `changelog.mdx`** for any user-visible feature. Format: a single bullet under the latest release section (or a new dated section if none matches today).
 
