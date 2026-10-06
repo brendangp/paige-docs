@@ -3563,7 +3563,7 @@
           "Contacts"
         ],
         "summary": "Update a contact name, tags or custom attributes",
-        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Tag names are normalised at write time**: trimmed, **lower-cased**, and truncated to 64 characters. Tag matching everywhere else (segments, broadcast audiences) is exact and case-sensitive, so `VIP` and `vip` are the SAME tag and are both stored as `vip`. Each tag array is capped at **25** entries; a longer array is `400 invalid_request`.\n\n**Required scope:** `contacts:write`",
+        "description": "`{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. Tags accept a full-replacement array or an `{ add, remove }` delta; attributes merge (a `null` value deletes the key).\n\n**At least one of `name`, `tags` or `attributes` is required** — enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`. An `{ add, remove }` tag delta must itself carry a non-empty `add` or `remove` array.\n\n**Tag names are normalised at write time**: trimmed, **lower-cased**, and truncated to 64 characters. Tag matching everywhere else (segments, broadcast audiences) is exact and case-sensitive, so `VIP` and `vip` are the SAME tag and are both stored as `vip`. Each tag array is capped at **25** entries; a longer array is `400 invalid_request`.\n\n**`400 TAGS_COLUMN_MISSING`** — the request named `tags` but this project's `contacts` table has no `tags` column (a lean self-hosted backend; `tags JSONB` is required of a compliant one). Nothing is written, not even a `name` sent in the same request. A request that does not mention `tags` is unaffected.\n\n**Side effect:** a write that touches `tags` publishes a `contacts_changed` event to the project's dashboard subscribers, so an open Paige dashboard reflects it without a refresh. The response is unchanged, and a `name`- or `attributes`-only write publishes nothing.\n\n**Required scope:** `contacts:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4558,7 +4558,7 @@
           "Build"
         ],
         "summary": "Promote dev to production",
-        "description": "Copies the dev working copy to production (dev → production) and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**`require_warnings` is advisory, never fatal.** It reports relative `require()` calls in the promoted code that resolve to no file in the project. The deploy still succeeded and the code was promoted exactly as sent — but a warning with `load_time_reachable: true` means the bot worker will throw at init and answer no inbound message at all.\n\n**Required scope:** `code:write`",
+        "description": "Copies the dev working copy to production (dev → production) and syncs table structure. Table DATA and flow publishing are opt-in via `tables` / `flows`.\n\n**No field is required** — an empty body `{}` is a valid, complete request: it promotes the code and syncs table structure without copying any rows or publishing any flows. This one genuinely takes an empty body, unlike the other all-optional-looking bodies on this API.\n\nA deploy can partially succeed: table and flow failures are collected rather than thrown, so check `table_sync_failed` / `flows_failed` and the matching error arrays on a `200` rather than assuming success.\n\n**Structure sync is additive here, deliberately.** It creates missing tables and adds missing columns; it never drops anything. The dashboard deploy dialog has a separate, unticked opt-in for removing a table or column that no longer exists in staging (GRE-772) — that opt-in is intentionally NOT exposed on this endpoint or the MCP `deploy` tool, because dropping a production table is irreversible and needs a human tick rather than an API key. Do not treat the asymmetry as an inconsistency to fix.\n\n**`require_warnings` is advisory, never fatal.** It reports relative `require()` calls in the promoted code that resolve to no file in the project. The deploy still succeeded and the code was promoted exactly as sent — but a warning with `load_time_reachable: true` means the bot worker will throw at init and answer no inbound message at all.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4643,6 +4643,14 @@
                           "type": "number",
                           "description": "Count of tables whose structure was synced."
                         },
+                        "sequences_repaired": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "Report-only (GRE-779). Each entry (`table`, `column`, `sequence`) names a production custom-table primary key whose auto-increment default was missing or pointed at a sequence outside `public`, and which this deploy repaired so inserts that omit the id succeed again. A non-empty list NEVER means the deploy failed — it is the opposite, and these are deliberately kept OUT of `table_errors`. The pass is always-on, needs no request field, and skips base tables and `wp_*` synced tables."
+                        },
                         "rows_copied": {
                           "type": "number",
                           "description": "Rows copied for the tables named in `tables`. 0 when data copy was not requested."
@@ -4667,9 +4675,42 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Name of the flow that was not published."
+                              },
+                              "message": {
+                                "type": "string",
+                                "description": "Human-readable reason. Safe to show a user."
+                              },
+                              "code": {
+                                "type": "string",
+                                "enum": [
+                                  "BUSINESS_UNVERIFIED"
+                                ],
+                                "description": "Machine-readable reason, when one is known (GRE-592). `BUSINESS_UNVERIFIED` means Meta will not publish flows until the WhatsApp Business Account’s business is verified in Meta Business Manager: the publish was skipped (or refused), and code and tables deployed normally. What the flow is on the connected number afterwards is in `state` — read it rather than assuming: a refused update can take an already-live flow OFFLINE. Absent for any other failure. More codes may be added — treat an unrecognised code like an absent one."
+                              },
+                              "retryable": {
+                                "type": "boolean",
+                                "description": "Present alongside `code`. `false` means redeploying will fail identically until the account state changes — do not retry in a loop."
+                              },
+                              "state": {
+                                "type": "string",
+                                "enum": [
+                                  "draft",
+                                  "live_unchanged",
+                                  "live_offline"
+                                ],
+                                "description": "Present alongside `code: BUSINESS_UNVERIFIED`: what the flow is on the connected number after this deploy. `draft` — a flow that was not live yet; it exists as a DRAFT and customers cannot open it. `live_unchanged` — an already-live flow whose update was skipped BEFORE anything was sent to Meta; the previous live version is still serving customers. `live_offline` — an already-live flow whose update reached Meta and was then refused at publish: sending the update reverted it to DRAFT, so it is NO LONGER available to customers until the business is verified and the project is deployed again. Only `live_unchanged` means customers can still open the flow. More states may be added — treat an unrecognised one as not available."
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "message"
+                            ]
                           },
-                          "description": "Per-flow publish failures."
+                          "description": "Per-flow publish failures, one entry per affected flow."
                         },
                         "flows_failed": {
                           "type": "boolean",
@@ -4689,6 +4730,7 @@
                         "files_count",
                         "tables_created",
                         "tables_synced",
+                        "sequences_repaired",
                         "rows_copied",
                         "table_errors",
                         "table_sync_failed",
@@ -6270,7 +6312,7 @@
           "Broadcasts"
         ],
         "summary": "Assemble a broadcast for approval",
-        "description": "**Assembly NEVER sends.** Guardrail: an assembled broadcast ALWAYS lands in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Beyond `name`, a valid call needs two things the schema below cannot mark required** (they are checked by the assembler, which reports failures as `400`):\n\n- **A template** — `template_name` (with `template_language`) or `template_id`. It must already be APPROVED by Meta.\n- **An audience** — either a saved `segment_id`, or an inline filter built from `opted_in` / `tags` / `clicked`. An audience that resolves to zero contacts is rejected.\n\nAlso supply `variable_mapping` whenever the template has variables; a mapping that does not match the template is rejected. `schedule` is genuinely optional — omit it to assemble for immediate approval.\n\n**Required scope:** `broadcasts:manage`",
+        "description": "**Assembly NEVER sends.** Guardrail: an assembled broadcast ALWAYS lands in `pending_approval` and can only go out via the dashboard approve flow. A MARKETING template requires an opted-in audience.\n\n**Beyond `name`, a valid call needs two things the schema below cannot mark required** (they are checked by the assembler, which reports failures as `400`):\n\n- **A template** — `template_name` (with `template_language`) or `template_id`. It must already be APPROVED by Meta.\n- **An audience** — either a saved `segment_id`, or an inline filter built from `opted_in` / `tags` / `clicked`. An audience that resolves to zero contacts is rejected.\n\nAlso supply `variable_mapping` whenever the template has variables; a mapping that does not match the template is rejected. `schedule` is genuinely optional — omit it to assemble for immediate approval.\n\n**A self-hosted project must be sent an audience its OWN backend can express (GRE-741).** A saved segment whose only criterion is hand-picked contacts (`include_ids`) is refused with `400 PICKS_ONLY_UNSUPPORTED` unless that backend advertised the `include_only` flag on its `broadcast_capabilities` handshake — the contract reads `include_ids` as a union on top of the filter, so \"only these three\" would otherwise reach the whole contact list. A multi-segment union is refused with `400 MULTI_SEGMENT_UNSUPPORTED` (not reachable through this endpoint today, which takes a single `segment_id`). Both are the SAME refusal, with the same wording, that the dashboard applies at create and update, and both are decided here at write time rather than left to fail at dispatch days later. VM-hosted projects are unaffected.\n\n**Required scope:** `broadcasts:manage`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -8539,7 +8581,7 @@
           "Media"
         ],
         "summary": "Upload a media asset",
-        "description": "Stores one file against the project, registers it with Meta for sending, and returns the `slug` your bot resolves it by at runtime (`sendMedia(to, \"<slug>\")` / `getMediaId(\"<slug>\")`). Write the slug into a table row with `POST /v1/tables/{table}/rows` and the bot can send the asset later without ever touching the dashboard.\n\n**Three transports, pick one.** Every one of them needs the file itself:\n\n- `multipart/form-data` with a single part named **`file`**, plus optional `name` and `caption` text fields. Up to **20 MB**.\n- JSON `{ \"source_url\": \"https://...\" }` — Paige downloads it for you. Up to **20 MB**. Only public http(s) URLs: private, loopback, link-local and other reserved addresses are refused (`400 blocked_source_url`), redirects are re-checked at every hop and capped, and a non-http(s) scheme is `400 invalid_source_url`. Add `filename` / `mime` to override what the remote server declares.\n- JSON `{ \"data\": \"<base64>\", \"filename\": \"...\", \"mime\": \"...\" }` — inline bytes, capped at **8 MB decoded**, lower than the other two on purpose: base64 costs about 4/3 in transit and is buffered whole in memory, so large files belong on multipart or `source_url`. A `data:` URI prefix is accepted and stripped.\n\n**`name` is the slug.** Send it to choose the bot-facing name; omit it and the filename is used. It is normalized to lowercase letters, digits and hyphens. **A slug that already exists is `409 SLUG_EXISTS`** — it is never overwritten, because the existing asset may already be referenced by deployed code or a published flow.\n\n**Meta registration is best-effort, and the response tells you the truth about it.** `media_id` is `null` and `meta_status` is `\"pending\"` when the file was stored but not registered (typically because no WhatsApp number is connected). The asset is still usable and Paige retries registration on a schedule; a failed register is never reported as a success. `meta_status` is `\"expired\"` once the id passes Meta's 30-day lifetime.\n\n**Size and type.** Oversize is `413 file_too_large`; a type Paige cannot ingest is `415`; an empty file is `400`. Images, video, audio, PDF, DOCX, plain text and markdown are accepted.\n\n**Uploading an image costs credits.** Paige runs one AI vision call per image to write the knowledge description your bot answers from, and that call is billed to the project like any other AI usage — it shows up in Usage alongside builds. Out of credits is `402 insufficient_credits`. Send `describe_image: false` to skip it: the file is still stored, still registered with Meta and still usable, it just gets no AI-written description and costs nothing. Non-image uploads (PDF, DOCX, text) use no AI at all and are always free.\n\n**Two limits apply beyond the per-request throttle.** Uploads are metered by BYTES as well as by request count, so a burst of large files can return `429 rate_limited` even while you are inside the request-per-minute budget — retry after the window or upload in smaller batches. And each project has a total media storage ceiling: an upload that would exceed it is refused with `413 storage_limit_exceeded` rather than quietly succeeding. `GET /v1/media` reports `storage.used_bytes` / `storage.remaining_bytes` so you can check before you push.\n\nSend an `Idempotency-Key` header to make a retry safe. The fingerprint covers the **file bytes**, so retrying the same upload replays the original response, while reusing the key for a *different* file is `409 idempotency_key_mismatch` rather than a silently-dropped upload.\n\n**Required scope:** `media:write`",
+        "description": "Stores one file against the project, registers it with Meta for sending, and returns the `slug` your bot resolves it by at runtime (`sendMedia(to, \"<slug>\")` / `getMediaId(\"<slug>\")`). Write the slug into a table row with `POST /v1/tables/{table}/rows` and the bot can send the asset later without ever touching the dashboard.\n\n**Three transports, pick one.** Every one of them needs the file itself:\n\n- `multipart/form-data` with a single part named **`file`**, plus optional `name` and `caption` text fields. Up to **20 MB**.\n- JSON `{ \"source_url\": \"https://...\" }` — Paige downloads it for you. Up to **20 MB**. Only public http(s) URLs: private, loopback, link-local and other reserved addresses are refused (`400 blocked_source_url`), redirects are re-checked at every hop and capped, and a non-http(s) scheme is `400 invalid_source_url`. Add `filename` / `mime` to override what the remote server declares.\n- JSON `{ \"data\": \"<base64>\", \"filename\": \"...\", \"mime\": \"...\" }` — inline bytes, capped at **8 MB decoded**, lower than the other two on purpose: base64 costs about 4/3 in transit and is buffered whole in memory, so large files belong on multipart or `source_url`. A `data:` URI prefix is accepted and stripped.\n\n**`name` is the slug.** Send it to choose the bot-facing name; omit it and the filename is used. It is normalized to lowercase letters, digits and hyphens. **A slug that already exists is `409 SLUG_EXISTS`** — it is never overwritten, because the existing asset may already be referenced by deployed code or a published flow.\n\n**Meta registration is best-effort, and the response tells you the truth about it.** `media_id` is `null` and `meta_status` is `\"pending\"` when the file was stored but not registered (typically because no WhatsApp number is connected). The asset is still usable and Paige retries registration on a schedule; a failed register is never reported as a success. `meta_status` is `\"expired\"` once the id passes Meta's 30-day lifetime.\n\n**Size and type.** Oversize is `413 file_too_large`; a type Paige cannot ingest is `415`; an empty file is `400`. Images, video, audio, PDF, DOCX, plain text and markdown are accepted.\n\n**Uploading an image costs credits.** Paige runs one AI vision call per image to write the knowledge description your bot answers from, and that call is billed to the project like any other AI usage — it shows up in Usage alongside builds. Out of credits is `402 insufficient_credits`. Send `describe_image: false` to skip it: the file is still stored, still registered with Meta and still usable, it just gets no AI-written description and costs nothing. An upload with `intent: \"runtime\"` (a file the bot only sends) or `intent: \"template\"` never runs the vision call either. Non-image uploads (PDF, DOCX, text) use no AI at all and are always free.\n\n**Two limits apply beyond the per-request throttle.** Uploads are metered by BYTES as well as by request count, so a burst of large files can return `429 rate_limited` even while you are inside the request-per-minute budget — retry after the window or upload in smaller batches. And each project has a total media storage ceiling: an upload that would exceed it is refused with `413 storage_limit_exceeded` rather than quietly succeeding. `GET /v1/media` reports `storage.used_bytes` / `storage.remaining_bytes` so you can check before you push.\n\nSend an `Idempotency-Key` header to make a retry safe. The fingerprint covers the **file bytes**, so retrying the same upload replays the original response, while reusing the key for a *different* file is `409 idempotency_key_mismatch` rather than a silently-dropped upload.\n\n**Required scope:** `media:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -8613,6 +8655,31 @@
                           }
                         ],
                         "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                      },
+                      "intent": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "knowledge",
+                              "flow",
+                              "runtime",
+                              "multi",
+                              "template"
+                            ],
+                            "description": "What Paige should do with the file: `knowledge` (feed its text to the bot), `flow`, `runtime`, `multi`, or `template`. `runtime` is send-only (e.g. a broadcast header): its text is NOT extracted into the bot's knowledge base, no AI vision call is made for an image, and it stays sendable — use `multi` to also add it to knowledge. A `template` is a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is excluded from the runtime send manifest."
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "What Paige should do with the file: `knowledge`, `flow`, `runtime`, `multi`, or `template`. Send `runtime` for a file the bot only sends (e.g. a broadcast header) — it is stored, registered with Meta and sendable, but its text is NOT added to the bot's knowledge and no AI vision call is made for an image; use `multi` to also add it to knowledge. Send `template` for a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is left out of the runtime send manifest. Omit it, or send an empty string, for no designation."
                       }
                     },
                     "required": [
@@ -8668,6 +8735,31 @@
                           }
                         ],
                         "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                      },
+                      "intent": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "knowledge",
+                              "flow",
+                              "runtime",
+                              "multi",
+                              "template"
+                            ],
+                            "description": "What Paige should do with the file: `knowledge` (feed its text to the bot), `flow`, `runtime`, `multi`, or `template`. `runtime` is send-only (e.g. a broadcast header): its text is NOT extracted into the bot's knowledge base, no AI vision call is made for an image, and it stays sendable — use `multi` to also add it to knowledge. A `template` is a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is excluded from the runtime send manifest."
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "What Paige should do with the file: `knowledge`, `flow`, `runtime`, `multi`, or `template`. Send `runtime` for a file the bot only sends (e.g. a broadcast header) — it is stored, registered with Meta and sendable, but its text is NOT added to the bot's knowledge and no AI vision call is made for an image; use `multi` to also add it to knowledge. Send `template` for a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is left out of the runtime send manifest. Omit it, or send an empty string, for no designation."
                       }
                     },
                     "required": [
@@ -8717,6 +8809,31 @@
                       }
                     ],
                     "description": "Run the AI vision description on an image upload (default true). It costs credits, so set false to store and register the file without it. Ignored for non-image files. Accepts a boolean, or `true`/`false`/`1`/`0` as a multipart form field."
+                  },
+                  "intent": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "knowledge",
+                          "flow",
+                          "runtime",
+                          "multi",
+                          "template"
+                        ],
+                        "description": "What Paige should do with the file: `knowledge` (feed its text to the bot), `flow`, `runtime`, `multi`, or `template`. `runtime` is send-only (e.g. a broadcast header): its text is NOT extracted into the bot's knowledge base, no AI vision call is made for an image, and it stays sendable — use `multi` to also add it to knowledge. A `template` is a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is excluded from the runtime send manifest."
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "What Paige should do with the file: `knowledge`, `flow`, `runtime`, `multi`, or `template`. Send `runtime` for a file the bot only sends (e.g. a broadcast header) — it is stored, registered with Meta and sendable, but its text is NOT added to the bot's knowledge and no AI vision call is made for an image; use `multi` to also add it to knowledge. Send `template` for a document Paige fills in for a contact — its text is NOT extracted into the bot's knowledge base, it does not count against the knowledge-base size ceiling, and it is left out of the runtime send manifest. Omit it, or send an empty string, for no designation."
                   }
                 }
               }
@@ -9376,7 +9493,7 @@
           {
             "schema": {
               "type": "string",
-              "pattern": "^[a-z0-9][a-z0-9-]{0,119}$",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{0,119}$",
               "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by."
             },
             "required": true,
@@ -9672,7 +9789,7 @@
           {
             "schema": {
               "type": "string",
-              "pattern": "^[a-z0-9][a-z0-9-]{0,119}$",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{0,119}$",
               "description": "The asset's bot-facing slug — the key the runtime `getMediaId` / `sendMedia` helpers look it up by."
             },
             "required": true,
