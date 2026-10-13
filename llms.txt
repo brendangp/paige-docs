@@ -13,6 +13,7 @@ Key facts:
 - [Quickstart](https://howto.paigeme.dev/quickstart): build and launch a first bot end to end.
 - [Connect WhatsApp](https://howto.paigeme.dev/whatsapp-setup): link your WhatsApp Business number through Meta's embedded signup.
 - [Deploy](https://howto.paigeme.dev/guides/deploy): promote staging to production and go live.
+- [Numbers](https://howto.paigeme.dev/guides/numbers): rent a WhatsApp-ready South African number from Green Pages for R90 a month when you have no number of your own. Rolled out gradually, so it may not be in every account's Settings yet.
 
 ## Core concepts
 - [Projects](https://howto.paigeme.dev/concepts/projects): the unit of everything — one project, one number.

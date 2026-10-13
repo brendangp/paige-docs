@@ -168,6 +168,8 @@
             "pages": [
               "guides/settings-project",
               "guides/settings-whatsapp",
+              "guides/numbers",
+              "guides/numbers-site",
               "guides/templates",
               "guides/billing",
               "guides/workspaces",
