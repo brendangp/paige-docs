@@ -1,7 +1,7 @@
 ---
 title: "Project settings"
 sidebarTitle: "Project"
-description: "The Project section of the Settings tab is where you rename a project, see its status and WhatsApp connection at a glance, share your bot, test on Paige Dev, manage device notifications, and reach the Danger Zone."
+description: "The Project section of the Settings tab is where you rename a project, see its status and WhatsApp connection at a glance, share your bot, test on Paige Dev, choose who sees which conversations, manage device notifications, and reach the Danger Zone."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
@@ -23,12 +23,40 @@ From the **Project** section you can:
 - Activate **Broadcasts** for the project. If tagging contacts in bulk ever tells you this project needs an update, come back here and click **Repair broadcasting** — it's a one-off, and sending broadcasts keeps working in the meantime.
 
 <Warning>
-  The **Danger Zone** at the bottom has two irreversible actions. **Reset Project** removes all code, conversations, and messages (your contacts and WhatsApp connection are kept). **Delete Project** removes everything. Neither can be undone.
+  The **Danger Zone** at the bottom has two irreversible actions. **Reset Project** removes all code, conversations, and messages (your contacts, their notes and your WhatsApp connection are kept). **Delete Project** removes everything. Neither can be undone.
 </Warning>
 
 ### Paige Dev — test on your phone
 
 The **Paige Dev** card lets you link your real phone number and message a shared test number to try your bot on actual WhatsApp, without a number of your own and without touching your live data. Linking, moving a number between projects, the **Try now** test template, and **Clear test data** are all covered in full on the [Testing](/guides/testing) page.
+
+### Conversation access
+
+When several people answer WhatsApp chats on one project, the **Conversation access** card decides who sees what. It appears on projects that belong to a [workspace](/guides/workspaces), and lists each member with one of three levels:
+
+| Level | What they can do |
+| --- | --- |
+| **Manager** | See every conversation and [assign conversations](/guides/conversations-tab#assigning-conversations) to team members. |
+| **All conversations** | See every conversation and who it's assigned to, but not assign. This is where everyone starts. |
+| **Only assigned** | See only the conversations assigned to them. |
+
+The workspace **owner** and **admins** are always managers. Making someone an admin of the workspace makes them a manager straight away. Only a manager can change someone's level.
+
+**What "Only assigned" leaves out.** Someone on **Only assigned** can reply, send templates and files, take a conversation over, tag the contact and read and write its notes, but only for their own contacts. On top of that:
+
+- They can't open **Broadcasts**, the **Database**, **Storage**, **Logs** or **Secrets**.
+- They can't deploy the bot. There's no **Deploy** button for them.
+- In the chat panel they can only use the **Conversations** and **Help** agents. On the Build and Settings tabs, that means Help.
+
+**Live updates and notifications follow the same rule.** Someone on **Only assigned** only sees new messages arrive live, and only gets phone notifications, for their own conversations. When a manager assigns them one, they get a **New conversation assigned** notification. If a manager changes your level while you have Paige open, your tabs and live updates change straight away, with no reload.
+
+If you remove someone from the workspace, or they leave, their conversations go back to being unassigned.
+
+<Note>
+  **Access levels apply to people signed in to Paige.** An [API key or a connected AI agent](/guides/settings-api) doesn't belong to a person, so it still sees every conversation.
+</Note>
+
+If an **Only assigned** member sees **"Conversation assignment isn't set up for this project yet"**, the project's database hasn't been updated for assignments. Nothing can be shown to them until it is, and in the meantime nobody on that project can be set to **Only assigned**. Everyone else is unaffected.
 
 ## Notifications
 

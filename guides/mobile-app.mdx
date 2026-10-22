@@ -64,7 +64,7 @@ Also worth knowing: the live preview when creating a [message template](/guides/
 
 {/* TODO: HAND-02 — Settings → Notifications in the installed app on a phone, with the Push notifications switch on, and the browser permission prompt over it if you can catch both. Physical handset; hand-shot. See SCREENSHOT-PACK.md (GRE-434). */}
 
-Paige notifies you about three things:
+Paige notifies you about four things:
 
 <AccordionGroup>
   <Accordion title="A customer message that needs you" icon="message-circle">
@@ -72,7 +72,10 @@ Paige notifies you about three things:
 
     You won't get pinged for every message your bot handles by itself. That's the point: it's telling you when your bot *isn't* handling it.
 
-    Everyone with access to Conversations on the project gets these.
+    Everyone with access to Conversations on the project gets these, except that someone whose [conversation access](/guides/settings-project#conversation-access) is **Only assigned** only gets them for the conversations assigned to them.
+  </Accordion>
+  <Accordion title="A conversation was assigned to you" icon="user-check">
+    **New conversation assigned**, with the contact's name, when a manager [assigns you a conversation](/guides/conversations-tab#assigning-conversations). Only the person it's assigned to gets this.
   </Accordion>
   <Accordion title="Your deploy finished" icon="rocket">
     **Build succeeded** or **Build failed**, naming the project. Only the person who clicked Deploy gets this.

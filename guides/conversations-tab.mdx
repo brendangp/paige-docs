@@ -1,7 +1,7 @@
 ---
 title: "The Conversations tab"
 sidebarTitle: "Conversations tab"
-description: "The Conversations tab is your WhatsApp inbox — every contact, their message history, and the state each conversation is in. Read what the green circle means, how to take a conversation over from your bot, how to send a template or a file, and how the 24-hour window affects replying."
+description: "The Conversations tab is your WhatsApp inbox — every contact, their message history, and the state each conversation is in. Read what the green circle means, how to take a conversation over from your bot, how to send a template or a file, how to leave notes for your team and assign conversations, and how the 24-hour window affects replying."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
@@ -18,6 +18,8 @@ Every contact who has messaged your bot appears in the left-hand list, most rece
 
 - **Search** the list by name or phone number with the box at the top.
 - **Filter by state** with the **All states** dropdown to show only conversations in a particular [state](/concepts/conversations#conversation-state) — for example everyone currently in handover.
+- **Filter by who has it** with the row of buttons above the list — **All**, **Unassigned**, **Mine**, and for managers one per team member. See [Assigning conversations](#assigning-conversations).
+- **See who's answering** from the small badge on each assigned contact, with that person's initials and name, or **You** when it's yours.
 
 ## What the green circle means
 
@@ -169,6 +171,55 @@ Each change saves on its own as soon as you make it — there's no Save button. 
 </Warning>
 
 Tags added here work exactly like tags added anywhere else, so a segment built on `vip` picks this contact up straight away and your next broadcast to that segment reaches them.
+
+## Notes for your team
+
+Notes are private messages to your team about a contact: *"wants a callback after 3pm"*, *"already sent the quote"*, *"upset about the delivery, be gentle"*. They are **never sent to the contact**. They aren't WhatsApp messages and don't go anywhere outside Paige.
+
+Open a conversation and click **Notes** in the thread header. On a computer the notes open in a panel beside the conversation. Drag its edge to make it wider; Paige remembers the width and whether you left it open. On a phone they open from the bottom of the screen.
+
+Inside you'll find:
+
+- **Every note on this contact, newest first**, each with the name of the person who wrote it and the date and time.
+- **A box at the bottom** for a new note. Click **Add note**, or press Ctrl+Enter (Cmd+Enter on a Mac). A note can be up to **4,000 characters**.
+- **Edit** (the pencil) on notes you wrote. Only the person who wrote a note can change it, and an edited note says *edited* next to its time.
+- **Delete** (the bin) on notes you wrote. The project owner and workspace admins can delete anyone's note. Paige asks you to confirm first.
+
+Notes belong to the **contact**, not to one conversation, so they're there every time anyone opens that contact. Everyone who can open the Conversations tab on the project can read them.
+
+<Note>
+  **Notes outlast the people who wrote them.** If someone leaves your workspace, their notes stay, with **(removed)** after their name. Resetting the project keeps its notes too, just as it keeps your contacts.
+</Note>
+
+You can also ask the [Conversations Agent](/agents/conversations-agent) *"what has the team noted about this contact?"* and it reads the notes for you. It can only read them. To add a note, use the Notes panel.
+
+If you see **"Notes aren't set up for this project yet"**, the project's database hasn't been updated for notes yet. Everything else in the tab still works. Contact support if it doesn't clear up.
+
+## Assigning conversations
+
+On a team project, a manager can give each conversation to the person who should answer it. Who counts as a manager, and who sees which conversations, is set per person in **Settings → Project → Conversation access**. See [Conversation access](/guides/settings-project#conversation-access).
+
+- **Assign a conversation.** Open it and click **Assign** in the thread header. On a phone it's the person icon, and the list opens from the bottom of the screen. Pick a team member, or choose **Unassign** to put it back in the unassigned queue. The change shows straight away; if it can't be saved, you see a message and it goes back to how it was.
+- **See who has it.** Every assigned conversation in the contact list shows a small badge with the person's initials and name, or **You** when it's yours. Unassigned conversations have no badge.
+- **Filter the list.** The row of buttons above the contact list switches between **All**, **Unassigned** (the queue nobody has picked up yet) and **Mine**. Managers also get a button for each team member, or a **Member** menu when there are more than three, to see one person's conversations. On a phone, swipe the row sideways to see them all.
+
+The list keeps itself up to date. When a conversation is assigned or unassigned, it moves to the right place without a refresh.
+
+Assigning doesn't send the contact anything, and it doesn't change the conversation's state or its tags. The person you assign it to gets a **New conversation assigned** notification with the contact's name, if they've switched [notifications](/guides/mobile-app#notifications) on.
+
+### What you see depends on your access level
+
+| Your level | What you get in this tab |
+| --- | --- |
+| **Manager** | The filters, every conversation's assignee, and the **Assign** control. |
+| **All conversations** | The **All**, **Unassigned** and **Mine** filters and who each conversation is assigned to. You can't assign. |
+| **Only assigned** | Just your own conversations, with no filters, because there's nothing to filter. You can reply, send templates and files, take a conversation over, tag the contact and read and write its notes. |
+
+If you're on **Only assigned** and a manager takes a conversation away from you while you have it open, it closes with a short note. A conversation assigned to you appears in your list straight away. If nothing is assigned to you yet, the list says so.
+
+<Note>
+  If the filters, badges and **Assign** control don't appear on a team project, its database doesn't have assignments set up yet. This can happen on some self-hosted projects. The rest of the tab works as normal.
+</Note>
 
 ## Let the Conversations Agent help
 

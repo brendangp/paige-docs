@@ -160,7 +160,8 @@ Your bot is CommonJS JavaScript running in a locked-down Node worker. There is n
 | Duplicating or cloning a project. | Create a new project and ask the Code agent to rebuild what you want. Nothing carries across on its own. |
 | Starting a project from a template. Every new project starts blank. | Ask the Code agent for what you want. [Flow templates](/templates/overview) are a different thing and they do work — ask for one by name. |
 | Owning more than **3 workspaces**. The fourth fails with `WORKSPACE_LIMIT`. | None self-serve. |
-| More than **5 members** in a workspace, including you. | None self-serve. |
+| More members than your workspace's seat limit: **5**, including you, unless Green Pages has agreed more. Pending invitations take a seat. | Cancel a pending invitation or remove a member, or write to [info@greenpages.app](mailto:info@greenpages.app) to add seats. There's no self-serve option. |
+| Setting up your own branded web address for a workspace yourself. | Green Pages sets it up for you. See [Run Paige on your own branded web address](/guides/white-label). |
 | More than **25 tags** on one contact. | Remove a tag before adding another. |
 | Tagging more than **500 contacts** at a time in the Contacts list — or tagging in bulk at all, if you are a workspace **member** rather than an owner or admin. | Tag in batches, or ask the Broadcasting agent to tag a whole audience. |
 | Exporting your contact list — from the dashboard or the API. There is no endpoint that lists contacts; `/v1` can read one contact's messages and update one contact, and that is all. | Download a broadcast's **recipient** CSV, which covers everyone that broadcast targeted. See [Downloading the recipient list](/guides/broadcasts#downloading-the-recipient-list). |

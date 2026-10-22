@@ -173,6 +173,7 @@
               "guides/templates",
               "guides/billing",
               "guides/workspaces",
+              "guides/white-label",
               "guides/settings-api",
               "guides/inbound-hooks",
               "guides/connect-an-agent",
