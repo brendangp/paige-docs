@@ -100,3 +100,34 @@ Three things worth knowing:
 <Note>
   Bot code written before this used a different, blunter helper that replaced a contact's whole tag list at once. It still works so existing bots keep running, but `paige.tag()` is what you want — it adds and removes individual tags instead of overwriting whatever else the contact had.
 </Note>
+
+## Archiving and assigning chats from your bot
+
+Your rules for the [Conversations tab](/guides/conversations-tab#rules-your-bot-follows-for-you) can live in your bot. Four helpers handle it. Ask the [Code Agent](/guides/prompting) in plain language — *"archive the chat once the welcome message is sent"* — and it writes this for you.
+
+| Helper | What it does |
+| --- | --- |
+| `paige.archive(sendTo)` | The chat leaves every list but **Archived**. Its assignee is kept. |
+| `paige.unarchive(sendTo)` | The chat comes back to its assignee, or to **Unassigned**. |
+| `paige.assign(sendTo, memberEmail)` | The chat goes to that team member. An archived chat comes back. |
+| `paige.unassign(sendTo)` | The chat goes to **Unassigned**. An archived chat stays archived. |
+
+`sendTo` is the identifier your handler already sends to, a phone number or a BSUID. Paige tells them apart.
+
+```js
+await sendText(conversation.conversation_id, sendTo, welcomeText, botNumber);
+await paige.archive(sendTo);
+
+if (intent === 'fees') {
+  await paige.assign(sendTo, 'thandi@example.com');
+}
+```
+
+Worth knowing:
+
+- **They never throw.** Each one resolves to `true` if it worked or the chat was already that way, and `false` if nothing changed, with the reason in [your logs](/guides/logs). A chat rule can't break a conversation.
+- **Call them after the reply has gone.** Each can wait up to 10 seconds if Paige is unreachable, and your customer's reply shouldn't wait with it.
+- **Assign by email, and only once.** The person has to be on the project. Assigning notifies them, so do it when the condition first becomes true rather than on every message.
+- **An archived chat stays archived when the customer writes again.** To bring it back on a reply, call `paige.unarchive(sendTo)` after your bot has answered.
+- **If your code sets the `handover` state itself, call `paige.unarchive` and then `paige.unassign`.** Paige doesn't hear about a state your code writes, so your code does what a handover means.
+- **In the Preview panel they do nothing and return `true`.** On [Paige Dev](/guides/testing) they're real.

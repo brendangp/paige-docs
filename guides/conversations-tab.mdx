@@ -18,7 +18,7 @@ Every contact who has messaged your bot appears in the left-hand list, most rece
 
 - **Search** the list by name or phone number with the box at the top.
 - **Filter by state** with the **All states** dropdown to show only conversations in a particular [state](/concepts/conversations#conversation-state) — for example everyone currently in handover.
-- **Filter by who has it** with the row of buttons above the list — **All**, **Unassigned**, **Mine**, and for managers one per team member. See [Assigning conversations](#assigning-conversations).
+- **Filter by who has it** with the row of buttons above the list — **All**, **Unassigned**, **Mine**, **Archived**, and for managers one per team member. See [Assigning conversations](#assigning-conversations) and [Archiving a chat](#archiving-a-chat).
 - **See who's answering** from the small badge on each assigned contact, with that person's initials and name, or **You** when it's yours.
 
 ## What the green circle means
@@ -201,24 +201,68 @@ On a team project, a manager can give each conversation to the person who should
 
 - **Assign a conversation.** Open it and click **Assign** in the thread header. On a phone it's the person icon, and the list opens from the bottom of the screen. Pick a team member, or choose **Unassign** to put it back in the unassigned queue. The change shows straight away; if it can't be saved, you see a message and it goes back to how it was.
 - **See who has it.** Every assigned conversation in the contact list shows a small badge with the person's initials and name, or **You** when it's yours. Unassigned conversations have no badge.
-- **Filter the list.** The row of buttons above the contact list switches between **All**, **Unassigned** (the queue nobody has picked up yet) and **Mine**. Managers also get a button for each team member, or a **Member** menu when there are more than three, to see one person's conversations. On a phone, swipe the row sideways to see them all.
+- **Filter the list.** The row of buttons above the contact list switches between **All**, **Unassigned** (the queue nobody has picked up yet), **Mine** and **Archived** (see [Archiving a chat](#archiving-a-chat)). Managers also get a button for each team member, or a **Member** menu when there are more than three, to see one person's conversations. On a phone, swipe the row sideways to see them all.
 
 The list keeps itself up to date. When a conversation is assigned or unassigned, it moves to the right place without a refresh.
 
 Assigning doesn't send the contact anything, and it doesn't change the conversation's state or its tags. The person you assign it to gets a **New conversation assigned** notification with the contact's name, if they've switched [notifications](/guides/mobile-app#notifications) on.
+
+**A handover clears the assignment.** When a conversation goes to handover, it loses its assignee and lands in **Unassigned** for someone to pick up, whether the bot, another team member or the API handed it over. The exception is the assignee's own handover: if the person the chat is assigned to replies or turns on handover themselves, they keep it.
 
 ### What you see depends on your access level
 
 | Your level | What you get in this tab |
 | --- | --- |
 | **Manager** | The filters, every conversation's assignee, and the **Assign** control. |
-| **All conversations** | The **All**, **Unassigned** and **Mine** filters and who each conversation is assigned to. You can't assign. |
-| **Only assigned** | Just your own conversations, with no filters, because there's nothing to filter. You can reply, send templates and files, take a conversation over, tag the contact and read and write its notes. |
+| **All conversations** | The **All**, **Unassigned**, **Mine** and **Archived** filters and who each conversation is assigned to. You can't assign. |
+| **Only assigned** | Just your own conversations, with only **All** and **Archived** to choose between. You can reply, send templates and files, take a conversation over, tag the contact and read and write its notes. |
 
 If you're on **Only assigned** and a manager takes a conversation away from you while you have it open, it closes with a short note. A conversation assigned to you appears in your list straight away. If nothing is assigned to you yet, the list says so.
 
 <Note>
   If the filters, badges and **Assign** control don't appear on a team project, its database doesn't have assignments set up yet. This can happen on some self-hosted projects. The rest of the tab works as normal.
+</Note>
+
+## Archiving a chat
+
+When a chat is done, archive it so it leaves your list and the contacts who need a reply are easier to find. You can still open and read it at any time.
+
+- **Archive a chat.** Open it and click **Archive** in the thread header. On a phone it's the box icon. Paige asks you to confirm, because archiving hands the conversation back to the bot: the bot starts answering that contact again if they write. The chat moves out of **All**, **Unassigned**, **Mine** and every team member's list, and into **Archived**. Whoever it was assigned to stays on it.
+- **Find an archived chat.** Press **Archived** in the row of buttons above the contact list. Search also finds archived chats, each with an **Archived** badge, so a name or number always brings a contact up.
+- **Bring a chat back.** Open it and click **Unarchive**. It goes back to the person it was assigned to, or to **Unassigned** if nobody had it. Assigning an archived chat to someone also brings it back, because assigning means someone should look at it.
+
+### What brings an archived chat back
+
+**A handover does.** If the conversation goes to handover, however that happens, the chat comes out of **Archived**. It follows the same rule as any other handover: it [loses its assignee](#assigning-conversations) unless the assignee did it themselves. A chat in handover is never shown as archived.
+
+**A reply from the contact doesn't.** If they write to an archived chat, it stays in **Archived** and the bot handles it as usual. Your bot's code decides whether anything more should happen. Messages your bot or a broadcast sends never bring a chat back either.
+
+### Rules your bot follows for you
+
+Ask the [Code Agent](/agents/code-agent) in your own words:
+
+> "Archive the chat once the welcome message is sent."
+
+> "Bring the chat back when the customer replies."
+
+> "Assign fee questions to Thandi."
+
+Once you've deployed, your bot archives, unarchives, assigns and unassigns chats itself. To assign, use a team member on this project. If the person named isn't on the project, the chat stays as it was and the reason shows in **Tools → Logs**. These rules live in your bot, so to change one, ask the agent again. If a rule assigns many chats to one person at once, they all go to that person, and they get at most one notification a minute.
+
+<Warning>
+  **Test these on the live bot.** Nothing happens to your chats while you test in the Preview panel, but on [Paige Dev](/guides/testing) the rules are real, so a chat with your own number can be archived or assigned.
+</Warning>
+
+For the code behind these rules, see [Archiving and assigning chats from your bot](/concepts/bot-code#archiving-and-assigning-chats-from-your-bot).
+
+### Who can archive
+
+Managers and **All conversations** members can archive any chat they can see. **Only assigned** members can archive and unarchive their own chats, and find them under **Archived**. Unassigning an archived chat, or removing the team member who had it, leaves it archived.
+
+Your own apps and connected AI agents can do the same if their key or connection holds `conversations:write`, with `POST /v1/contacts/{id}/archive` and `/unarchive` or the [`archive_chat` and `unarchive_chat` tools](/guides/agent-tools#conversations-and-messaging). When one of them lists conversations, archived chats are included unless it asks to leave them out.
+
+<Note>
+  If the Archive button and the **Archived** filter don't appear, the project's database doesn't have archiving set up yet. This can happen on some self-hosted projects. Nothing else changes.
 </Note>
 
 ## Let the Conversations Agent help

@@ -85,6 +85,8 @@ That's because your bot needs to know *where* the conversation is when it resume
   Handover doesn't time out. A conversation stays in handover until you hand it back, however long that takes. If you take one over on a Friday afternoon, your bot won't quietly resume over the weekend.
 </Note>
 
+Handover also decides who has the chat. It leaves [Archived](/guides/conversations-tab#archiving-a-chat), if it was there, and lands in **Unassigned** unless the person it's assigned to took it over themselves. Archiving works the other way: archiving a chat in handover hands it back to your bot.
+
 ## The 24-hour window
 
 WhatsApp only lets a business message a customer freely for **24 hours** after that customer's last message. This is Meta's rule, not Paige's, and it applies to everything you send from the dashboard.

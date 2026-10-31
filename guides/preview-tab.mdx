@@ -26,6 +26,20 @@ You're not limited to text:
   Open **Tools → Logs** while you test to watch your bot's `console.log` output land against each message. See [Execution logs](/guides/logs).
 </Tip>
 
+## What Preview doesn't touch
+
+Preview never sends a real WhatsApp message, even if your bot's code sends with a real access token saved in your [secrets](/guides/secrets). The message shows up in the phone instead of going out.
+
+It doesn't contact your other outside services either. Calls to places like Airtable, Slack, Yoco or your own systems are faked rather than performed, so nothing is written there. That's also why a preview run can come back empty where [Paige Dev](/guides/testing) returns real records.
+
+The one exception is your bot's AI. Calls to OpenAI or Anthropic still go out, so your bot can answer normally in Preview, and they're billed to your own key.
+
+<Note>
+  This applies however your bot's code makes the call: `axios`, `fetch`, `node-fetch` or the `openai` client. There's one catch for AI. A call to OpenAI or Anthropic made through `axios` comes back empty in Preview, so use `fetch` or the `openai` client for those.
+</Note>
+
+Treat Paige Dev, not Preview, as the accurate test of what your bot really does.
+
 ## Tap a URL button
 
 The preview renders interactive **URL buttons** the same way real WhatsApp does. Tap one and the destination opens inside the phone frame in an embedded browser view:

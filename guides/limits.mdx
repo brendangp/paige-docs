@@ -73,7 +73,7 @@ Your bot is CommonJS JavaScript running in a locked-down Node worker. There is n
 | Driving a browser, or sending email directly. `puppeteer` and `nodemailer` are not installed. | Call a hosted API for it with `axios`. |
 
 <Note>
-  **Preview is not a full sandbox.** In Preview, `axios` is mocked, so calls made through it do not reach the network — but `fetch`, `node-fetch` and `openai` are **not** mocked and do make real calls. Bear that in mind before testing anything that charges money or sends a message. See [Preview](/guides/preview-tab).
+  **Preview doesn't reach outside services.** Calls made with `axios`, `fetch`, `node-fetch` and the `openai` client are faked, and WhatsApp sends are captured rather than delivered. The one exception is your bot's AI: calls to OpenAI or Anthropic through `fetch`, `node-fetch` or the `openai` client still go out and are billed to your own key. **[Paige Dev](/guides/testing) is different:** it calls outside services for real, so bear that in mind before testing anything that charges money or sends a message. See [What Preview doesn't touch](/guides/preview-tab#what-preview-doesnt-touch).
 </Note>
 
 ## Flows
@@ -110,6 +110,7 @@ Your bot is CommonJS JavaScript running in a locked-down Node worker. There is n
 | The Conversations agent sending a message. It only ever hands you a **draft** to send yourself. | Read the draft and send it. |
 | The Conversations agent tagging more than **one** contact per request. | Ask the Broadcasting agent on the Broadcasts tab. It tags a whole audience after you approve the count. |
 | The Help agent reading your code, changing anything, or running a test. It answers questions and nothing else. | Switch to the Code agent. |
+| Sending more than **20 messages a minute** in the chat, per person. The chat answers *You're sending messages too quickly*. | Wait a minute, then send your message again. |
 | Editing code on **mobile**. You can browse the file tree; tapping a file shows its path and no editor. | Use a desktop browser. Everything the agent writes works fine from mobile. |
 
 ## A connected agent or an API key
@@ -177,12 +178,14 @@ Your bot is CommonJS JavaScript running in a locked-down Node worker. There is n
 
 ## Connectors
 
-The connectors Paige ships are **Airtable**, **Slack** and **WordPress**, plus **Conversations**, which is a small piece of code rather than a credential. See [Integrations](/integrations).
+The connectors Paige ships are **Airtable**, **Slack**, **WordPress** and **Yoco**, plus **Conversations**, which is a small piece of code rather than a credential. See [Integrations](/integrations).
 
 | Not supported yet | Workaround |
 | --- | --- |
-| Any other connector — a CRM, an accounting package, a payment provider, a calendar. | Ask the Code agent to call that service's API from your bot code, and store the key as a [secret](/guides/secrets). This is the normal route and it works well. |
+| Any other connector — a CRM, an accounting package, another payment provider, a calendar. | Ask the Code agent to call that service's API from your bot code, and store the key as a [secret](/guides/secrets). This is the normal route and it works well. |
 | Deleting an Airtable record from your bot. The connector reads, creates and updates; it does not delete. | Delete it in Airtable yourself. |
+| Yoco on a bot that runs on your own server. The connector is offered only on bots Paige runs. | Call Yoco from your own server. |
+| Refunds through the Yoco connector, or a test mode for a connected shop. The keys are live. | Refund from your Yoco dashboard. See [Test it before you go live](/integrations#test-it-before-you-go-live). |
 
 ## Files
 
