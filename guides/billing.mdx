@@ -104,6 +104,17 @@ Your balance, a breakdown of which agent spent what, and your full history are i
 
 Credits don't pay for your bot talking to customers, deploys, or WhatsApp's own message costs. Those come from your subscription and from Meta respectively — [Message Costs](/guides/message-costs) prices what Meta charges you.
 
+### What one prompt costs
+
+Each message you send to an agent is one **prompt**, and one prompt can use several AI models behind the scenes: the agent itself, a flow builder or test it starts, a short summary of an older chat, the name it picks for a new project. You pay for all of them, each at its own model's price, as **one total for the prompt**.
+
+- **While the agent works**, the line under the chat box reads **This prompt so far: … credits** and keeps going up. When it finishes, the line reads **This prompt: … credits**. Credits leave your balance as the work happens.
+- **In Settings → Usage**, each prompt is one row in the history. Tap **models** on a row to see what each model cost. A prompt that's still running shows a **running** badge, and its total updates as it works.
+- **If you press Stop**, nothing more is charged from that moment. The work the agent had already finished is still charged.
+- **Describing an image you attach** uses credits too. That happens when you upload it, before your prompt starts, so it shows as its own **Image Description** row.
+
+The Help Agent stays free, so its prompts cost nothing.
+
 ### Message Costs: two checks that read your bot
 
 Looking at **Tools → Message Costs** is free. Two buttons in it use credits, because Paige reads your bot with AI to answer them:

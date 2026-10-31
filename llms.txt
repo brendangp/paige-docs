@@ -34,7 +34,7 @@ Key facts:
 - [Connect an AI agent](https://howto.paigeme.dev/guides/connect-an-agent): Paige's MCP server, for Claude, ChatGPT, Codex and Cursor.
 - [What a connected agent can do](https://howto.paigeme.dev/guides/agent-tools): every MCP tool and the permission it needs.
 - [API reference](https://howto.paigeme.dev/api-reference/introduction): the `/v1` REST API, authentication, scopes, errors and webhooks.
-- [Integrations](https://howto.paigeme.dev/integrations): Airtable, Slack and WordPress connectors.
+- [Integrations](https://howto.paigeme.dev/integrations): Airtable, Slack, WordPress and Yoco connectors.
 - [Requesting a feature](https://howto.paigeme.dev/guides/request-a-feature): file a gap in Paige. Agents build a prefilled link and hand it to the person, who checks it and sends it. See "Missing a feature?" below for the URL template.
 
 ## Learn

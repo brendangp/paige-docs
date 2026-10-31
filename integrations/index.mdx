@@ -1,7 +1,7 @@
 ---
 title: "Integrations: connect your bot to the systems you already run"
 sidebarTitle: "Overview"
-description: "Integrations link your bot to the tools your business already lives in — Airtable, Slack, WordPress and more — so it can read and write there without you handling API keys."
+description: "Integrations link your bot to the tools your business already lives in — Airtable, Slack, WordPress, Yoco and more — so it can read, write and take payment there."
 ---
 
 import { PageDemo } from "/snippets/page-demo.jsx"
@@ -21,7 +21,7 @@ You could do all of this with [secrets](/guides/secrets) — generate an API key
 - **The agent knows the service.** It looks up the real reference before writing anything, including your actual Airtable tables and fields.
 
 <Tip>
-  For Airtable and Slack, use the integration rather than storing a raw token as a secret. Secrets are still the right answer for everything else.
+  For Airtable, Slack and Yoco, use the integration rather than storing a raw token or key as a secret. Secrets are still the right answer for everything else.
 </Tip>
 
 ## Every integration follows the same shape
@@ -44,6 +44,9 @@ Each integration page is laid out the same way, so once you've connected one you
   <Card title="WordPress" icon="globe" href="/integrations/wordpress">
     Import your site's posts, pages or events on a schedule — so your bot answers from what you've already published.
   </Card>
+  <Card title="Yoco" icon="credit-card" href="/integrations#yoco">
+    Send a customer a Yoco payment link in the chat and know as soon as they've paid.
+  </Card>
 </CardGroup>
 
 ### Conversations
@@ -62,6 +65,8 @@ Each card offers up to two routes:
 Either way Paige checks the credential with the service before saving it, so a typo fails immediately rather than at 3am inside your bot.
 
 Some integrations need no credential at all. [WordPress](/integrations/wordpress) reads your site over its normal public web address, so there's nothing to sign in to and nothing to paste — you enter your address and pick what to sync instead.
+
+[Yoco](#yoco) has no one-click route. You paste an API key you made in Yoco, one for each shop.
 
 ### When a sign-in expires
 
@@ -89,6 +94,123 @@ Connections are per-project. Two projects in the same workspace connect separate
 
 [WordPress](/integrations/wordpress) is the exception, because there's no credential to remove. Disconnecting stops the syncing but leaves everything already imported in place, and your bot keeps using it — Paige tells you so before you confirm.
 
+[Yoco](#yoco) also asks you to confirm, because disconnecting removes every shop's key and stops Yoco telling your bot about payments.
+
 ## Integrations in scheduled tasks
 
 Your integrations work in [scheduled tasks](/guides/scheduled-tasks) exactly as they do anywhere else. A nightly Airtable sync or a daily Slack summary is a perfectly good thing to build — a task gets the same connection your bot uses when a customer messages it.
+
+## Yoco
+
+Yoco lets your bot send a customer a Yoco payment link in the chat and know as soon as they've paid. You ask for the payment step in plain language, and the [Code Agent](/agents/code-agent) builds it. You never write a webhook, and Paige looks after each shop's key.
+
+Connect it from **Tools → Connectors**. The Yoco card appears only on bots that Paige runs for you, so you won't see it if your bot runs on your own server. Only the project owner or a workspace owner or admin can connect it. Everyone else sees the card without its buttons, with a note to ask a project admin.
+
+<Warning>
+  **These are live keys, and there is no test mode.** Payments made through your bot are real money, and that includes links created while you test on [Paige Dev](/guides/testing). See [Test it before you go live](#test-it-before-you-go-live).
+</Warning>
+
+### Connect a shop
+
+Click **Connect** on the Yoco card. Paige asks for a shop name and a Yoco API key. The shop name is only there to tell your shops apart, and customers never see it.
+
+To get the key:
+
+<Steps>
+  <Step title="Log in to the Yoco Developer Console">
+    Go to the [Yoco Developer Console](https://developer-iam.yoco.com/ui/login) and log in with the Yoco account for this shop.
+  </Step>
+  <Step title="Create an application">
+    Click **New application**, name it "Paige" and choose the **live** environment.
+  </Step>
+  <Step title="Select four permissions, then save">
+    - `application/webhooks:read` and `application/webhooks:write`, which let Paige set up payment notifications.
+    - `business/orders:read` and `business/orders:write`, which let your bot create payment links.
+
+    Select all four. Paige can't confirm every one of them when you connect, and without the `business/orders` ones your payment links won't work.
+  </Step>
+  <Step title="Generate the key">
+    Open the application, choose **Generate API key** and copy it. You'll only see it once.
+  </Step>
+  <Step title="Paste it into Paige">
+    Enter the key with a name for the shop, and press **Connect**.
+  </Step>
+</Steps>
+
+<Note>
+  The key from the Yoco App's Checkout API, which starts with `sk_`, won't work here. It has to come from an application in the Developer Console.
+</Note>
+
+Paige checks every key with Yoco before saving it and tells you straight away if something is wrong, such as a key Yoco doesn't accept, a shop name you've already used, or Yoco being unreachable. Nothing is saved when that happens.
+
+**Several shops?** Each shop with its own Yoco account has its own key. Add them one at a time. Paige sets up the payment notifications for each shop for you, so there's nothing to set up in Yoco.
+
+**Is my key safe?** It's encrypted, and only your bot uses it while running. You won't see it again in Paige, only its last four characters, and it isn't shown in [Secrets](/guides/secrets). To change a key, remove the shop and add it again.
+
+### Manage your shops
+
+Once connected, the card reads something like **Connected · 2 shops**. Click **Manage** to see each shop, the end of its key, and that its payments webhook is active. From there you can:
+
+- **Add another shop.**
+- **Remove** a shop. Removing your last shop disconnects Yoco completely, and Paige tells you so before you confirm.
+
+**Disconnect** on the card removes every shop's key and stops Yoco telling your bot about payments. Payment links already sent still work in Yoco, but your bot won't hear about them.
+
+Paige also adds an inbound hook called **Yoco payments** under **Settings → API**, marked **Managed by Yoco connector**. You can copy its address and see its recent activity there, but you can't rotate it, delete it or switch it off, because every shop's payment notifications depend on it. It's looked after in Connectors instead. See [Inbound hooks](/guides/inbound-hooks).
+
+### Take payment in the chat
+
+Once a shop is connected, ask for what you want and the agent builds it:
+
+> "Take payment with Yoco before confirming the order."
+
+> "Ask which branch they're ordering from, then send a Pay now button for that shop."
+
+If Yoco isn't connected yet, the agent tells you to connect it first. It never asks for a Yoco key in the chat, and a key doesn't belong in Secrets.
+
+Here's what the customer gets:
+
+<Steps>
+  <Step title="The order is saved, waiting for payment">
+    If the customer taps twice, or already has an unpaid order, the bot sends the same link again rather than making a second order.
+  </Step>
+  <Step title="A Pay now button arrives">
+    The message shows Yoco's order number, the one the shop sees, and the total. The customer has 30 minutes to pay.
+  </Step>
+  <Step title="The customer pays">
+    Yoco tells your bot, and the bot checks the payment and confirms the order. If the same notification arrives twice, the order is still only confirmed once.
+  </Step>
+  <Step title="Or the link runs out">
+    After 30 minutes an unpaid order expires. The link is cancelled and the customer is told.
+  </Step>
+</Steps>
+
+<Warning>
+  **Deploying isn't the last step.** The payment flow needs a [scheduled task](/guides/scheduled-tasks) that runs every minute. It picks up any payment notification that went missing, expires unpaid orders and retries confirmations, and a deploy doesn't create it. Deploy first, then go back to the agent and ask it to register the task. Until then a missed payment stays unconfirmed, orders never expire and old links can still be paid. It counts towards your five scheduled tasks.
+</Warning>
+
+A few more things to know:
+
+- **Amounts are in rand, and R2 is the minimum.** Your bot can't make a payment link for less.
+- **Tell the agent how you want to hear about problems.** A payment that arrives after its order expired, or one the bot can't settle, needs a person to look at it. Ask for a Slack message, an email or a WhatsApp to you. Otherwise the only record is in your table and your [logs](/guides/logs).
+- **Refunds happen in Yoco.** Your bot can't issue one, so use your Yoco dashboard.
+
+### Test it before you go live
+
+There's no safe test mode for a connected shop, so each way of testing shows you something different.
+
+| Where you test | What happens | What it proves |
+| --- | --- | --- |
+| [Preview](/guides/preview-tab#what-preview-doesnt-touch) | Yoco is faked. No real link is made, the order number reads `PREVIEW`, and the link can't be paid. | The order, the link and the button. Never the payment. |
+| [Paige Dev](/guides/testing) | Your bot uses the shop's live key and creates **real** payment links. Anyone who pays one pays the shop. | The whole path, with real money. |
+
+### When it breaks
+
+- **The Yoco card isn't there.** Your project runs on your own server. Yoco is only offered on bots Paige runs.
+- **"That key was not accepted by Yoco".** The key has to come from an application in the Developer Console, and it needs `application/webhooks:read`. A Checkout API key (`sk_...`) is refused.
+- **Paige asks you to check the key's webhook permissions.** The key doesn't have `application/webhooks:write`. Add it in the Developer Console and try again.
+- **The shop connected, but payment links fail.** The key is missing `business/orders:write`. Paige can't test for that one when you connect. Create a key with all four permissions, then remove the shop and add it again.
+- **Payments aren't reaching your bot.** Open the **Yoco payments** hook under **Settings → API** and check its recent activity:
+  - **Nothing listed.** Yoco isn't reaching Paige. Check the shop is still listed under **Manage**. If its key was deleted or regenerated in Yoco, remove the shop and add it again.
+  - **`failed`.** Paige received the payment and your bot's code hit an error. Read the error on the row, then check [your logs](/guides/logs).
+  - **`handled`, but nothing happened.** Your bot ran and did nothing with the payment. Tell the agent what you expected.

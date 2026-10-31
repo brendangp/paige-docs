@@ -54,6 +54,8 @@ Unlike an API key or a webhook signing secret, a hook URL is **not** show-once.
 - **The on/off switch** pauses a hook without replacing it. While it's off the row reads *Off — requests are refused*, and anything sent to it is turned away until you switch it back on.
 - **Delete** removes it for good.
 
+The exception is a hook marked **Managed by Yoco connector**. The [Yoco connector](/integrations#manage-your-shops) adds it for you, and every shop's payment notifications depend on it. You can copy its address and see its activity, but you can't rotate it, delete it or switch it off.
+
 ## Checking that requests are arriving
 
 Each hook shows when it last received something, so "is this working?" is answerable at a glance. Expand **Recent activity** and you'll see the **20 most recent arrivals** — when each one came in, and whether your bot handled it or hit an error.

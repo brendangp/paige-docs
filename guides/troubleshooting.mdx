@@ -21,6 +21,7 @@ Read the first two sections before you do anything else. They are the fastest ro
 | The agent keeps trying the same failing thing | Restore, then break the request into smaller steps |
 | A deploy came back with warnings | [Read what the warning named](/guides/deploy#deployed-with-warnings) — it's a partial success |
 | You're not sure if it's Paige or Meta | [Use the table below](#is-it-paige-or-is-it-meta) |
+| The chat says *You're sending messages too quickly* | Wait a minute, then send your message again. The limit is 20 messages a minute, per person |
 
 ## Your live bot is probably still fine
 
@@ -188,7 +189,7 @@ Some failures aren't Paige's to fix, and knowing which is which saves you a lot 
 
 This is the question most people arrive with, so here is the plain answer.
 
-Credits meter **AI usage**, not actions. A longer or larger request uses more; a request that stops early uses less. Your balance is checked before a request starts and debited after it finishes — nothing is reserved up front.
+Credits meter **AI usage**, not actions. A longer or larger request uses more; a request that stops early uses less. Your balance is checked before a request starts and debited as the work happens — nothing is reserved up front. The line under the chat box shows what the prompt has cost so far. See [What one prompt costs](/guides/billing#what-one-prompt-costs).
 
 <Warning>
   **A request that fails is still charged for the AI work it did before failing.** There is no refund. If the agent errors out halfway through a change, the part it had already done is billed.
