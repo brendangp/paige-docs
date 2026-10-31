@@ -50,10 +50,6 @@
       "description": "Read/edit bot code, deploy, read/generate/update flows."
     },
     {
-      "name": "Chat",
-      "description": "Send Paige a message in plain language and get its reply (projects on the new AI engine)."
-    },
-    {
       "name": "Tables",
       "description": "Read and write the project's own database tables. Paige platform tables are denied, and an update or delete must always be filtered."
     },
@@ -1109,7 +1105,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1533,7 +1529,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2260,8 +2256,8 @@
         "tags": [
           "Conversations"
         ],
-        "summary": "List conversations (state + archive filter, keyset cursor)",
-        "description": "Most recently active first. Each conversation carries `archived`, and `archived=exclude` or `archived=only` narrows the list; the filter applies before paging, so `hasMore` and `nextCursor` stay correct.\n\nArchive belongs to the contact: every conversation of an archived contact counts as archived. A chat whose latest conversation is in `handover` is never archived, even if an archive is stored.\n\n**`409 ARCHIVE_NOT_AVAILABLE`** — `exclude` or `only` on a project that has archived chats but has not received the migration this filter needs. The default `include` always answers there, with `archived: null` on each conversation. A project where archiving was never set up has nothing archived, so it answers normally. **`503 ARCHIVE_CHECK_FAILED`** — archived chats could not be read just now, or reading them timed out; retry. `include` answers `archived: null` when only the check failed.\n\n**Required scope:** `conversations:read`",
+        "summary": "List conversations (state filter, keyset cursor)",
+        "description": "List conversations (state filter, keyset cursor)\n\n**Required scope:** `conversations:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -2281,20 +2277,6 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "include",
-                "exclude",
-                "only"
-              ],
-              "description": "`include` (default): every conversation. `exclude`: leave archived chats out. `only`: archived chats only. Any other value is `400 invalid_request`."
-            },
-            "required": false,
-            "name": "archived",
-            "in": "query"
-          },
-          {
-            "schema": {
               "type": [
                 "integer",
                 "null"
@@ -2308,7 +2290,7 @@
           {
             "schema": {
               "type": "string",
-              "description": "Opaque nextCursor from a prior page. Keep the same `archived` value across pages."
+              "description": "Opaque nextCursor from a prior page."
             },
             "required": false,
             "name": "cursor",
@@ -2443,13 +2425,6 @@
                                   "content",
                                   "direction"
                                 ]
-                              },
-                              "archived": {
-                                "type": [
-                                  "boolean",
-                                  "null"
-                                ],
-                                "description": "Whether the contact of this conversation is archived; every conversation of an archived contact reads true. A chat whose latest conversation is in handover is never archived. `null` means Paige could not tell on this project right now: treat it as unknown, not as false."
                               }
                             },
                             "required": [
@@ -2458,8 +2433,7 @@
                               "status",
                               "wa_user_id",
                               "contact",
-                              "last_message",
-                              "archived"
+                              "last_message"
                             ]
                           }
                         },
@@ -2526,16 +2500,6 @@
               }
             }
           },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
             "headers": {
@@ -2574,16 +2538,6 @@
           },
           "500": {
             "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3407,7 +3361,7 @@
           "Conversations"
         ],
         "summary": "Set a conversation's state (validated against known states)",
-        "description": "Sets the conversation's state. **`state` is required** — it is enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`, not a no-op. The value is validated against the states this project actually uses. Moving a conversation INTO `handover` also clears the contact's archive and its assignee, so the chat lands in Unassigned in the dashboard. An API call has no member behind it, so it always unassigns (only a dashboard member handing over their own chat keeps it).\n\n**Required scope:** `conversations:write`",
+        "description": "Sets the conversation's state. **`state` is required** — it is enforced by a cross-field rule the schema below cannot express, so an empty body is `400 invalid_request`, not a no-op. The value is validated against the states this project actually uses.\n\n**Required scope:** `conversations:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -3864,432 +3818,6 @@
           },
           "500": {
             "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/contacts/{id}/archive": {
-      "post": {
-        "operationId": "archiveChat",
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Archive a contact's chat",
-        "description": "Takes the chat out of the dashboard's lists, except Archived. `{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. No request body.\n\n**Idempotent:** archiving an archived chat succeeds and keeps the first `archived_at`. The assignee is kept.\n\n**Side effect:** a chat in `handover` goes back to the bot, because an archived chat has nobody answering it. A new inbound message does not unarchive the chat; setting it to `handover` does.\n\n**`409 ARCHIVE_NOT_AVAILABLE`** — archiving isn't set up on this project yet. Nothing is written. **`503 ARCHIVE_CHECK_FAILED`** — Paige could not tell just now; nothing is written, retry. An unknown contact is `404 CONTACT_NOT_FOUND`.\n\n**Required scope:** `conversations:write`",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "x-required-scopes": [
-          "conversations:write"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "enum": [
-                "phone",
-                "bsuid"
-              ]
-            },
-            "required": false,
-            "name": "identifierType",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
-            },
-            "required": false,
-            "name": "X-Paige-Project",
-            "in": "header"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "contact": {
-                          "type": "object",
-                          "properties": {
-                            "phone": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            },
-                            "bsuid": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            }
-                          },
-                          "required": [
-                            "phone",
-                            "bsuid"
-                          ]
-                        },
-                        "archived": {
-                          "type": "boolean"
-                        },
-                        "archived_at": {}
-                      },
-                      "required": [
-                        "contact",
-                        "archived"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found (`not_found` / `*_not_found`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
-            "headers": {
-              "RateLimit-Limit": {
-                "description": "Requests permitted in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Remaining": {
-                "description": "Requests remaining in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Reset": {
-                "description": "Seconds until the window resets.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds to wait before retrying.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/contacts/{id}/unarchive": {
-      "post": {
-        "operationId": "unarchiveChat",
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Bring a contact's chat back from Archived",
-        "description": "Returns the chat to its assignee's lists, or to Unassigned if it has none. `{id}` is the contact phone (E.164) by default, or its BSUID with `?identifierType=bsuid`. No request body.\n\n**Idempotent:** a chat that is not archived succeeds with `archived: false`. The conversation state is not changed.\n\n**`409 ARCHIVE_NOT_AVAILABLE`** — archiving isn't set up on this project yet. **`503 ARCHIVE_CHECK_FAILED`** — Paige could not tell just now; nothing is written, retry. An unknown contact is `404 CONTACT_NOT_FOUND`.\n\n**Required scope:** `conversations:write`",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "x-required-scopes": [
-          "conversations:write"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "enum": [
-                "phone",
-                "bsuid"
-              ]
-            },
-            "required": false,
-            "name": "identifierType",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
-            },
-            "required": false,
-            "name": "X-Paige-Project",
-            "in": "header"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "contact": {
-                          "type": "object",
-                          "properties": {
-                            "phone": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            },
-                            "bsuid": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            }
-                          },
-                          "required": [
-                            "phone",
-                            "bsuid"
-                          ]
-                        },
-                        "archived": {
-                          "type": "boolean"
-                        },
-                        "archived_at": {}
-                      },
-                      "required": [
-                        "contact",
-                        "archived"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found (`not_found` / `*_not_found`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
-            "headers": {
-              "RateLimit-Limit": {
-                "description": "Requests permitted in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Remaining": {
-                "description": "Requests remaining in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Reset": {
-                "description": "Seconds until the window resets.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds to wait before retrying.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4838,7 +4366,7 @@
           "Build"
         ],
         "summary": "Author or edit bot code via the code agent",
-        "description": "Runs Paige's code agent (its system prompt, scaffold + connector awareness, and guardrails) in a bounded headless loop to write/edit the bot's code from a natural-language instruction — the higher-quality counterpart to `PUT /v1/files/{path}`. Flow JSON is rejected (use the flow endpoints). Frozen/injected/auto-generated files (e.g. `services/messages.js`, `config/mediaAssets.js`, `package.json`, `.paige/**`) are refused, while the agent still authors the bot wiring it owns (`routes/*`, `app.js`, `config/db.js`). Consumes credits; rejected with `402 insufficient_credits` when out of balance. A truncated or failed agent run returns `502 build_failed`.\n\n**Projects on the new AI engine (v2) answer with a `status` (GRE-1040).** The request runs on the same engine as the dashboard chat, with nobody watching: it is routed (a question about the bot is answered free of charge, a change is built, a big change is planned first), it may change WhatsApp Flows too when the key also holds `flows:write` (and read templates, broadcasts or conversation states only with `templates:read` / `broadcasts:read` / `conversations:read`; it never sends, never tags and never reads contacts — use those endpoints). Each credential (API key, or MCP connection) has its OWN build conversation: a build sees that credential's earlier builds, never the dashboard chat or another key's builds, and it never appears in the dashboard chat. **One build per project at a time:** a second `POST /v1/code` (or a plan approval) while a build is running on the project — or while the key owner has a chat turn running in the dashboard — answers `409 build_in_progress`; retry when it has finished. A build that reaches its step or token limit stops there (it is never resumed automatically); send another call to carry on. Read `status` before anything else:\n- `completed` — done; `summary` and `files_changed` as before (`cancelled: true` when the run hit its time limit or you disconnected: what it wrote is kept).\n- `needs_confirmation` — a big change was PLANNED and nothing was built. `plan` holds the plan (goal, approach, steps, risks, complexity, what it touches) and `plan_id` its id. Show it to your user, then call `POST /v1/code/plans/{plan_id}/decision` (`confirm_path`) with `approve`, `reject` or `revise`.\n- `needs_input` — Paige needs an answer before it can work; `question` is what it asked, and `options` (2 to 4, each a `label` and an optional `description`) when it asked a multiple-choice question: answer with one label, or with your own words when `allow_other` is true. Send the answer as the `instruction` of another `POST /v1/code` call: the question is part of the conversation that call reads.\nProjects on the current engine never send `status`, `engine`, `turn_id` or the fields after them: their response is exactly the three fields it has always been.\n\n**Required scope:** `code:write`",
+        "description": "Runs Paige's code agent (its system prompt, scaffold + connector awareness, and guardrails) in a bounded headless loop to write/edit the bot's code from a natural-language instruction — the higher-quality counterpart to `PUT /v1/files/{path}`. Flow JSON is rejected (use the flow endpoints). Frozen/injected/auto-generated files (e.g. `services/messages.js`, `config/mediaAssets.js`, `package.json`, `.paige/**`) are refused, while the agent still authors the bot wiring it owns (`routes/*`, `app.js`, `config/db.js`). Consumes credits; rejected with `402 insufficient_credits` when out of balance. A truncated or failed agent run returns `502 build_failed`.\n\n**Required scope:** `code:write`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -4897,173 +4425,16 @@
                       "type": "object",
                       "properties": {
                         "summary": {
-                          "type": "string",
-                          "description": "What the agent did or said."
+                          "type": "string"
                         },
                         "files_changed": {
                           "type": "array",
                           "items": {
                             "type": "string"
-                          },
-                          "description": "Project files the run wrote (dev)."
+                          }
                         },
                         "cancelled": {
-                          "type": "boolean",
-                          "description": "True when the run was cut off (time limit, or the caller disconnected). Work already written is kept."
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": [
-                            "completed",
-                            "needs_confirmation",
-                            "needs_input"
-                          ],
-                          "description": "v2 engine only. `needs_confirmation`: a plan waits for POST /v1/code/plans/{plan_id}/decision. `needs_input`: answer `question` with another POST /v1/code."
-                        },
-                        "engine": {
-                          "type": "string",
-                          "enum": [
-                            "v2"
-                          ],
-                          "description": "v2 engine only: which engine ran the build."
-                        },
-                        "turn_id": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "v2 engine only: the turn id (matches its trace and its credit-ledger row)."
-                        },
-                        "plan_id": {
-                          "type": "string",
-                          "description": "With `needs_confirmation` (and on an approved build): the plan id."
-                        },
-                        "plan": {
-                          "type": [
-                            "object",
-                            "null"
-                          ],
-                          "properties": {},
-                          "description": "With `needs_confirmation`: the proposed plan — `goal`, `approach`, `build_choice` (`kind` flow / code / both, `reason`, `verification` verified / unverified / unknown, `messages_fallback`; absent on plans saved before it existed), `steps` (each `id`, `title`, `files`, `checks`), `risks`, `complexity` (1-4), `touches` (`deploy` / `data` / `broadcasts`), optional `contract_notes`."
-                        },
-                        "confirm_path": {
-                          "type": "string",
-                          "description": "With `needs_confirmation`: where to send the decision."
-                        },
-                        "question": {
-                          "type": "string",
-                          "description": "With `needs_input`: what Paige asked."
-                        },
-                        "options": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "label": {
-                                "type": "string",
-                                "description": "The choice, in a few words. Send it back as the answer."
-                              },
-                              "description": {
-                                "type": "string",
-                                "description": "What choosing it means, in one line."
-                              }
-                            },
-                            "required": [
-                              "label"
-                            ]
-                          },
-                          "description": "With `needs_input` when Paige asked a multiple-choice question (GRE-1052): 2 to 4 choices. Answer with one `label` exactly, or — when `allow_other` is true — with your own words."
-                        },
-                        "allow_other": {
-                          "type": "boolean",
-                          "description": "With `options`: true when an answer other than the listed labels is welcome."
-                        },
-                        "tests": {
-                          "type": "object",
-                          "properties": {
-                            "status": {
-                              "type": "string",
-                              "enum": [
-                                "passed",
-                                "failed",
-                                "inconclusive",
-                                "skipped",
-                                "aborted"
-                              ]
-                            },
-                            "reason": {
-                              "type": [
-                                "string",
-                                "null"
-                              ],
-                              "description": "Why the run was skipped or not conclusive (e.g. `insufficient_credits`, `run_in_progress`, `ai_step_cap`), or null."
-                            },
-                            "scenarios": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "string"
-                                  },
-                                  "status": {
-                                    "type": "string",
-                                    "enum": [
-                                      "passed",
-                                      "failed",
-                                      "inconclusive",
-                                      "skipped",
-                                      "aborted"
-                                    ]
-                                  },
-                                  "reason": {
-                                    "type": [
-                                      "string",
-                                      "null"
-                                    ]
-                                  },
-                                  "steps": {
-                                    "type": "integer"
-                                  },
-                                  "attempts": {
-                                    "type": "integer"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "status",
-                                  "reason",
-                                  "steps",
-                                  "attempts"
-                                ]
-                              }
-                            },
-                            "jev_calls": {
-                              "type": "integer"
-                            },
-                            "ai_steps": {
-                              "type": "integer"
-                            },
-                            "run_id": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            },
-                            "duration_ms": {
-                              "type": "integer"
-                            }
-                          },
-                          "required": [
-                            "status",
-                            "reason",
-                            "scenarios",
-                            "jev_calls",
-                            "ai_steps",
-                            "run_id",
-                            "duration_ms"
-                          ],
-                          "description": "v2 engine only (GRE-1047): when the build changed the bot and it has test scenarios, its tests were played through the preview bot when the build finished (failures went back to the builder, at most twice); this is the LAST run of the build. Codes and counts only — never message text."
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -5121,16 +4492,6 @@
               }
             }
           },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
             "headers": {
@@ -5179,411 +4540,6 @@
           },
           "502": {
             "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/code/plans/{id}/decision": {
-      "post": {
-        "operationId": "decideBuildPlan",
-        "tags": [
-          "Build"
-        ],
-        "summary": "Confirm, reject or revise a build plan",
-        "description": "The follow-up to a `POST /v1/code` that answered `status: \"needs_confirmation\"` (projects on the new AI engine only, GRE-1040). `{id}` is that response's `plan_id`. Only the SAME credential whose build proposed the plan can decide it — the same API key (or the same MCP connection) — never another key of the same owner and never a plan proposed in the dashboard chat; any other plan id answers `404 not_found`.\n\n- `approve` builds the plan now and answers like `POST /v1/code` (`status` `completed` / `needs_input`, `summary`, `files_changed`, plus `plan_id`). Approving a plan whose build stopped part-way resumes it from its first unfinished step. Consumes credits.\n- `reject` drops the plan. `revise` records what to change — **`note` is required for revise** (`400 note_required` without it) — and the next `POST /v1/code` call plans again with that note. Both answer `status: \"decided\"`.\n\nRepeating a decision is safe: a plan that is already building, built, or decided the same way answers `status: \"decided\"` with `already_decided: true` and starts nothing; a different decision on a decided plan is `409 plan_already_decided`. Supports the optional `Idempotency-Key` header. Approving while another build is running on the project answers `409 build_in_progress`. A project not on the new engine answers `409 engine_unavailable`.\n\n**Required scope:** `code:write`",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "x-required-scopes": [
-          "code:write"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
-            },
-            "required": false,
-            "name": "X-Paige-Project",
-            "in": "header"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "decision": {
-                    "type": "string",
-                    "enum": [
-                      "approve",
-                      "reject",
-                      "revise"
-                    ],
-                    "description": "\"approve\" builds the plan now (and resumes a plan whose build stopped part-way); \"reject\" drops it; \"revise\" records what to change (note required) for the next build_code call to plan again."
-                  },
-                  "note": {
-                    "type": "string",
-                    "maxLength": 2000,
-                    "description": "Optional guidance for the builder on approve; REQUIRED for revise (what to change). At most 2000 characters."
-                  }
-                },
-                "required": [
-                  "decision"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "summary": {
-                          "type": "string"
-                        },
-                        "files_changed": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "cancelled": {
-                          "type": "boolean"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": [
-                            "completed",
-                            "needs_input",
-                            "needs_confirmation",
-                            "decided"
-                          ],
-                          "description": "`decided` for reject / revise and for a repeat; otherwise the approved build's status, as on `POST /v1/code`."
-                        },
-                        "engine": {
-                          "type": "string",
-                          "enum": [
-                            "v2"
-                          ],
-                          "description": "v2 engine only: which engine ran the build."
-                        },
-                        "turn_id": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "v2 engine only: the turn id (matches its trace and its credit-ledger row)."
-                        },
-                        "plan_id": {
-                          "type": "string",
-                          "description": "With `needs_confirmation` (and on an approved build): the plan id."
-                        },
-                        "plan": {
-                          "type": [
-                            "object",
-                            "null"
-                          ],
-                          "properties": {},
-                          "description": "With `status: \"decided\"`: the plan row — `id`, `status` (proposed | rejected | approved | building | completed | failed), `decision`, `requires_approval`, `completed_steps`, `plan`. With `needs_confirmation` on `POST /v1/code`: the proposed plan itself."
-                        },
-                        "confirm_path": {
-                          "type": "string",
-                          "description": "With `needs_confirmation`: where to send the decision."
-                        },
-                        "question": {
-                          "type": "string",
-                          "description": "With `needs_input`: what Paige asked."
-                        },
-                        "options": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "label": {
-                                "type": "string",
-                                "description": "The choice, in a few words. Send it back as the answer."
-                              },
-                              "description": {
-                                "type": "string",
-                                "description": "What choosing it means, in one line."
-                              }
-                            },
-                            "required": [
-                              "label"
-                            ]
-                          },
-                          "description": "With `needs_input` when Paige asked a multiple-choice question (GRE-1052): 2 to 4 choices. Answer with one `label` exactly, or — when `allow_other` is true — with your own words."
-                        },
-                        "allow_other": {
-                          "type": "boolean",
-                          "description": "With `options`: true when an answer other than the listed labels is welcome."
-                        },
-                        "tests": {
-                          "type": "object",
-                          "properties": {
-                            "status": {
-                              "type": "string",
-                              "enum": [
-                                "passed",
-                                "failed",
-                                "inconclusive",
-                                "skipped",
-                                "aborted"
-                              ]
-                            },
-                            "reason": {
-                              "type": [
-                                "string",
-                                "null"
-                              ],
-                              "description": "Why the run was skipped or not conclusive (e.g. `insufficient_credits`, `run_in_progress`, `ai_step_cap`), or null."
-                            },
-                            "scenarios": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "string"
-                                  },
-                                  "status": {
-                                    "type": "string",
-                                    "enum": [
-                                      "passed",
-                                      "failed",
-                                      "inconclusive",
-                                      "skipped",
-                                      "aborted"
-                                    ]
-                                  },
-                                  "reason": {
-                                    "type": [
-                                      "string",
-                                      "null"
-                                    ]
-                                  },
-                                  "steps": {
-                                    "type": "integer"
-                                  },
-                                  "attempts": {
-                                    "type": "integer"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "status",
-                                  "reason",
-                                  "steps",
-                                  "attempts"
-                                ]
-                              }
-                            },
-                            "jev_calls": {
-                              "type": "integer"
-                            },
-                            "ai_steps": {
-                              "type": "integer"
-                            },
-                            "run_id": {
-                              "type": [
-                                "string",
-                                "null"
-                              ]
-                            },
-                            "duration_ms": {
-                              "type": "integer"
-                            }
-                          },
-                          "required": [
-                            "status",
-                            "reason",
-                            "scenarios",
-                            "jev_calls",
-                            "ai_steps",
-                            "run_id",
-                            "duration_ms"
-                          ],
-                          "description": "v2 engine only (GRE-1047): when the build changed the bot and it has test scenarios, its tests were played through the preview bot when the build finished (failures went back to the builder, at most twice); this is the LAST run of the build. Codes and counts only — never message text."
-                        },
-                        "already_decided": {
-                          "type": "boolean",
-                          "description": "With `status: \"decided\"`: true when nothing new was recorded or started (a repeat, a lost race, or a plan already built)."
-                        }
-                      },
-                      "required": [
-                        "status"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Out of credits (`insufficient_credits`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found (`not_found` / `*_not_found`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
-            "headers": {
-              "RateLimit-Limit": {
-                "description": "Requests permitted in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Remaining": {
-                "description": "Requests remaining in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Reset": {
-                "description": "Seconds until the window resets.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds to wait before retrying.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5634,7 +4590,7 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "Custom table names whose DATA to copy dev→prod. Structure always syncs; omit to leave production rows untouched. A table behind an editable dashboard table is copied only while production is empty, and that copy only inserts; once it has rows they are kept. Nothing is copied unless it is named here: such a table left out while production is empty comes back in data_copy_skipped with reason not_seeded."
+                    "description": "Custom table names whose DATA to copy dev→prod. Structure always syncs; omit to leave production rows untouched."
                   },
                   "flows": {
                     "type": "array",
@@ -5698,21 +4654,6 @@
                         "rows_copied": {
                           "type": "number",
                           "description": "Rows copied for the tables named in `tables`. 0 when data copy was not requested."
-                        },
-                        "data_copy_skipped": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {}
-                          },
-                          "description": "Report-only (GRE-1104). Each entry (`table`, `reason`) names a table in `tables` whose production rows were kept. `live_rows`: a dashboard edits this table and production already has rows, so a copy would overwrite them. `check_failed`: Paige could not tell, so it left the table alone. `not_seeded`: a dashboard edits this table and production is empty, but it was not in `tables`, so nothing was copied; name it in `tables` to seed it, and that copy only inserts. A non-empty list NEVER means the deploy failed, and these are deliberately kept OUT of `table_errors`."
-                        },
-                        "dashboards_unreadable": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          },
-                          "description": "Report-only (GRE-1104). Dashboard files Paige could not read during the data copy, on either the working copy or production. Nobody can say which tables such a file edits, so every table with production rows was kept (`check_failed`). Fix the file to copy those tables again."
                         },
                         "table_errors": {
                           "type": "array",
@@ -5791,8 +4732,6 @@
                         "tables_synced",
                         "sequences_repaired",
                         "rows_copied",
-                        "data_copy_skipped",
-                        "dashboards_unreadable",
                         "table_errors",
                         "table_sync_failed",
                         "flows_published",
@@ -6897,339 +5836,6 @@
         }
       }
     },
-    "/v1/chat": {
-      "post": {
-        "operationId": "chat",
-        "tags": [
-          "Chat"
-        ],
-        "summary": "Send Paige a message and get its reply",
-        "description": "Talk to Paige the way a person does in the dashboard chat: one plain-language `message` — a question about the bot, a change to build, something to do with conversations, templates or broadcasts, or the answer to a question Paige asked — and Paige's `reply`. **Projects on the new AI engine only**; any other project answers `409 engine_unavailable` (use the other endpoints, e.g. `POST /v1/code`). The MCP tool `ask_paige` wraps this endpoint.\n\n**What Paige may do is decided by your key's OTHER scopes, action by action.** `agent:chat` opens the conversation and nothing more: reading code needs `code:read`, changing it needs `code:write` (flows also `flows:write`), reading or changing conversations needs `conversations:read` / `conversations:write`, contacts `contacts:read` / `contacts:write`, templates `templates:read`, broadcasts `broadcasts:read` / `broadcasts:manage`, project tables `tables:read` / `tables:write` (a table change also needs `code:write`; a raw query also needs `contacts:read` + `conversations:read`, because it can read Paige's own tables; the bot's logs also need `conversations:read`). Without the scope, Paige is told the action is not allowed for this key and says so in its reply. Paige never drafts into the dashboard composer and never drives the dashboard preview bot.\n\n**Nothing is SENT from a chat, and four kinds of change always wait for a person.** Creating a template, sending a template, tagging an audience and a campaign come back as `actions` (the reply ends with `status: \"needs_confirmation\"`) — Paige cannot create a template or tag contacts itself through the API, whatever the key holds. Other changes DO apply when the key holds that endpoint's scope: a conversation's state (`conversations:write`), a segment (`broadcasts:manage`), code, tables and flows (`code:write`, `tables:write`, `flows:write`, including publishing a flow). Each action is for you (or your user) to carry out: `template_send` (needs `messages:send` to be proposed; send it with `POST /v1/messages`), `template_create` (needs `templates:manage` to be proposed; create it with `POST /v1/templates`), `tag_audience` (needs `contacts:write`; apply it in the dashboard or per contact with `PATCH /v1/contacts/{id}`), `broadcast_approval` (a campaign held in `pending_approval`, `broadcast_id`; it is approved in the dashboard only).\n\n**Shared with `POST /v1/code`:** the same per-credential conversation (each API key, or MCP connection, has its own; it never sees the dashboard chat or another key's calls, and never appears in the dashboard chat) — so a plan proposed here (`needs_confirmation` with `plan_id`) is decided with `POST /v1/code/plans/{plan_id}/decision` (needs `code:write`), and a question asked here (`needs_input`) is answered by your next message. The same single-flight rule: one API / MCP turn per project at a time, and none while the key owner has a chat turn running in the dashboard — `409 build_in_progress`, for questions too; retry when it has finished. A turn that reaches its step or token limit stops there; send another message to carry on. A turn that writes code commits it like a build.\n\n**Billing:** a question about your bot or Paige is free; every other reply uses credits like a dashboard chat turn (`402 insufficient_credits` when out of balance). **Rate limit:** its own per-key bucket of 10 messages a minute, on top of the general per-key limit (`429 rate_limited`). Read `status` first:\n- `completed` — `reply` is Paige's answer (`files_changed` lists what it wrote; `cancelled: true` when it hit its time limit or you disconnected — what it wrote is kept).\n- `needs_confirmation` — a plan (`plan_id`, `plan`, `confirm_path`) and/or `actions` wait for a person.\n- `needs_input` — Paige asked `question` (with `options` when it is multiple choice: answer with one `label`, or your own words when `allow_other` is true); send the answer as your next `message`.\n\n**Required scope:** `agent:chat`",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "x-required-scopes": [
-          "agent:chat"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "description": "Target project id, for an MCP OAuth bearer (`mcp_at_…`) attached to more than one project — get ids from `GET /v1/projects`. Matched case-insensitively.\n\nOmit it and a READ falls back to the connection's default project; a **mutation** (any non-GET) on a connection with 2+ projects is rejected with `400 project_required` — a write is never defaulted to a guessed project. A connection with exactly one project never needs the header.\n\nScopes are checked against the SELECTED project only, never a union across the connection.\n\nFor a `pk_` API key the header selects nothing — one key is one project's context — but it IS validated: omit it and the key's own project is used, send it and it must name that project, otherwise the call is rejected with `403 project_not_attached` (a blank value is `400 invalid_project_header`, as above)."
-            },
-            "required": false,
-            "name": "X-Paige-Project",
-            "in": "header"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "message": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 10000,
-                    "description": "What you want from Paige, in plain language: a question about the bot, a change to build, something to do with conversations, templates or broadcasts, or the answer to a question Paige asked you."
-                  }
-                },
-                "required": [
-                  "message"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "status": {
-                          "type": "string",
-                          "enum": [
-                            "completed",
-                            "needs_confirmation",
-                            "needs_input"
-                          ],
-                          "description": "`needs_confirmation`: a plan and/or `actions` wait for a person. `needs_input`: answer `question` with your next message."
-                        },
-                        "reply": {
-                          "type": "string",
-                          "description": "Paige's reply (its final message of the turn)."
-                        },
-                        "files_changed": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          },
-                          "description": "Project files the turn wrote (dev); empty for most replies."
-                        },
-                        "cancelled": {
-                          "type": "boolean",
-                          "description": "True when the turn was cut off (time limit, or the caller disconnected). Work already written is kept."
-                        },
-                        "engine": {
-                          "type": "string",
-                          "enum": [
-                            "v2"
-                          ]
-                        },
-                        "turn_id": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
-                          "description": "The turn id (matches its trace and its credit-ledger row)."
-                        },
-                        "plan_id": {
-                          "type": "string",
-                          "description": "With a plan: decide it with POST /v1/code/plans/{plan_id}/decision."
-                        },
-                        "plan": {
-                          "type": [
-                            "object",
-                            "null"
-                          ],
-                          "properties": {},
-                          "description": "With a plan: the proposed plan (as on POST /v1/code)."
-                        },
-                        "confirm_path": {
-                          "type": "string"
-                        },
-                        "question": {
-                          "type": "string",
-                          "description": "With `needs_input` (or with `needs_confirmation` when Paige also asked something in the same turn): what Paige asked."
-                        },
-                        "options": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "label": {
-                                "type": "string",
-                                "description": "The choice, in a few words. Send it back as the answer."
-                              },
-                              "description": {
-                                "type": "string",
-                                "description": "What choosing it means, in one line."
-                              }
-                            },
-                            "required": [
-                              "label"
-                            ]
-                          },
-                          "description": "With `question` when Paige asked a multiple-choice question (GRE-1052): 2 to 4 choices. Answer with one `label` exactly, or — when `allow_other` is true — with your own words."
-                        },
-                        "allow_other": {
-                          "type": "boolean",
-                          "description": "With `options`: true when an answer other than the listed labels is welcome."
-                        },
-                        "actions": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "type": {
-                                "type": "string",
-                                "enum": [
-                                  "template_send",
-                                  "template_create",
-                                  "tag_audience",
-                                  "broadcast_approval"
-                                ],
-                                "description": "What waits for a person. `template_send` → send with POST /v1/messages; `template_create` → POST /v1/templates; `tag_audience` → apply in the dashboard (or per contact, PATCH /v1/contacts/{id}); `broadcast_approval` → approve the held campaign in the dashboard."
-                              },
-                              "proposal": {
-                                "type": "object",
-                                "properties": {},
-                                "description": "template_send / template_create / tag_audience: the proposal, exactly as the dashboard's approval card shows it (recipient, template, variables; the template draft; the audience, its count and the tags)."
-                              },
-                              "broadcast_id": {
-                                "type": "string",
-                                "description": "broadcast_approval: the campaign held in pending_approval."
-                              },
-                              "status": {
-                                "type": "string",
-                                "description": "broadcast_approval: `pending_approval`."
-                              },
-                              "summary": {
-                                "type": [
-                                  "object",
-                                  "null"
-                                ],
-                                "properties": {},
-                                "description": "broadcast_approval: audience count, estimated cost, template preview, variable mapping, schedule."
-                              },
-                              "launch_blocked_reason": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ],
-                                "description": "broadcast_approval: why it cannot launch yet (e.g. its template is still pending), or null."
-                              }
-                            },
-                            "required": [
-                              "type"
-                            ]
-                          },
-                          "description": "With `needs_confirmation`: what Paige proposed and nobody has done yet — template creates and sends, audience tags and campaigns are never applied from a chat. (Other changes, made with the key's scopes, have already applied and are described in `reply`.)"
-                        }
-                      },
-                      "required": [
-                        "status",
-                        "reply",
-                        "files_changed",
-                        "cancelled",
-                        "engine",
-                        "turn_id"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation / bad request (e.g. `invalid_request`, `invalid_cursor`, `invalid_template` for a Meta 4xx rejection of a template payload, which carries Meta's own detail as the message; note `outside_24h_window` is 409, not 400). Also `invalid_project_header` (any credential: `X-Paige-Project` was sent but blank) and, for multi-project MCP bearers, `project_required` (a mutation, or a read with no default, and no `X-Paige-Project`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key (`api_key_required` / `invalid_api_key` / `invalid_token` for a revoked or expired OAuth bearer).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Out of credits (`insufficient_credits`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Key lacks the required scope, project inactive, or a write targets a platform-protected file (`insufficient_scope` / `project_inactive` / `subscription_inactive` / `protected_file`). Also `project_not_attached` (the `X-Paige-Project` project is not one this credential may act on — not attached to the MCP connection, or not the `pk_` key's own project; identical response whether or not it exists) and, for MCP bearers, `no_project_access` (the connection has no projects attached).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit (`rate_limited`) or daily send quota (`quota_exceeded`) exceeded. Carries `RateLimit-*` + `Retry-After` headers.",
-            "headers": {
-              "RateLimit-Limit": {
-                "description": "Requests permitted in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Remaining": {
-                "description": "Requests remaining in the current window.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "RateLimit-Reset": {
-                "description": "Seconds until the window resets.",
-                "schema": {
-                  "type": "integer"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds to wait before retrying.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error (`server_error`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Upstream failure — a Meta credentials rejection (`meta_auth_error`) or a failed/truncated agent run on the build + flow endpoints (`build_failed`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Temporarily unavailable — try again (`credit_check_failed`, `plan_build_unavailable`, `plans_unavailable`).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/segments": {
       "post": {
         "operationId": "createSegment",
@@ -7431,7 +6037,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8643,7 +7249,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8871,7 +7477,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -9160,7 +7766,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -9408,7 +8014,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -9706,7 +8312,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -9910,7 +8516,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -10404,7 +9010,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -11273,7 +9879,7 @@
             }
           },
           "409": {
-            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`). On the build endpoints: `build_in_progress` (one build per project at a time), `plan_already_decided` or `engine_unavailable`.",
+            "description": "Conflict — 24h window closed (`outside_24h_window`) or idempotency (`idempotency_in_progress` / `idempotency_key_mismatch`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -12341,7 +10947,7 @@
     {
       "scope": "conversations:write",
       "label": "Update conversations",
-      "description": "Change a conversation's state (e.g. handover / open / closed) and archive or unarchive a chat."
+      "description": "Change a conversation's state (e.g. handover / open / closed)."
     },
     {
       "scope": "contacts:read",
@@ -12412,11 +11018,6 @@
       "scope": "media:write",
       "label": "Upload media",
       "description": "Upload new media assets and delete existing ones."
-    },
-    {
-      "scope": "agent:chat",
-      "label": "Chat with Paige",
-      "description": "Send Paige a message in plain language and get its answer back. Anything Paige does for the message (build code, change a conversation, prepare a broadcast…) still needs that action's own scope. Questions are free; other replies use credits."
     },
     {
       "scope": "webhooks:manage",
