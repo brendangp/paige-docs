@@ -60,11 +60,27 @@ Also worth knowing: the live preview when creating a [message template](/guides/
 
 ## Notifications
 
-**Settings → Notifications** has a single switch: **Push notifications**. Turning it on asks your browser's permission — say yes. That's the whole setup; there's nothing else to configure.
+Notifications work on your computer as well as your phone, and Paige doesn't have to be installed, except on iPhone and iPad. Each person turns them on for themselves, on each device or browser they use, because only you can click **Allow**.
+
+### Turning them on
+
+You don't need Settings for this. There are three ways in:
+
+- **The prompt.** If you have the Conversations tab on a project, a **Turn on notifications** message appears when you open that project. Click **Enable**, then **Allow** when your browser asks. Close it with the **X** and it won't come back on that device.
+- **Your account menu.** Click your picture at the top right and choose **Turn on notifications**. On a phone it's in the **☰** menu instead. This works for everyone, including people who can't open Settings. If they're already on, it says **Notifications are on**.
+- **Settings → Notifications.** The **Push notifications** switch does the same, and shows your status: **Enabled**, **Disabled**, **Permission denied** or **Not supported on this browser**.
+
+On a company's own [branded web address](/guides/white-label), there's no Notifications section in Settings, so use the prompt or the account menu.
+
+<Note>
+  **On iPhone or iPad**, notifications only work once Paige is on your Home Screen (iOS 16.4 or later). Instead of an **Enable** button, the prompt and the menu show you how: tap **Share**, then **Add to Home Screen**, and open Paige from there. Then turn notifications on from the installed app. See [Install it](#install-it).
+</Note>
 
 {/* TODO: HAND-02 — Settings → Notifications in the installed app on a phone, with the Push notifications switch on, and the browser permission prompt over it if you can catch both. Physical handset; hand-shot. See SCREENSHOT-PACK.md (GRE-434). */}
 
-Paige notifies you about four things:
+### What Paige notifies you about
+
+Paige notifies you about four things. Tapping a notification opens Paige in the right place: the customer's chat for a message, or the Code tab for a deploy.
 
 <AccordionGroup>
   <Accordion title="A customer message that needs you" icon="message-circle">
@@ -73,6 +89,8 @@ Paige notifies you about four things:
     You won't get pinged for every message your bot handles by itself. That's the point: it's telling you when your bot *isn't* handling it.
 
     Everyone with access to Conversations on the project gets these, except that someone whose [conversation access](/guides/settings-project#conversation-access) is **Only assigned** only gets them for the conversations assigned to them.
+
+    **If your bot runs on your own server**, it works differently: only the person the chat is assigned to is told when the customer replies, and only while the chat is in handover. The notification shows the contact's name and the start of their message. It stays quiet for messages the bot handles on its own, and never tells you about your own replies.
   </Accordion>
   <Accordion title="A conversation was assigned to you" icon="user-check">
     **New conversation assigned**, with the contact's name, when a manager [assigns you a conversation](/guides/conversations-tab#assigning-conversations). Only the person it's assigned to gets this.
@@ -87,17 +105,34 @@ Paige notifies you about four things:
 
 ### Per device, but every device
 
-The switch controls **this device only** — turning it on on your phone doesn't turn it on on your laptop.
+Turning notifications on affects **this device only** — turning them on on your phone doesn't turn them on on your laptop. Signing out turns them off on that device.
 
 But once a device is subscribed it gets everything. So with your phone and laptop both on, every notification arrives on both.
 
-<Note>
-  **You won't get a notification while you're looking at Paige.** If a Paige window is open and focused, the notification is suppressed — you'd see the message arrive on screen anyway. They show up when Paige is in the background, on another tab, or closed. If you're testing notifications and nothing appears, switch away from Paige first.
-</Note>
+### While Paige is open in front of you
+
+You still get a notification about a chat, unless you're looking at that exact chat. So with Paige open on one customer's chat, a message from another customer still shows a notification, and a message on the chat you have open doesn't: you see it arrive on screen. Click the notification and that chat opens in the Paige window you already have.
+
+Deploy and broadcast notifications stay quiet while Paige is open and in front of you. They show up when Paige is in the background, on another tab, or closed.
+
+### Alert sound
+
+Paige also plays a short sound in your browser when a chat is assigned to you, and when a customer messages a chat assigned to you that isn't open on your screen. It's on by default.
+
+To turn it off, click your picture at the top right and untick **Alert sound**. On a phone it's a switch in the **☰** menu, and it's also in **Settings → Notifications**. The setting is for that browser only, and it works whether or not notifications are on.
+
+- **No sound on the first alert?** Browsers only let a page play sound after you've clicked on it, so click anywhere in Paige once after opening it. Some phones don't allow it at all; you still get the notification.
+- **Fewer sounds than messages?** That's on purpose. A run of messages from one person plays one sound every 30 seconds, and when many chats are assigned to you at once you hear one a minute.
+- **Which project?** The sound only plays for the project you have open. Another project's chats still get a notification.
+- If your access is **Only assigned**, there's no sound or notification for chats you can't see.
 
 Push notifications aren't the only heads-up Paige can give you. You can also ask for an **email** in any month your bot uses up its 1,000 free WhatsApp service messages. That one is switched on per project in **Tools → Message Costs**, in the **Email reminder** card, not here, and it's for bots hosted by Paige only. See [Get an email when the free messages run out](/guides/message-costs#get-an-email-when-the-free-messages-run-out).
 
-If you've blocked notifications for Paige, the switch is disabled and can't be re-enabled from inside Paige — you'll need to allow them again in your browser or phone settings, then reload.
+### If notifications are blocked
+
+If you've blocked notifications for Paige, Paige can't ask again. The account menu reads **Notifications are blocked** and tells you what to do: in a browser, use the icon next to the web address to set Notifications to **Allow**, then reload the page. In the installed app, open your device's settings, find Paige under Notifications and allow them, then reopen Paige.
+
+If you don't see a way to turn notifications on at all, your browser can't receive them.
 
 ## Offline
 
