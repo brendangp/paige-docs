@@ -86,13 +86,13 @@ Roles define what each member can see and do within a workspace.
 
 <AccordionGroup>
   <Accordion title="Owner" icon="crown">
-    The owner has full control over the workspace — managing members, updating settings, transferring projects, and deleting the workspace. Each workspace has exactly one owner. The owner can transfer ownership to another member.
+    The owner has full control over the workspace — managing members, updating settings, managing billing, transferring projects, and deleting the workspace. Each workspace has exactly one owner. The owner can transfer ownership to another member.
   </Accordion>
   <Accordion title="Admin" icon="shield">
-    Admins can invite and remove members, manage projects within the workspace, and update workspace settings. They cannot delete the workspace or transfer ownership.
+    Admins can invite and remove members, manage projects within the workspace, update workspace settings, and manage billing and credits for the workspace's projects. They cannot delete the workspace or transfer ownership.
   </Accordion>
   <Accordion title="Member" icon="user">
-    Members have access to the projects shared within the workspace. Their specific abilities within a project depend on the permissions assigned to them. Members cannot manage other members or change workspace settings.
+    Members have access to the projects shared within the workspace. Their specific abilities within a project depend on the permissions assigned to them. Members cannot manage other members, change workspace settings, or manage billing.
   </Accordion>
 </AccordionGroup>
 
@@ -138,6 +138,12 @@ Connecting an AI agent to a workspace project — and managing the agents alread
 </Warning>
 
 The same rule covers the **Connected agents** card: on a workspace project, only owners and admins can see which agents are connected or disconnect them. See [Connect an AI agent](/guides/connect-an-agent).
+
+### Billing and credits
+
+Billing on a workspace project is **restricted to the workspace owner and admins**, whatever switches a member has. Only they see **Settings → Billing** and **Settings → Usage**, and only they can subscribe, change the card, pause or cancel, buy credits, edit billing details or set the Low Credit Alert.
+
+Members still use the project's credits when they chat with Paige. When the balance runs low or runs out, they see a note above the chat box asking them to have the project owner or a workspace admin top up. See [Who can manage billing](/guides/billing#who-can-manage-billing).
 
 ## Transfer a project into a workspace
 
