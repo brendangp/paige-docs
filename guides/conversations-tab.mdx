@@ -17,7 +17,8 @@ For the underlying model — contacts, conversation state, handover, and the 24-
 Every contact who has messaged your bot appears in the left-hand list, most recent at the top, with a preview of the last message.
 
 - **Search** the list by name or phone number with the box at the top.
-- **Filter by state** with the **All states** dropdown to show only conversations in a particular [state](/concepts/conversations#conversation-state) — for example everyone currently in handover.
+- **Filter by state** with the **All states** dropdown under the search box to show only conversations in a particular [state](/concepts/conversations#conversation-state) — for example everyone currently in handover.
+- **Filter by tag** with the **Tags** dropdown next to it, to show only the chats whose contact carries one of the tags you pick. See [Filtering the list by tag](#filtering-the-list-by-tag).
 - **Filter by who has it** with the row of buttons above the list — **All**, **Unassigned**, **Mine**, **Archived**, and for managers one per team member. See [Assigning conversations](#assigning-conversations) and [Archiving a chat](#archiving-a-chat).
 - **See who's answering** from the small badge on each assigned contact, with that person's initials and name, or **You** when it's yours.
 
@@ -182,6 +183,26 @@ Each change saves on its own as soon as you make it — there's no Save button. 
 
 Tags added here work exactly like tags added anywhere else, so a segment built on `vip` picks this contact up straight away and your next broadcast to that segment reaches them.
 
+## Filtering the list by tag
+
+When you want to work through one group of customers — your VIPs, everyone from a campaign, a grade — filter the contact list by their tags instead of scrolling.
+
+Under the search box there are two dropdowns side by side: **State** and **Tags**. Click **Tags** (on a phone it opens from the bottom of the screen) and you'll see every tag your contacts carry, busiest first, with how many contacts have each. Type in **Find a tag** to narrow the list, then tick the tags you want.
+
+- **The list changes as soon as you tick.** There's no Apply button.
+- **Ticking several tags shows chats with any of them.** Tick `vip` and `cma25` and you see everyone tagged `vip`, everyone tagged `cma25`, and everyone with both.
+- **The tags you picked show under the dropdowns.** Tap one to take it off, or tap **Clear** to remove them all. The dropdown reads **Tags** when nothing is picked, and names your picks otherwise — for example *vip, cma25*, or *vip +2* when there are more than fit.
+- **It works with everything else.** The tag filter combines with your search, the state filter and the **All** / **Unassigned** / **Mine** buttons. Archived chats stay out of the list unless you're on **Archived**.
+- **Tags must match exactly.** An older `VIP` with a capital is a different tag from `vip`, just as it is for [segments](/guides/broadcasts/segments), so the list shows the same people a segment on that tag would reach.
+
+If no chat carries the tags you picked, the list says **No chats with these tags**, with a **Clear tag filter** button. If your project has no tags yet, the dropdown tells you how to add one: open a chat and tag the contact from its header (see [Tagging a contact while you're talking to them](#tagging-a-contact-while-youre-talking-to-them)).
+
+The list keeps itself up to date while a tag filter is on. If you take the last picked tag off the contact you have open, it drops out of the list, but the chat stays open. If a picked tag is renamed or deleted elsewhere, it's removed from your filter and a short message tells you so. Your picks reset when you switch project or reload the page.
+
+If you can only see the chats assigned to you, you still see every tag name in the dropdown, just without the counts.
+
+Your own apps and connected AI agents can filter the same way when they list conversations, if their key or connection holds `conversations:read`: the `tags` filter on `GET /v1/conversations` and on the [`list_conversations` tool](/guides/agent-tools#conversations-and-messaging). The same rules apply: a chat shows up when its contact has any of the tags, and the tags must match exactly.
+
 ## Notes for your team
 
 Notes are private messages to your team about a contact: *"wants a callback after 3pm"*, *"already sent the quote"*, *"upset about the delivery, be gentle"*. They are **never sent to the contact**. They aren't WhatsApp messages and don't go anywhere outside Paige.
@@ -225,7 +246,7 @@ Assigning doesn't send the contact anything, and it doesn't change the conversat
 | --- | --- |
 | **Manager** | The filters, every conversation's assignee, and the **Assign** control. |
 | **All conversations** | The **All**, **Unassigned**, **Mine** and **Archived** filters and who each conversation is assigned to. You can't assign. |
-| **Only assigned** | Just your own conversations, with only **All** and **Archived** to choose between. You can reply, send templates and files, take a conversation over, tag the contact and read and write its notes. |
+| **Only assigned** | Just your own conversations, with only **All** and **Archived** to choose between. You can reply, send templates and files, take a conversation over, tag the contact, filter by tag (the tag list shows names without counts) and read and write its notes. |
 
 If you're on **Only assigned** and a manager takes a conversation away from you while you have it open, it closes with a short note. A conversation assigned to you appears in your list straight away. If nothing is assigned to you yet, the list says so.
 

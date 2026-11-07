@@ -88,6 +88,20 @@ At runtime it works like a short conversation between WhatsApp and your bot:
 
 Because the flow and your bot are two halves of one thing, ask for changes to a dynamic flow in the chat rather than editing either half on its own. That's how they stay in step.
 
+### `action` can't be a payload key
+
+When a screen asks your bot for the next step, it sends along a few values, such as which item was tapped. None of them can be called `action`. WhatsApp's request to your bot already has its own `action` field, so a value of the same name never reaches your bot, and the flow quietly keeps showing the same screen. Name it `component_action` instead:
+
+```json
+{ "component_action": "select_event", "event_id": "evt_1" }
+```
+
+Paige's flow check refuses a dynamic flow that uses `action` and says to use `component_action`, so a flow Paige builds or changes never ships with it. An existing bot still deploys as before.
+
+<Tip>
+  Each tap on a dynamic flow writes a line to your [logs](/guides/logs#logs-from-dynamic-flows) saying which screen your bot sent back. If a flow keeps landing on the wrong screen, look there first.
+</Tip>
+
 ## Going live
 
 <Warning>
