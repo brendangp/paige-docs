@@ -2257,7 +2257,7 @@
           "Conversations"
         ],
         "summary": "List conversations (state filter, keyset cursor)",
-        "description": "List conversations (state filter, keyset cursor)\n\n**Required scope:** `conversations:read`",
+        "description": "List conversations (state filter, keyset cursor)\n\n`tags` keeps only conversations whose contact carries ANY of the given tags, matched exactly and case-sensitively as stored (`tags=VIP` does not match `vip`). Send several as REPEATED keys (`?tags=vip&tags=cma25`); a value is never split on commas, because a tag name may contain one. The filter applies before paging and combines with `state`. A phone-less (BSUID-only) chat matches through the `wa_user_id` of its contact. A project whose contacts have no `tags` column answers an empty page.\n\n**Required scope:** `conversations:read`",
         "security": [
           {
             "ApiKeyAuth": []
@@ -2289,8 +2289,20 @@
           },
           {
             "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Contact tags, ANY match, exact and case-sensitive (`VIP` does not match `vip`). Repeat the key for several tags (`tags=vip&tags=cma25`); never comma-separated. At most 20 tags, each at most 64 characters, no control characters; more, or a longer name, is `400 invalid_request`. Values are trimmed and blanks ignored. Keep the same tags across pages."
+            },
+            "required": false,
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "schema": {
               "type": "string",
-              "description": "Opaque nextCursor from a prior page."
+              "description": "Opaque nextCursor from a prior page. Keep the same `tags` value across pages."
             },
             "required": false,
             "name": "cursor",

@@ -33,7 +33,7 @@ It's the first thing a well-behaved agent calls, and the only tool that needs no
 
 | Tool | What it does | Scope |
 | --- | --- | --- |
-| `list_conversations` | Lists the project's WhatsApp conversations, so the agent can answer questions about who's been in touch and about what. Archived chats are included unless the agent passes `archived: exclude`; `archived: only` lists just those. | `conversations:read` |
+| `list_conversations` | Lists the project's WhatsApp conversations, so the agent can answer questions about who's been in touch and about what. Archived chats are included unless the agent passes `archived: exclude`; `archived: only` lists just those. `tags` (up to 20) keeps only chats whose contact carries any of the given tags; tags match exactly, capitals included, so `VIP` doesn't match `vip`. | `conversations:read` |
 | `send_message` | Sends a free-form WhatsApp message from the project's number. Only works inside WhatsApp's 24-hour window — outside it, the send fails with `outside_24h_window`. | `messages:send` |
 | `archive_chat` | [Archives a contact's chat](/guides/conversations-tab#archiving-a-chat), so it leaves the Conversations lists except **Archived**. The assignee is kept. A chat in handover goes back to the bot, so don't use it on a chat a person is still answering. Safe to repeat. | `conversations:write` |
 | `unarchive_chat` | Brings a contact's chat back from **Archived**, to its assignee or to **Unassigned**. Doesn't change the conversation's state. Safe to repeat. | `conversations:write` |

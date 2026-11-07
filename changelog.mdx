@@ -10,6 +10,9 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ### New features
 
+- **Filter your conversations by tag.** A new **Tags** dropdown next to the state filter in the Conversations tab shows only the chats whose contact carries any of the tags you pick. It combines with search, the state filter and the assignment buttons, and on a phone it opens from the bottom of the screen. See [Filtering the list by tag](/guides/conversations-tab#filtering-the-list-by-tag).
+- **Filter conversations by tag from your own apps and agents.** `GET /v1/conversations` and the MCP `list_conversations` tool take a `tags` filter: send each tag as its own `tags=` key (`?tags=vip&tags=cma25`), up to 20. A conversation matches when its contact has any of them, and tags match exactly, capitals included. See [Agent tools](/guides/agent-tools#conversations-and-messaging).
+- **Dynamic flow taps show up in your logs.** Each tap on a dynamic flow writes what your bot logged and one line saying which screen it sent back, or why it failed. See [Logs from dynamic flows](/guides/logs#logs-from-dynamic-flows).
 - **Turn on notifications without opening Settings.** When you open a project with the Conversations tab, Paige offers a **Turn on notifications** message: click **Enable**, then **Allow**. It's also in your account menu at the top right, or the **☰** menu on a phone, for everyone, including people without Settings. Paige doesn't need to be installed, except on iPhone and iPad, where the message shows you how to add it to your Home Screen first. See [Notifications](/guides/mobile-app#turning-them-on).
 - **An alert sound when a chat needs you.** Paige plays a short sound when a chat is assigned to you, or a customer messages a chat assigned to you that isn't on your screen. It's on by default; untick **Alert sound** in the account menu or **Settings → Notifications** to turn it off. See [Alert sound](/guides/mobile-app#alert-sound).
 - **Notifications while Paige is open.** You now get a notification for any chat other than the one you're looking at, and clicking it opens that chat in the window you already have. See [While Paige is open in front of you](/guides/mobile-app#while-paige-is-open-in-front-of-you).
@@ -21,6 +24,11 @@ Track new features, improvements, and fixes shipped to Paige.
 - **One Usage row per request.** When one thing you ask for takes several replies, Usage shows them as one row with the total. Tap **parts** to see what each reply cost. The cost line under the chat box now reads **This reply**. See [The Usage page](/guides/billing#the-usage-page).
 - **Every prompt uses credits, questions to Help included.** A small question costs very little. At zero credits the chat won't start a new request on any agent. If you can manage billing, **Buy credits** in the warning above the chat box opens the purchase right there. See [Low-credit warning and zero-balance gating](/guides/billing#low-credit-warning-and-zero-balance-gating).
 - **Only owners and admins can manage billing.** Subscribing, changing the card, pausing or cancelling, buying credits, billing details and the Low Credit Alert are limited to the project owner or a workspace owner or admin. Other members still use credits and are asked to have an owner or admin top up. See [Who can manage billing](/guides/billing#who-can-manage-billing).
+
+### Fixes
+
+- **Paige can confirm a flow is live on Paige Dev.** When it checks a flow, Paige now reports the Paige Dev copy separately from the one on your own number, so a project without its own WhatsApp number no longer sees a flow on Paige Dev reported as not uploaded. See [Paige Dev and your own number](/guides/flows/testing-and-publishing#paige-dev-and-your-own-number).
+- **`action` is refused as a dynamic flow payload key.** WhatsApp drops a value called `action`, so the bot never received it. Paige's flow check now refuses it and uses `component_action` instead. See [`action` can't be a payload key](/guides/flows/dynamic-flows#action-cant-be-a-payload-key).
 
 ## October 2026
 

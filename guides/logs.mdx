@@ -121,6 +121,22 @@ console.log("Order found:", order.id, "status:", order.status);
   </Card>
 </CardGroup>
 
+## Logs from dynamic flows
+
+A [dynamic flow](/guides/flows/dynamic-flows) asks your bot for its next screen every time someone taps through it, and those requests show up here too. For each tap you see anything your bot wrote while working out the next screen, plus one line saying what was tapped, which screen it was on and which screen your bot sent back:
+
+```
+[flow] data_exchange component_action=select_event on EVENTS_LIST → returned EVENT_DETAILS
+```
+
+If your bot failed to answer — it took too long, crashed, or has no flow handler — you see an error line instead. These lines show the flow's name where the contact usually is. Taps on [Paige Dev](/guides/testing) land under **Preview**, and taps on your own number under **Production**.
+
+This is often the quickest way to see why a flow keeps showing the wrong screen: the line tells you exactly which screen your bot returned. The Code agent reads these lines too.
+
+<Note>
+  Paige never writes what your customers typed into the flow to these lines. Only what your own bot code logs appears alongside them. The automatic check Paige runs on a flow while building it doesn't add anything here, so the logs only show real taps.
+</Note>
+
 ## Let the Code agent read your logs
 
 You don't have to diagnose things from the logs yourself. The Code agent reads these same entries — just describe the symptom in chat and it will go and look:
