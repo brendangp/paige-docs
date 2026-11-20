@@ -10,6 +10,10 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ### New features
 
+- **Let Preview read from your own system.** In **Tools → Preview APIs**, project owners and admins can name the hosts your Preview chat may read from for real (GET requests only), so a bot that looks things up elsewhere shows real answers instead of its "not found" reply. Writes stay faked, WhatsApp can never be added, and the automatic tests never use the list. See [Let Preview read from your own system](/guides/preview-tab#let-preview-read-from-your-own-system).
+- **Broadcast variables can use fields from your own backend.** If your project sends through your own backend and it offers extra fields such as a school or grade, the **Variables** step lists them under **From your bot**, and each person gets their own value. See [Building a broadcast](/guides/broadcasts#building-a-broadcast).
+- **Paige checks the build against the exact details you gave.** On the new AI engine, field names, request bodies, headers and reply text from your message are copied word for word into the plan, under **Show details**. After the build, a **Request check** line names any that the code doesn't use exactly. See [Exact details from your request](/agents/code-agent#exact-details-from-your-request).
+
 - **Filter your conversations by tag.** A new **Tags** dropdown next to the state filter in the Conversations tab shows only the chats whose contact carries any of the tags you pick. It combines with search, the state filter and the assignment buttons, and on a phone it opens from the bottom of the screen. See [Filtering the list by tag](/guides/conversations-tab#filtering-the-list-by-tag).
 - **Filter conversations by tag from your own apps and agents.** `GET /v1/conversations` and the MCP `list_conversations` tool take a `tags` filter: send each tag as its own `tags=` key (`?tags=vip&tags=cma25`), up to 20. A conversation matches when its contact has any of them, and tags match exactly, capitals included. See [Agent tools](/guides/agent-tools#conversations-and-messaging).
 - **Dynamic flow taps show up in your logs.** Each tap on a dynamic flow writes what your bot logged and one line saying which screen it sent back, or why it failed. See [Logs from dynamic flows](/guides/logs#logs-from-dynamic-flows).
@@ -20,6 +24,9 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ### Changes
 
+- **Tests that need a secret you haven't added are skipped, not failed.** The reply names the secrets to add, and Paige doesn't change your bot or spend credits trying to fix it. See [When a test needs a missing secret](/agents/code-agent#when-a-test-needs-a-missing-secret).
+- **Automatic tests use made-up answers for outside services.** A test can carry its own answers for the APIs your bot calls, so it reaches your bot's normal path instead of its error reply. See [Automatic tests use made-up answers](/guides/preview-tab#automatic-tests-use-made-up-answers).
+- **API reference updated.** Build results report `tests.missing_secrets` and a plan's `literals`, and assembling a broadcast with a field the project can't fill is refused with `400 UNKNOWN_VARIABLE_FIELD`. The reference now also lists the archive, chat and plan-decision endpoints. See the [API reference](/api-reference/introduction).
 - **A simpler Usage page, with prompts left.** **Settings → Usage** shows your balance and about how many prompts it still buys, and the history has five columns: **Date**, **Prompt**, **Steps**, **Credits** and **Balance**. You see the text of your own prompts only; a teammate's reads **Prompt by** and their name. See [The Usage page](/guides/billing#the-usage-page).
 - **One Usage row per request.** When one thing you ask for takes several replies, Usage shows them as one row with the total. Tap **parts** to see what each reply cost. The cost line under the chat box now reads **This reply**. See [The Usage page](/guides/billing#the-usage-page).
 - **Every prompt uses credits, questions to Help included.** A small question costs very little. At zero credits the chat won't start a new request on any agent. If you can manage billing, **Buy credits** in the warning above the chat box opens the purchase right there. See [Low-credit warning and zero-balance gating](/guides/billing#low-credit-warning-and-zero-balance-gating).
@@ -27,6 +34,7 @@ Track new features, improvements, and fixes shipped to Paige.
 
 ### Fixes
 
+- **Preview picks up a new secret straight away.** A secret you add, change or delete in **Tools → Secrets** reaches your Preview chat from your next message. See [How secrets work](/guides/secrets#how-secrets-work).
 - **Paige can confirm a flow is live on Paige Dev.** When it checks a flow, Paige now reports the Paige Dev copy separately from the one on your own number, so a project without its own WhatsApp number no longer sees a flow on Paige Dev reported as not uploaded. See [Paige Dev and your own number](/guides/flows/testing-and-publishing#paige-dev-and-your-own-number).
 - **`action` is refused as a dynamic flow payload key.** WhatsApp drops a value called `action`, so the bot never received it. Paige's flow check now refuses it and uses `component_action` instead. See [`action` can't be a payload key](/guides/flows/dynamic-flows#action-cant-be-a-payload-key).
 

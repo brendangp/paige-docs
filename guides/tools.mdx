@@ -34,6 +34,9 @@ Your bot is more than its code. It needs somewhere to keep data, somewhere to ke
   <Card title="Message Costs" icon="calculator" href="/guides/message-costs">
     What WhatsApp charges you for the messages your bot sends, on Meta’s current rates — plus an audit that finds places to send fewer.
   </Card>
+  <Card title="Preview APIs" icon="globe" href="/guides/preview-tab#let-preview-read-from-your-own-system">
+    Name the hosts your Preview chat may read from for real, so a bot that looks things up in another system shows real answers. Owners and admins only.
+  </Card>
 </CardGroup>
 
 ## How Tools relates to Deploy
@@ -50,6 +53,8 @@ This trips people up, so it's worth being explicit — the six infrastructure se
 | **Scheduled Tasks** | **Live only.** Tasks always run your deployed code — you can't schedule a file you haven't deployed. |
 
 <Note>
+  **Preview APIs** isn't in the table either. It only changes what your Preview chat reads; your live bot always calls outside services for real.
+
   **Message Costs** isn't in the table because there's nothing to deploy. It only reads — your messages, your flows and your bot's code — and reports. The one exception is its **Send fewer messages** audit, which edits your *preview* bot and then waits for you to deploy like any other change.
 </Note>
 

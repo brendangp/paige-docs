@@ -124,6 +124,10 @@ A well-behaved agent reads before it writes. `update_flow` addresses a flow **by
   This isn't the agent being polite about it. The rule lives in Paige's own platform layer, so it holds for a connected agent, for a raw API call, and for anything else that ever talks to Paige. Asking an agent to "just send it" cannot work.
 </Warning>
 
+### Which fields a variable can use
+
+A template variable mapped to a field must name a contact field (`name`, `number` or `username`) or, on a project that sends through its own backend, one of the extra fields that backend offers, such as `school`. Any other field is refused with `UNKNOWN_VARIABLE_FIELD`, and the error message lists the fields the project offers. See [Extra fields from your bot](/guides/broadcasts#building-a-broadcast).
+
 An agent that could send a promotion to four thousand people because it misread a sentence is not a good agent. So the agent does the tedious part — the audience, the template, the variables, the schedule — and the decision stays yours.
 
 <Note>

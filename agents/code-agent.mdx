@@ -92,6 +92,32 @@ Ask it to fill one in and it reads the file **once**, then stops and shows you a
 
 That pause is the point. The list it writes code against is a decision you made, not one it guessed, and the code that comes out fills in the same blanks the same way every time, with no AI at send time. See [Documents](/guides/documents).
 
+## Tests after a build
+
+On projects using Paige's new AI engine, Paige tests your bot when a build finishes. It plays your bot's test scenarios (the goals a user has, like "book a table") through the preview, tries to fix what fails, and ends its reply with which scenarios passed and which failed. These tests only ever talk to the preview bot, so no customer gets a message.
+
+The tests never read your real systems. Each test can carry made-up answers for the outside services your bot calls, so it reaches your bot's normal path instead of its error reply. See [Automatic tests use made-up answers](/guides/preview-tab#automatic-tests-use-made-up-answers).
+
+### When a test needs a missing secret
+
+If your bot reads a [secret](/guides/secrets), such as an API key, that isn't set yet, no change to the code can make its tests pass. Paige skips those tests instead of failing them, and the reply or test card says so by name, for example:
+
+> Tests couldn't run: add BOOKING_API_KEY in Settings → Secrets.
+
+When only some tests needed the missing secret, the card shows the usual pass count with *Some tests couldn't run* and the names to add.
+
+Add the secrets in **Tools → Secrets**, then ask Paige to run the tests again. Paige doesn't change your bot or spend credits on fix tries for a missing secret, and later builds report the same thing without re-running those tests until you add it. Names that Paige or a [connector](/integrations) sets for your bot are never reported as missing.
+
+## Exact details from your request
+
+On projects using Paige's new AI engine, when a request is big enough for Paige to show you a plan first and your message spells out exact details, Paige copies them word for word into the plan. Those details are field names, a request body, headers, a key format, a URL path or the exact reply text. Tap **Show details** on the plan card and they're listed under **Exact details from your message**, so you can spot a missing or wrong one and ask for changes before you approve.
+
+After the build, Paige checks the code for each one. If one is missing or written differently, the reply ends with a **Request check** line naming it, and the name the code used instead when there is one:
+
+> **Request check:** `supervisor_id` (it has `supervisorId`) from your message is not in the code this build wrote. Check it, or ask me to use it exactly.
+
+The check never changes anything by itself. If the difference matters, ask Paige to use the exact value. When every detail is in the code, there's no line.
+
 ## How a new bot starts
 
 When you ask the Code Agent to build a new bot, it begins from one of two starter templates depending on the kind of bot you want.

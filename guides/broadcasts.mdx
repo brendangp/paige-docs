@@ -45,6 +45,12 @@ Click **New Broadcast** and you'll go through six steps.
     - **Contact field** — each person's own **Full name**, **Phone number**, or **Username**.
 
     A contact field is what turns one template into a personal message. The preview below shows how it'll read.
+
+    **Extra fields from your bot.** If your project runs on your own backend and that backend keeps extra details about the people you message, such as their school or grade, the field list can show those too. They appear under **From your bot**, below the contact fields, labelled like **School (from your bot)**, and each person gets their own value. Someone your bot has no value for is skipped and shows as failed, rather than getting a half-filled message.
+
+    These fields appear only if your backend offers them; whoever looks after it will know each one as a `field:` capability, such as `field:school`. If your developer has just added one, open **Settings → Project** and click **Repair broadcasting** first so Paige picks it up. In a test send Paige doesn't have the real value, so the message shows the field's name in brackets instead, like **[School]**.
+
+    If you reuse a broadcast whose field your backend no longer offers, the wizard tells you that placeholder uses a field this project can't fill, and you choose another field to continue.
   </Step>
   <Step title="Audience">
     Either pick one or more [saved segments](/guides/broadcasts/segments), or build a one-off filter here from tags. The tag box lists the tags your contacts already carry with a count beside each, so you can see what you're about to reach before you pick — see [Tags](/guides/broadcasts/segments#building-one). **Opted in only** is on by default — leave it that way.

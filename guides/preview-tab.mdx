@@ -30,7 +30,7 @@ You're not limited to text:
 
 Preview never sends a real WhatsApp message, even if your bot's code sends with a real access token saved in your [secrets](/guides/secrets). The message shows up in the phone instead of going out.
 
-It doesn't contact your other outside services either. Calls to places like Airtable, Slack, Yoco or your own systems are faked rather than performed, so nothing is written there. That's also why a preview run can come back empty where [Paige Dev](/guides/testing) returns real records.
+It doesn't contact your other outside services either. Calls to places like Airtable, Slack, Yoco or your own systems are faked rather than performed, so nothing is written there. That's also why a preview run can come back empty where [Paige Dev](/guides/testing) returns real records, unless you [let Preview read from that system](#let-preview-read-from-your-own-system).
 
 The one exception is your bot's AI. Calls to OpenAI or Anthropic still go out, so your bot can answer normally in Preview, and they're billed to your own key.
 
@@ -39,6 +39,42 @@ The one exception is your bot's AI. Calls to OpenAI or Anthropic still go out, s
 </Note>
 
 Treat Paige Dev, not Preview, as the accurate test of what your bot really does.
+
+### Let Preview read from your own system
+
+If your bot looks things up in another system, such as a booking system, a supervisor list or a stock API, the faked empty answer means Preview only ever shows your bot's "not found" or error reply. You can let Preview read from that system for real in **Tools → Preview APIs**.
+
+<Steps>
+  <Step title="Open Tools → Preview APIs">
+    Find the card headed **Real API reads in Preview**. With no hosts added it says *No hosts yet: every outside call in Preview is faked.*
+  </Step>
+  <Step title="Add the host">
+    Under **Add a host**, type just the host of the system, like `api.example.com`, and click **Add host**. If you paste a full web address, Paige keeps only the host.
+  </Step>
+  <Step title="Send a Preview message">
+    From your next Preview message, your bot's requests that **read** from that host (GET requests) go to the real system.
+  </Step>
+</Steps>
+
+What still holds once a host is added:
+
+- **Only reads are real.** Anything that would change data there (POST, PUT, PATCH or DELETE) is still faked.
+- **Only that exact host.** Adding `api.example.com` doesn't cover `www.example.com`; add each host you need, up to 20.
+- **Secure addresses only.** The read goes out only for an `https://` address on the normal port. A redirect isn't followed: your bot gets the redirect answer itself.
+- **WhatsApp can never be added.** WhatsApp sends from Preview are always captured, and Paige refuses any `facebook.com` host.
+- **The automatic tests never use this list.** They use made-up answers instead. See [Automatic tests use made-up answers](#automatic-tests-use-made-up-answers).
+
+To stop, click the bin icon beside a host. Preview fakes it again from your next message.
+
+<Note>
+  Only the project owner and workspace owners or admins see **Preview APIs**, and it isn't offered for a bot that runs on your own server, because that bot doesn't run in Paige's Preview.
+</Note>
+
+{/* TODO: screenshot of Tools → Preview APIs with one host added */}
+
+### Automatic tests use made-up answers
+
+On projects using Paige's new AI engine, Paige tests your bot through the preview after a build. Those tests never read your real systems, not even hosts you added above, so they give the same result every time. Instead, each test can carry made-up answers for the outside services your bot calls (for example *"this supervisor exists, named Sam"*), so the test reaches your bot's normal path rather than its error reply. Paige writes those answers itself, and its test report tells it which outside services still got an empty answer. See [Tests after a build](/agents/code-agent#tests-after-a-build).
 
 ## Tap a URL button
 

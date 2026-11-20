@@ -73,7 +73,7 @@ Your bot is CommonJS JavaScript running in a locked-down Node worker. There is n
 | Driving a browser, or sending email directly. `puppeteer` and `nodemailer` are not installed. | Call a hosted API for it with `axios`. |
 
 <Note>
-  **Preview doesn't reach outside services.** Calls made with `axios`, `fetch`, `node-fetch` and the `openai` client are faked, and WhatsApp sends are captured rather than delivered. The one exception is your bot's AI: calls to OpenAI or Anthropic through `fetch`, `node-fetch` or the `openai` client still go out and are billed to your own key. **[Paige Dev](/guides/testing) is different:** it calls outside services for real, so bear that in mind before testing anything that charges money or sends a message. See [What Preview doesn't touch](/guides/preview-tab#what-preview-doesnt-touch).
+  **Preview doesn't reach outside services.** Calls made with `axios`, `fetch`, `node-fetch` and the `openai` client are faked, and WhatsApp sends are captured rather than delivered. The one exception is your bot's AI: calls to OpenAI or Anthropic through `fetch`, `node-fetch` or the `openai` client still go out and are billed to your own key. You can also let Preview make real reads (GET requests) from hosts you name in **Tools → Preview APIs**; writes to them stay faked. **[Paige Dev](/guides/testing) is different:** it calls outside services for real, so bear that in mind before testing anything that charges money or sends a message. See [What Preview doesn't touch](/guides/preview-tab#what-preview-doesnt-touch).
 </Note>
 
 ## Flows

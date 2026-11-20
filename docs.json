@@ -274,6 +274,10 @@
   },
   "redirects": [
     {
+      "source": "/api-reference/endpoints/conversations/list-conversations-state-filter-keyset-cursor",
+      "destination": "/api-reference/endpoints/conversations/list-conversations-state-+-archive-filter-keyset-cursor"
+    },
+    {
       "source": "/api-reference/endpoints/broadcasts/assemble-a-broadcast-—-always-lands-in-pending_approval-never-sends",
       "destination": "/api-reference/endpoints/broadcasts/assemble-a-broadcast-for-approval"
     },
